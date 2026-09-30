@@ -8,7 +8,11 @@ The code and analysis results can be viewed on our [analysis webpage](add link h
 
 ## Abstract
 
-Text will go here
+Studying gene expression during human development is challenging due to limited access to samples from live fetuses. Amniotic fluid (AF) provides a unique source of live fetal cells without disturbing fetal development. We hypothesised that single-cell RNA-sequencing (scRNA-seq) analysis of AF samples could yield novel insights into human development. We performed scRNA-seq on AF samples from seven euploid and structurally normal second trimester pregnancies (15-25 weeks gestation), all of which resulted in live births of healthy term infants. Despite the presence of debris in AF and variable sample quality, we identified 11,414 cells across all samples following mapping to a modified transcriptome, empty droplet removal and quality filtering. Cell types were annotated using both unsupervised clustering and a supervised method, *CellTypist*, with its inbuilt *Pan_Fetal_Human* and *Developing_Human_Organs* references.
+
+Fetal skin cells emerged as the most abundant cell type in AF, followed by other epithelial, myeloid and lymphoid cell types. Marker gene and Gene Ontology analyses confirmed the epithelial or immune lineage of each cluster. We also observed significant gestational age–related shifts in cell type composition; distal lung epithelial cells, for instance, were detected in later-gestation samples, coinciding with the canalicular phase of lung development. Furthermore, differential expression analysis of fetal skin cells between earlier and later gestational age revealed numerous genes changing across this prenatal development period and were validated in an independent dataset. This independent dataset and our dataset have been provided together as an annotated, integrated fetal cell atlas of 45,048 cells as a resource for the community.
+
+This study applied novel analytical approaches to demonstrate proof-of-concept for the utility of scRNA-seq in characterising AF and demonstrating its capacity to capture a diverse range of viable fetal cell types. Our results suggest that changes in AF cellular composition mirror organ development, underscoring the potential of AF scRNA-seq to deepen our understanding of normal and pathological fetal biology.
 
 ## Authors and Affiliations
 
