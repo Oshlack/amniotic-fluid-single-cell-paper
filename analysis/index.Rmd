@@ -26,7 +26,7 @@ library(sessioninfo)
 
 # Authors
 
-Calandra Grima^1,2^, Ishara Atukorala^3,4^, Sally Beard^3^, Shalini Guleria^5^, Liam Neil^5^, Natalie Hannan^3^, Bhupinder Pal^5^, Jovana Maksimovic^1,2,6^, Lisa Hui\*^3,4,7^, Alicia Oshlack\*^1,2,8^
+Calandra Grima^1,2^, Ishara Atukorala^3,4^, Sally Beard^3^, Shalini Guleria^5^, Liam Neil^5^, Natalie Hannan^3^, Bhupinder Pal^5^, Jovana Maksimovic\*^1,2,6^, Lisa Hui\*^3,4,7^, Alicia Oshlack\*^1,2,8^
 
 1.  Peter MacCallum Cancer Centre, Computational Biology Program, Parkville, Australia
 2.  The Sir Peter MacCallum Department of Oncology, University of Melbourne, Parkville, Australia
