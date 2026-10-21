@@ -8,24 +8,26 @@ The code and analysis results can be viewed on our [analysis webpage](https://os
 
 ## Abstract
 
-Studying gene expression during human development is challenging due to limited access to samples from live fetuses. Amniotic fluid (AF) provides a unique source of live fetal cells without disturbing fetal development. We hypothesised that single-cell RNA-sequencing (scRNA-seq) analysis of AF samples could yield novel insights into human development. We performed scRNA-seq on AF samples from seven euploid and structurally normal second trimester pregnancies (15-25 weeks gestation), all of which resulted in live births of healthy term infants. Despite the presence of debris in AF and variable sample quality, we identified 11,414 cells across all samples following mapping to a modified transcriptome, empty droplet removal and quality filtering. Cell types were annotated using both unsupervised clustering and a supervised method, *CellTypist*, with its inbuilt *Pan_Fetal_Human* and *Developing_Human_Organs* references.
+**Background:** Human fetal development is difficult to study due to ethical and practical constraints on the collection and use of human fetal tissue. Amniotic fluid (AF) is routinely collected during clinical amniocentesis and contains live fetal cells shed from developing tissues. Thus, we use single-cell RNA-sequencing (scRNA-seq) to build the first cell atlas of amniotic fluid from healthy second trimester fetuses. 
 
-Fetal skin cells emerged as the most abundant cell type in AF, followed by other epithelial, myeloid and lymphoid cell types. Marker gene and Gene Ontology analyses confirmed the epithelial or immune lineage of each cluster. We also observed significant gestational age–related shifts in cell type composition; distal lung epithelial cells, for instance, were detected in later-gestation samples, coinciding with the canalicular phase of lung development. Furthermore, differential expression analysis of fetal skin cells between earlier and later gestational age revealed numerous genes changing across this prenatal development period and were validated in an independent dataset. This independent dataset and our dataset have been provided together as an annotated, integrated fetal cell atlas of 45,048 cells as a resource for the community.
+**Methods:** scRNA-seq was performed on AF samples collected from seven euploid, structurally normal pregnancies at 15–25 weeks’ gestation, all of which resulted in live births of healthy term or near-term infants. Mapping to a modified transcriptome was used to help reduce counts sparsity. Supervised cell type annotation, unsupervised clustering and marker gene analyses were used to determine the cell types present in AF. Gestational age-related differences between earlier (≤ 19 weeks) and later (≥ 23 weeks) gestation samples were examined using differential gene expression (DGE) and differential proportion analyses.
 
-This study applied novel analytical approaches to demonstrate proof-of-concept for the utility of scRNA-seq in characterising AF and demonstrating its capacity to capture a diverse range of viable fetal cell types. Our results suggest that changes in AF cellular composition mirror organ development, underscoring the potential of AF scRNA-seq to deepen our understanding of normal and pathological fetal biology.
+**Results:** Fetal skin cells were the most abundant cell type in AF, followed by myeloid and lymphoid cell types. We observed significant gestational age–related shifts in cell type composition, with an increased proportion of lung epithelium cells in later-age samples, coinciding with the canalicular phase of lung development. DGE analysis of fetal skin cells between earlier and later gestation revealed numerous gene expression changes that recapitulated known developmental processes across the second trimester. These were also enriched in an independent AF dataset from pregnancies with diverse fetal pathologies. Our dataset provides an annotated atlas of 11,414 healthy fetal human cells, permitting further study into normal second trimester development. We provide an integrated fetal cell atlas of 45,048 cells combining previous data with our healthy samples.
+
+**Conclusions:** This study applied novel analytical approaches to demonstrate the utility of scRNA-seq in characterising AF and its capacity to capture a diverse range of viable fetal cell types. Our results suggest that changes in AF cellular composition mirror organ development, underscoring the potential of AF scRNA-seq to deepen our understanding of normal and pathological fetal biology.
 
 ## Authors and Affiliations
 
-Calandra V Grima<sup>1,2</sup>, Jovana Maksimovic<sup>1,2,3</sup>, Ishara Atukorala<sup>4,5</sup>, Sally Beard<sup>4</sup>, Shalini Guleria<sup>6</sup>, Liam Neil<sup>6</sup>, Natalie Hannan<sup>4</sup>, Bhupinder Pal<sup>6</sup>, Lisa Hui\*<sup>4,5,7</sup>, Alicia Oshlack\*<sup>1,2,8</sup>
+Calandra Grima^1,2^, Ishara Atukorala^3,4^, Sally Beard^3^, Shalini Guleria^5^, Liam Neil^5^, Natalie Hannan^3^, Bhupinder Pal^5^, Jovana Maksimovic\*^1,2,6^, Lisa Hui\*^3,4,7^, Alicia Oshlack\*^1,2,8^
 
-1.	Peter MacCallum Cancer Centre, Computational Biology Program, Parkville, Australia
-2.	The Sir Peter MacCallum Department of Oncology, University of Melbourne, Parkville, Australia
-3.	Murdoch Children’s Research Institute, Respiratory Group, Parkville, Australia
-4.	Department of Obstetrics and Gynaecology, University of Melbourne, Parkville, Australia
-5.	Department of Perinatal Medicine, Mercy Hospital for Women, Heidelberg, Australia
-6.	Olivia Newton-John Cancer Research Institute, Single Cell Cancer Genomics Laboratory, Heidelberg, Australia
-7.	Murdoch Children’s Research Institute, Reproductive Epidemiology Group, Parkville, Australia
-8.	School of Mathematics and Statistics, University of Melbourne, Melbourne, Victoria, Australia
+1.  Peter MacCallum Cancer Centre, Computational Biology Program, Parkville, Australia
+2.  The Sir Peter MacCallum Department of Oncology, University of Melbourne, Parkville, Australia
+3.  Department of Obstetrics and Gynaecology, University of Melbourne, Parkville, Australia
+4.  Department of Perinatal Medicine, Mercy Hospital for Women, Heidelberg, Australia
+5.  Olivia Newton-John Cancer Research Institute, Single Cell Cancer Genomics Laboratory, Heidelberg, Australia
+6.  Murdoch Children’s Research Institute, Respiratory Group, Parkville, Australia
+7.  Murdoch Children’s Research Institute, Reproductive Epidemiology Group, Parkville, Australia
+8.  School of Mathematics and Statistics, University of Melbourne, Melbourne, Victoria, Australia
 
 \* These authors contributed equally.
 
