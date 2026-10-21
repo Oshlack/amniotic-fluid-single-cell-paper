@@ -18,7 +18,7 @@ The code and analysis results can be viewed on our [analysis webpage](https://os
 
 ## Authors and Affiliations
 
-Calandra Grima^1,2^, Ishara Atukorala^3,4^, Sally Beard^3^, Shalini Guleria^5^, Liam Neil^5^, Natalie Hannan^3^, Bhupinder Pal^5^, Jovana Maksimovic\*^1,2,6^, Lisa Hui\*^3,4,7^, Alicia Oshlack\*^1,2,8^
+Calandra Grima<sup>1,2</sup>, Ishara Atukorala<sup>3,4</sup>, Sally Beard<sup>3</sup>, Shalini Guleria<sup>5</sup>, Liam Neil<sup>5</sup>, Natalie Hannan<sup>3</sup>, Bhupinder Pal<sup>5</sup>, Jovana Maksimovic\*<sup>1,2,6</sup>, Lisa Hui\*<sup>3,4,7</sup>, Alicia Oshlack\*<sup>1,2,8</sup>
 
 1.  Peter MacCallum Cancer Centre, Computational Biology Program, Parkville, Australia
 2.  The Sir Peter MacCallum Department of Oncology, University of Melbourne, Parkville, Australia
