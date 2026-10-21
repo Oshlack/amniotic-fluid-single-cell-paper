@@ -1,0 +1,349 @@
+---
+title: "Cluster marker gene and Gene Ontology analysis - Optimised Reference"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(limma)
+library(edgeR)
+library(org.Hs.eg.db)
+library(GO.db)
+library(pheatmap)
+library(ggplot2)
+library(ggbeeswarm)
+library(viridis)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(rmarkdown)
+library(tidyr)
+library(workflowr)
+library(here)
+library(tidyverse)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Refined cluster marker gene analysis for all cells
+
+## Load in the integrated dataset with refined cluster labels
+
+```{r}
+seu_int <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+```{r, fig.width=8, fig.height=8}
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "cluster_names") +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  guides(color=guide_legend(ncol = 3, override.aes = list(size=2))) +
+  bottom_legend +
+  ggtitle("Integrated dataset (clusters)")
+```
+
+### Plot QC metrics
+
+```{r, fig.width=12, fig.height=6}
+seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = cluster_names)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  no_legend + rotate_x_labels + 
+  ggtitle("QC metrics by cluster") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = cluster_names)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels + 
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  no_legend -> p2
+
+p3 <- seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = cluster_names)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels + no_legend +
+  scale_fill_manual(values = CLUSTER_NAME_COLOURS) +
+  ggtitle("Number of cells per cluster")
+
+p1 | p2 | p3
+```
+
+### Plot cell type composition of each cluster
+
+```{r, fig.height=8, fig.width=16}
+p1 <- seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  ggtitle("Number of cells per cluster")
+
+p2 <- seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle("Proportion of cell types per cluster")
+
+p1 | p2
+```
+
+```{r, fig.height=8, fig.width=16}
+p1 <- seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  ggtitle("Number of cells per cluster")
+
+p2 <- seu_int@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle("Proportion of cell types per cluster")
+
+p1 | p2
+```
+
+## Identify marker genes using *limma*
+
+```{r}
+counts <- as.matrix(seu_int[["RNA"]]@counts)
+sample <- seu_int$Sample
+
+clusters <- seu_int$refined_clusters
+# clustgrp <- paste0("cluster_", clusters)
+clustgrp <- factor(clusters, levels = levels(seu_int$refined_clusters))
+
+fit.cont <- findMarkerGenes(counts, clustgrp, sample)
+
+summary(decideTests(fit.cont))
+```
+
+```{r}
+# picks genes above given logFC threshold
+treat.all <- treat(fit.cont,lfc=0.5)
+
+dt <- decideTests(treat.all)
+summary(dt)
+```
+
+### Extract marker genes
+
+```{r}
+clusters_names <- levels(clusters)
+
+cluster_markers_top10 <- extractMarkerGenes(treat.all, clusters_names)
+cluster_markers_top20 <- extractMarkerGenes(treat.all, clusters_names, 
+                                            n_markers=20)
+cluster_markers_top50 <- extractMarkerGenes(treat.all, clusters_names, 
+                                            n_markers=50)
+
+saveRDS(cluster_markers_top10, 
+        here("data", "workflow", "AmnioSC.cluster_markers_top10.rds"))
+
+write.csv(cluster_markers_top10, 
+          file = here("data", "workflow", "AmnioSC.cluster_markers_top10.csv"),
+          quote = FALSE)
+
+write.csv(cluster_markers_top20, 
+          file = here("data", "workflow", "AmnioSC.cluster_markers_top20.csv"),
+          quote = FALSE)
+
+CLUSTER_NAMES <- readRDS(here("data", "workflow", "CLUSTER_NAMES.rds"))
+cluster_markers_top20.named <- cluster_markers_top20
+names(cluster_markers_top20.named) <- unname(CLUSTER_NAMES[names(cluster_markers_top20.named)])
+write.csv(cluster_markers_top20.named, 
+          file = here("data", "workflow", "AmnioSC.cluster_markers_top20.named.csv"),
+          quote = FALSE)
+write.csv(cluster_markers_top20.named, 
+          file = here("output", "supp_tables", "AmnioSC.cluster_markers_top20.named.csv"),
+          quote = FALSE)
+
+cluster_markers_top10.named <- cluster_markers_top10
+names(cluster_markers_top10.named) <- unname(CLUSTER_NAMES[names(cluster_markers_top10.named)])
+paged_table(as.data.frame(cluster_markers_top10.named))
+```
+
+### Plot heatmap
+
+```{r}
+annotation_df <- data.frame(clusters = seu_int$cluster_names,
+                            cell = colnames(seu_int),
+                            Sample = seu_int$Sample)
+annotation_df <- annotation_df[order(annotation_df$clusters),]
+
+annotation_colours <- list(clusters = CLUSTER_NAME_COLOURS)
+
+cluster_markers_seu <- seu_int[unique(unname(unlist(cluster_markers_top10))), annotation_df$cell]
+```
+
+```{r, fig.width=12, fig.height=12}
+pheatmap(GetAssayData(cluster_markers_seu, "data"), show_colnames = FALSE,
+         color = viridis(14), annotation_col = annotation_df[, "clusters", drop=FALSE],
+         annotation_colors = annotation_colours["clusters"],
+         cluster_cols = FALSE, cluster_rows = TRUE, 
+         gaps_col = cumsum(table(cluster_markers_seu$cluster_names)))
+```
+
+```{r, fig.width=30, fig.height=8}
+DotPlot(object = seu_int, features = unique(unlist(cluster_markers_top10)), 
+        group.by = "cluster_names") +
+  rotate_x_labels +
+  ggtitle("Expression of cluster marker genes")
+```
+
+## Perform gene ontology analysis by cluster
+
+```{r}
+cluster_go <- performGO(cluster_markers_top50, clusters_names) 
+
+cluster_go <- as.data.frame(cluster_go)
+
+write.table(cluster_go, sep = "\t", row.names = F,
+            file = here("data", "workflow", "AmnioSC_optref.cluster_refined_go_top_10.tsv"),
+            quote = FALSE)
+
+cluster_go.named <- cluster_go
+names(cluster_go.named) <- unname(CLUSTER_NAMES[names(cluster_go.named)])
+write.table(cluster_go.named, sep = "\t", row.names = F,
+            file = here("data", "workflow",
+                        "AmnioSC_optref.cluster_refined_go_top_10.named.tsv"),
+            quote = FALSE)
+write.table(cluster_go.named, sep = "\t", row.names = F,
+            file = here("output", "supp_tables",
+                        "AmnioSC_optref.cluster_refined_go_top_10.named.tsv"),
+            quote = FALSE)
+```
+
+```{r}
+paged_table(cluster_go.named)
+```
+
+# Plot canonical markers for each cluster
+
+Known canonical markers for each cluster in the literature have been selected from the top 20 marker genes found above and also from our biological knowledge to be used in a dot plot. For Clusters 16 and 17, which were found via subclustering the T cells, marker genes from that analysis have also been considered as that analysis is more focused towards these immune subtypes.
+
+```{r}
+AmnioSC.canonical_markers.all <- readRDS(here("data", "workflow", "AmnioSC.canonical_markers.all.rds"))
+AmnioSC.canonical_markers.all <- AmnioSC.canonical_markers.all[levels(seu_int$cluster_names)]
+
+canonical_markers.all <- unique(unlist(AmnioSC.canonical_markers.all, use.names = FALSE))
+canonical_markers.all <- filterPresentGenes(canonical_markers.all, seu_int)
+```
+
+```{r, fig.width=30, fig.height=8}
+DotPlot(object = seu_int, features = canonical_markers.all, assay = "SCT",
+        group.by = "cluster_names", col.max = 5) +
+  ggtitle("Canonical markers (all)") + 
+  theme_linedraw() + rotate_x_labels +
+  scale_color_viridis(option = "viridis", direction = 1) +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+AmnioSC.canonical_markers.reduced <- readRDS(here("data", "workflow", "AmnioSC.canonical_markers.reduced.rds"))
+AmnioSC.canonical_markers.reduced <- AmnioSC.canonical_markers.reduced[levels(seu_int$cluster_names)]
+
+canonical_markers.reduced <- unique(unlist(AmnioSC.canonical_markers.reduced, use.names = FALSE))
+canonical_markers.reduced <- filterPresentGenes(canonical_markers.reduced, seu_int)
+```
+
+```{r, fig.width=15, fig.height=6}
+DotPlot(object = seu_int, features = canonical_markers.reduced, assay = "SCT",
+        group.by = "cluster_names", col.max = 5) +
+  ggtitle("Canonical markers (reduced)") + 
+  theme_linedraw() + rotate_x_labels +
+  scale_color_viridis(option = "viridis", direction = 1) +
+  theme(panel.grid = element_blank())
+```
+
+# Confirm identity of lung clusters
+
+```{r}
+# Prepare the MSigDB C8 (cell type signature) gene sets, if not already saved
+if (!file.exists(here("data", "workflow", "GSEA", "Hs.c8.all.v2026.1.entrez.rds"))) {
+  # Downloaded from here: https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2026.1.Hs/c8.all.v2026.1.Hs.entrez.gmt
+  c8.all.v2026.1.Hs.entrez <- qusage::read.gmt(here("data", "workflow", "GSEA", "c8.all.v2026.1.Hs.entrez.gmt"))
+  saveRDS(c8.all.v2026.1.Hs.entrez, here("data", "workflow", "GSEA", "Hs.c8.all.v2026.1.entrez.rds"))
+}
+```
+
+```{r}
+Hs.c8.all <- readRDS(here("data", "workflow", "GSEA", "Hs.c8.all.v2026.1.entrez.rds"))
+```
+
+```{r}
+c8.all_clusters <- data.frame()
+for (i in c(10, 12)) {
+  cluster <- colnames(fit.cont$t)[i]
+  # translate gene SYMBOLS to entrez gene IDs
+  gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                               keys = rownames(fit.cont$t),
+                               column = c("ENTREZID"),
+                               keytype = "SYMBOL",
+                               multiVals = "first")
+
+  gene_sets.id <- ids2indices(Hs.c8.all, 
+                              unname(gns[rownames(fit.cont$t)]))
+
+  # docs suggest this: https://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/camera.html
+  statistic <- fit.cont$t[,i]
+  cam <- cameraPR(statistic, gene_sets.id)
+  cam$cluster <- cluster
+  cam <- cam %>% rownames_to_column("c8")
+
+  c8.all_clusters <- rbind(c8.all_clusters, cam)
+}
+```
+
+```{r}
+c8.all_clusters %>% filter(FDR < 0.05, Direction == "Up") %>% 
+  group_by(cluster) %>% 
+  slice_min(order_by = FDR, n = 5)
+```
+
+This supports Clusters 10 and 12 being lung cell clusters (Cluster 10 is the low confidence lung cluster).
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

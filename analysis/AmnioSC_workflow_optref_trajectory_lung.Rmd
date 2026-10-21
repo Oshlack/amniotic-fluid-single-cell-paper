@@ -1,0 +1,308 @@
+---
+title: "Trajectory analysis - Lung (Optimised Reference)"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(monocle3)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
+library(dplyr)
+library(tidyverse)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load in the integrated dataset
+
+```{r}
+seu_int <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+# Subset to the lung lineage
+
+Trajectory inference is restricted to the lung epithelium clusters (`Cluster_10`
+and `Cluster_12`, labelled `"Lung epithelium (low confidence)"` and `"Lung epithelium"`.
+
+```{r}
+LUNG_CLUSTERS <- c("Lung epithelium (low confidence)", "Lung epithelium")
+seu_int.lung <- seu_int[, seu_int$cluster_names %in% LUNG_CLUSTERS]
+```
+
+# Build the monocle3 cell_data_set
+
+Following the [monocle3 trajectory tutorial](https://cole-trapnell-lab.github.io/monocle3/docs/trajectories/),
+the lung subset is wrapped into a `cell_data_set` (`cds`). monocle3's plotting
+functions expect `gene_metadata` to contain a `gene_short_name` column.
+
+```{r}
+gene_metadata <- data.frame(gene_short_name = rownames(seu_int.lung[["RNA"]]@counts),
+                            row.names = rownames(seu_int.lung[["RNA"]]@counts))
+
+cds <- new_cell_data_set(seu_int.lung[["RNA"]]@counts,
+                         cell_metadata = as.data.frame(seu_int.lung@meta.data),
+                         gene_metadata = gene_metadata)
+```
+
+# Pre-process the data
+
+```{r}
+cds <- preprocess_cds(cds, num_dim = 50)
+plot_pc_variance_explained(cds)
+```
+
+# Dimensionality reduction and visualize the results
+
+```{r, fig.width=8, fig.height=6}
+cds <- reduce_dimension(cds)
+
+plot_cells(cds, label_groups_by_cluster = FALSE, color_cells_by = "cluster_names")
+```
+
+```{r, fig.width=10, fig.height=6}
+lung_marker_genes <- c("SFTPC", "SFTPB", "SFTA3", "NKX2-1", "SCGB3A2", "MECOM", "VEGFA")
+lung_marker_genes <- lung_marker_genes[lung_marker_genes %in% rownames(cds)]
+
+plot_cells(cds,
+          genes = lung_marker_genes,
+          label_cell_groups = FALSE,
+          show_trajectory_graph = FALSE)
+```
+
+# Cluster cells
+
+```{r, fig.width=8, fig.height=6}
+cds <- cluster_cells(cds)
+
+plot_cells(cds, color_cells_by = "partition")
+```
+
+# Learn the trajectory graph
+
+```{r, fig.width=8, fig.height=6}
+cds <- learn_graph(cds)
+
+plot_cells(cds,
+          color_cells_by = "cluster_names",
+          label_groups_by_cluster = FALSE,
+          label_leaves = FALSE,
+          label_branch_points = FALSE)
+```
+
+# Order the cells in pseudotime
+
+Cells in `"Lung epithelium (low confidence)"` are treated as the least
+differentiated / progenitor-like state and used to root the trajectory,
+following the programmatic root-finding helper from the tutorial.
+
+```{r}
+get_earliest_principal_node <- function(cds, target_cluster = "Lung epithelium (low confidence)") {
+  cell_ids <- which(colData(cds)[, "cluster_names"] == target_cluster)
+
+  closest_vertex <- cds@principal_graph_aux[["UMAP"]]$pr_graph_cell_proj_closest_vertex
+  closest_vertex <- as.matrix(closest_vertex[colnames(cds), ])
+  root_pr_nodes <- igraph::V(principal_graph(cds)[["UMAP"]])$name[as.numeric(names(
+    which.max(table(closest_vertex[cell_ids, ]))))]
+
+  root_pr_nodes
+}
+
+cds <- order_cells(cds, root_pr_nodes = get_earliest_principal_node(cds))
+saveRDS(cds, here("data", "workflow", "AmnioSC.lung_pseudotime.rds"))
+```
+
+```{r, fig.width=4, fig.height=4}
+plot_cells(cds,
+          color_cells_by = "pseudotime",
+          label_cell_groups = FALSE,
+          label_leaves = FALSE,
+          label_branch_points = FALSE,
+          graph_label_size = 1.5)
+```
+
+# Pseudotime on the whole-dataset UMAP
+
+The lung pseudotime values are mapped back onto the original (whole-dataset)
+Seurat UMAP, so the lung trajectory can be seen in the context of every other
+cluster. Cells outside the lung subset have no pseudotime value and are
+coloured grey (`na.value`).
+
+```{r}
+seu_int$lung_pseudotime <- NA
+seu_int$lung_pseudotime[names(pseudotime(cds))] <- pseudotime(cds)
+```
+
+```{r, fig.width=8, fig.height=6}
+FeaturePlot(seu_int, reduction = "umap", features = "lung_pseudotime") +
+  scale_color_viridis(option = "viridis", direction = 1, na.value = "grey85") +
+  blank_axes + ggtitle("Lung trajectory pseudotime")
+```
+
+# Genes that vary along the lung trajectory
+
+```{r, fig.width=10, fig.height=6}
+plot_cells(cds,
+          genes = lung_marker_genes,
+          label_cell_groups = FALSE,
+          show_trajectory_graph = FALSE,
+          color_cells_by = "pseudotime")
+```
+
+# Surfactant expression in fetal lung cells
+
+```{r}
+# surfactant_genes <- c("SFTPA1", "SFTPA2", "SFTPB", "SFTPC", "SFTPD", "ABCA3", "NKX2-1")
+lung_genes <- c("SFTPA1", "SFTPA2", "SFTPB", "SFTPC", "SFTPD", "ABCA3", "NKX2-1", "SCGB3A2", "VEGFA")
+# lung_genes %in% rownames(seu_int.early_late[["RNA"]])
+```
+
+```{r}
+seu_int.early_late <- seu_int[, seu_int$Donor.Paper != "AF_4"]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat <- as.matrix(seu_int.early_late[["RNA"]]@data[lung_genes,])
+meta <- seu_int.early_late@meta.data %>% dplyr::select(refined_clusters, early_late_gestation)
+
+meta <- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)
+
+meta <- pivot_longer(meta, -c(refined_clusters, early_late_gestation), names_to="Gene", values_to="Expression")
+head(meta)
+
+meta_summary <- meta %>%
+  group_by(refined_clusters, early_late_gestation, Gene) %>%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression > 0) / length(Expression) * 100)
+
+meta_summary$Gene <- factor(meta_summary$Gene, levels=lung_genes)
+```
+
+```{r}
+dot_plot <- ggplot(meta_summary, aes(x=Gene, y=refined_clusters)) +
+  geom_point(aes(size = Pct, fill = Avg), color="black", shape=21) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_fill_gradientn(colours = viridisLite::plasma(100),
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ylab("Cluster") + xlab("") +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels
+
+dot_plot
+
+dot_plot <- ggplot(meta_summary %>% filter(refined_clusters %in% c("Cluster_10", "Cluster_12")), 
+                   aes(x=Gene, y=refined_clusters)) +
+  geom_point(aes(size = Pct, fill = Avg), color="black", shape=21) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_fill_gradientn(colours = viridisLite::plasma(100),
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ylab("Cluster") + xlab("") +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels
+
+dot_plot
+```
+
+# Try including the unknown cluster in pseudotime
+
+## Load in the integrated dataset
+
+```{r}
+seu_int <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+## Subset to desired cells
+
+```{r}
+SELECTED_CLUSTERS <- c("Lung epithelium (low confidence)", 
+                       "Lung epithelium",
+                       "Unknown")
+seu_int.selected <- seu_int[, seu_int$cluster_names %in% SELECTED_CLUSTERS]
+```
+
+## Build the monocle3 cell_data_set
+
+Following the [monocle3 trajectory tutorial](https://cole-trapnell-lab.github.io/monocle3/docs/trajectories/),
+the lung subset is wrapped into a `cell_data_set` (`cds`). monocle3's plotting
+functions expect `gene_metadata` to contain a `gene_short_name` column.
+
+```{r}
+gene_metadata <- data.frame(gene_short_name = rownames(seu_int.selected[["RNA"]]@counts),
+                            row.names = rownames(seu_int.selected[["RNA"]]@counts))
+
+cds <- new_cell_data_set(seu_int.selected[["RNA"]]@counts,
+                         cell_metadata = as.data.frame(seu_int.selected@meta.data),
+                         gene_metadata = gene_metadata)
+```
+
+## Pre-process the data
+
+```{r}
+cds <- preprocess_cds(cds, num_dim = 50)
+plot_pc_variance_explained(cds)
+```
+
+## Dimensionality reduction and visualize the results
+
+```{r, fig.width=8, fig.height=6}
+cds <- reduce_dimension(cds)
+
+plot_cells(cds, label_groups_by_cluster = FALSE, color_cells_by = "cluster_names")
+```
+
+## Cluster cells
+
+```{r, fig.width=8, fig.height=6}
+cds <- cluster_cells(cds)
+
+plot_cells(cds, color_cells_by = "partition")
+```
+
+## Learn the trajectory graph
+
+```{r, fig.width=8, fig.height=6}
+cds <- learn_graph(cds)
+
+plot_cells(cds,
+          color_cells_by = "cluster_names",
+          label_groups_by_cluster = FALSE,
+          label_leaves = FALSE,
+          label_branch_points = FALSE)
+
+saveRDS(cds, here("data", "workflow", "AmnioSC.unknown_pseudotime.rds"))
+```
+
+The unknown cluster is not connected to the lung epithelium clusters.
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

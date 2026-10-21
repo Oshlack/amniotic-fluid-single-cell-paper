@@ -1,0 +1,259 @@
+---
+title: "Generate colour schemes"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Polychrome)
+library(scales)
+library(SingleCellExperiment)
+library(Seurat)
+library(stringr)
+library(here)
+```
+
+```{r}
+combined_metadata <- read.csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+rownames(combined_metadata) <- combined_metadata$Sample
+```
+
+# Datasets
+
+```{r}
+ALL_DATASETS <- c("dataset_01", "dataset_02", "dataset_03", "dataset_04",
+                  "dataset_05")
+ALL_DATASETS <- factor(ALL_DATASETS, levels = ALL_DATASETS)
+ALL_DATASETS_COLOURS <- c("darkturquoise", "coral", "orchid", "chartreuse2",
+                          "mediumpurple1")
+names(ALL_DATASETS_COLOURS) <- levels(ALL_DATASETS)
+
+GERLI_DATASETS <- unique(setdiff(combined_metadata$dataset_batch, ALL_DATASETS))
+GERLI_DATASETS_COLOURS <- light.colors(n = length(GERLI_DATASETS))
+names(GERLI_DATASETS_COLOURS) <- GERLI_DATASETS
+
+ALL_DATASETS_COLOURS <- c(ALL_DATASETS_COLOURS, GERLI_DATASETS_COLOURS)
+
+show_col(ALL_DATASETS_COLOURS)
+saveRDS(ALL_DATASETS_COLOURS, here("data", "colours", "ALL_DATASETS_COLOURS.rds"))
+```
+
+# Donors
+
+```{r}
+ALL_DONORS <- c("1AF", "2AF", "3AF", "4AF", "5AF", "6AF", "7AF", "8AF")
+ALL_DONORS <- factor(ALL_DONORS, levels = ALL_DONORS)
+# some colours from sky.colours()
+ALL_DONORS_COLOURS <- c("#F98500", "#B1BEFA", "#1CFDF1", "#7CFC00", "#FF00FF", "#29C5F6", "seagreen3", "firebrick1")
+names(ALL_DONORS_COLOURS) <- levels(ALL_DONORS)
+
+ALL_DONORS.PAPER <- c("AF_1", "AF_2", "AF_3", "AF_4", "AF_5", "AF_6", "AF_7")
+ALL_DONORS_COLOURS.PAPER <- ALL_DONORS_COLOURS[-3]
+names(ALL_DONORS_COLOURS.PAPER) <- ALL_DONORS.PAPER
+
+GERLI_SAMPLES <- unique(setdiff(combined_metadata$Sample, ALL_DONORS))
+GERLI_SAMPLES_COLOURS <- kelly.colors(n = length(GERLI_SAMPLES) + 2)[3:(length(GERLI_SAMPLES) + 2)]
+names(GERLI_SAMPLES_COLOURS) <- GERLI_SAMPLES
+
+ALL_DONORS_COLOURS <- c(ALL_DONORS_COLOURS, GERLI_SAMPLES_COLOURS)
+ALL_DONORS_COLOURS.PAPER <- c(ALL_DONORS_COLOURS.PAPER, GERLI_SAMPLES_COLOURS)
+
+show_col(ALL_DONORS_COLOURS)
+saveRDS(ALL_DONORS_COLOURS, here("data", "colours", "ALL_DONORS_COLOURS.rds"))
+saveRDS(ALL_DONORS_COLOURS.PAPER, here("data", "colours", "ALL_DONORS_COLOURS.PAPER.rds"))
+```
+
+# Samples
+
+```{r}
+ALL_SAMPLES <- c("1AFa", "1AFb", "2AF", "3AF", "4AF", "5AF", "6AF", "7AF", "8AF")
+ALL_SAMPLES <- factor(ALL_SAMPLES, levels = ALL_SAMPLES)
+# some colours from sky.colours()
+ALL_SAMPLES_COLOURS <- c("#FDFD16", "#F98500", "#B1BEFA", "#1CFDF1", "#7CFC00",
+                         "#FF00FF", "#29C5F6", "seagreen3", "firebrick1")
+names(ALL_SAMPLES_COLOURS) <- levels(ALL_SAMPLES)
+
+ALL_SAMPLES.PAPER <- c("AF_1a", "AF_1b", "AF_2", "AF_3", "AF_4", "AF_5", "AF_6", "AF_7")
+ALL_SAMPLES_COLOURS.PAPER <- ALL_SAMPLES_COLOURS[-4]
+names(ALL_SAMPLES_COLOURS.PAPER) <- ALL_SAMPLES.PAPER
+
+GERLI_SAMPLES <- unique(setdiff(combined_metadata$Sample, ALL_DONORS))
+GERLI_SAMPLES_COLOURS <- kelly.colors(n = length(GERLI_SAMPLES) + 2)[3:(length(GERLI_SAMPLES) + 2)]
+names(GERLI_SAMPLES_COLOURS) <- GERLI_SAMPLES
+
+ALL_SAMPLES_COLOURS <- c(ALL_SAMPLES_COLOURS, GERLI_SAMPLES_COLOURS)
+ALL_SAMPLES_COLOURS.PAPER <- c(ALL_SAMPLES_COLOURS.PAPER, GERLI_SAMPLES_COLOURS)
+
+show_col(ALL_SAMPLES_COLOURS)
+saveRDS(ALL_SAMPLES_COLOURS, here("data", "colours", "ALL_SAMPLES_COLOURS.rds"))
+saveRDS(ALL_SAMPLES_COLOURS.PAPER, here("data", "colours", "ALL_SAMPLES_COLOURS.PAPER.rds"))
+```
+
+# Foetal sex
+
+```{r}
+ALL_FOETAL_SEX_COLOURS <- c("sienna1", "deepskyblue1")
+names(ALL_FOETAL_SEX_COLOURS) <- c("Female", "Male")
+
+show_col(ALL_FOETAL_SEX_COLOURS)
+saveRDS(ALL_FOETAL_SEX_COLOURS, here("data", "colours", "ALL_FOETAL_SEX_COLOURS.rds"))
+```
+
+# Gestational Age Group
+
+```{r}
+ALL_GEST_COLOURS <- c("#28E2E5", "#F5C710", "#CD0BBC")
+names(ALL_GEST_COLOURS) <- c("Early", "Mid", "Late")
+show_col(ALL_GEST_COLOURS)
+saveRDS(ALL_GEST_COLOURS, here("data", "colours", "ALL_GEST_COLOURS.rds"))
+```
+
+# Clusters
+
+## All clusters
+
+```{r}
+ALL_CLUSTER_COLOURS <- c(light.colors(n=24),
+                         sky.colors(n=24),
+                         alphabet.colors(n=16))
+names(ALL_CLUSTER_COLOURS) <- 0:63
+
+show_col(ALL_CLUSTER_COLOURS)
+saveRDS(ALL_CLUSTER_COLOURS, here("data", "colours", "ALL_CLUSTER_COLOURS.rds"))
+```
+
+## Refined cluster numbers
+
+```{r}
+REFINED_CLUSTER_COLOURS <- c(light.colors(n = 17)[1:6], light.colors(n = 17)[8:12], light.colors(n = 17)[14:15], 
+                             light.colors(n = 17)[7], light.colors(n = 17)[13], "#40E0D0", light.colors(n = 17)[17])
+names(REFINED_CLUSTER_COLOURS) <- c(paste0("Cluster_0", 1:9), paste0("Cluster_", 10:17))
+
+show_col(REFINED_CLUSTER_COLOURS)
+saveRDS(REFINED_CLUSTER_COLOURS, here("data", "colours", "REFINED_CLUSTER_COLOURS.rds"))
+```
+
+## Refined clusters names
+
+```{r}
+CLUSTER_NAMES <- readRDS(here("data", "workflow", "CLUSTER_NAMES.rds"))
+
+CLUSTER_NAME_COLOURS <- REFINED_CLUSTER_COLOURS[names(CLUSTER_NAMES)]
+names(CLUSTER_NAME_COLOURS) <- unname(CLUSTER_NAMES)
+show_col(CLUSTER_NAME_COLOURS)
+
+saveRDS(CLUSTER_NAME_COLOURS, here("data", "colours", "CLUSTER_NAME_COLOURS.rds"))
+```
+
+# Map Gerli and AmnioSC colours
+
+```{r}
+# Map each Gerli cluster name to matching AmnioSC name, or NA if no equivalent
+GERLI_TO_AMNIOSC <- c(
+  "Keratinocytes"                         = "Keratinocytes",
+  "Squamous/keratinocyte-like epithelium" = NA,
+  "Neutrophils"                           = NA,
+  "Macrophages"                           = "Macrophages",
+  "Classical monocytes"                   = NA,
+  "Dendritic cells"                       = "Dendritic cells",
+  "T cells"                               = "T cells",
+  "Mast cells"                            = "Mast cells",
+  "ILC3"                                  = "ILC3",
+  "NK cells / cytotoxic lymphocytes"      = "NK cells / cytotoxic lymphocytes",
+  "Basophils"                             = NA,
+  "Erythroid"                             = "Erythroid",
+  "Erythroid progenitors (proliferating)" = NA,
+  "Immature granulocytes (promyelocytes)" = NA,
+  "B cells"                               = NA,
+  "Mast cells (cycling)"                  = NA,
+  "Multiciliated epithelial cells"        = "Ciliated",
+  "Kidney epithelium"                     = "Kidney epithelium",
+  "Fibroblasts / stromal cells"           = "Fibroblasts / mesenchyme",
+  "Lung epithelium"                       = "Lung epithelium",
+  "Epithelial cells"                      = NA
+)
+
+unused_colours <- c(setdiff(unname(light.colors(n = 24)), unname(CLUSTER_NAME_COLOURS)), dark.colors(n = 3)[2])
+
+CLUSTER_NAME_COLOURS.GERLI <- character(length(GERLI_TO_AMNIOSC))
+names(CLUSTER_NAME_COLOURS.GERLI) <- names(GERLI_TO_AMNIOSC)
+
+matched <- !is.na(GERLI_TO_AMNIOSC)
+CLUSTER_NAME_COLOURS.GERLI[matched] <- CLUSTER_NAME_COLOURS[GERLI_TO_AMNIOSC[matched]]
+
+unmatched <- names(GERLI_TO_AMNIOSC)[!matched]
+CLUSTER_NAME_COLOURS.GERLI[unmatched] <- unname(unused_colours)
+
+# reorder to match CLUSTER_NAMES.GERLI, sanity-check no duplicate colours
+CLUSTER_NAME_COLOURS.GERLI <- CLUSTER_NAME_COLOURS.GERLI[names(GERLI_TO_AMNIOSC)]
+stopifnot(length(unique(CLUSTER_NAME_COLOURS.GERLI)) == length(CLUSTER_NAME_COLOURS.GERLI))
+
+show_col(CLUSTER_NAME_COLOURS.GERLI)
+
+saveRDS(CLUSTER_NAME_COLOURS.GERLI, here("data", "colours", "CLUSTER_NAME_COLOURS.GERLI.rds"))
+```
+
+```{r}
+CLUSTER_NAMES.GERLI <- readRDS(here("data", "Gerli_et_al_2024", "CLUSTER_NAMES.GERLI.rds"))
+
+stopifnot(CLUSTER_NAMES.GERLI == names(CLUSTER_NAME_COLOURS.GERLI))
+
+REFINED_CLUSTER_COLOURS.GERLI <- CLUSTER_NAME_COLOURS.GERLI
+names(REFINED_CLUSTER_COLOURS.GERLI) <- names(CLUSTER_NAMES.GERLI)
+
+REFINED_CLUSTER_COLOURS.GERLI
+
+saveRDS(REFINED_CLUSTER_COLOURS.GERLI, here("data", "colours", "REFINED_CLUSTER_COLOURS.GERLI.rds"))
+```
+
+# *Celltypist* cell type labels
+
+```{r}
+seu_comparison <- readRDS(here("data", "workflow",
+                               "AmnioSC_ALL_optimised_ref_comparison.Celltypist_annotated.Seurat.rds"))
+seu_optref <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Celltypist_annotated.Seurat.rds"))
+seu_Gerli <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.Celltypist_annotated.Seurat.rds"))
+CT_cell_types <- unique(c(levels(seu_optref$pan_fetal.majority_voting), 
+                          levels(seu_optref$pan_fetal.predicted_labels),
+                          levels(seu_optref$fetal_organ.majority_voting), 
+                          levels(seu_optref$fetal_organ.predicted_labels),
+                          levels(seu_comparison$pan_fetal.majority_voting),
+                          levels(seu_comparison$pan_fetal.predicted_labels),
+                          levels(seu_Gerli$pan_fetal.majority_voting),
+                          levels(seu_Gerli$pan_fetal.predicted_labels),
+                          levels(seu_Gerli$fetal_organ.majority_voting), 
+                          levels(seu_Gerli$fetal_organ.predicted_labels)))
+
+CT_CELL_TYPE_COLOURS <- c(light.colors(n = 22), alphabet.colors(n = 26), sky.colors(n=24), dark.colors(n=24),
+                          kelly.colors(n = 22), green.armytage.colors(n = 8))
+CT_CELL_TYPE_COLOURS <- CT_CELL_TYPE_COLOURS[1:length(CT_cell_types)]
+names(CT_CELL_TYPE_COLOURS) <- CT_cell_types
+
+show_col(CT_CELL_TYPE_COLOURS)
+```
+
+```{r}
+# organised like this to make it easy to add other references later if needed
+ALL_CELL_TYPE_COLOURS <- CT_CELL_TYPE_COLOURS
+saveRDS(ALL_CELL_TYPE_COLOURS, here("data", "colours", "ALL_CELL_TYPE_COLOURS.rds"))
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

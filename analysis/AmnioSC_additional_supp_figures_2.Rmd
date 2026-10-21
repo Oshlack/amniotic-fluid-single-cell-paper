@@ -1,0 +1,1094 @@
+---
+title: "Supplementary figures for manuscript (Supplementary Figures 4-7)"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(viridis)
+library(Polychrome)
+library(magick)
+library(png)
+library(ggplot2)
+library(grid)
+library(limma)
+library(edgeR)
+library(ggtext)
+library(ggrepel)
+library(tidyverse)
+library(ggplotify)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+source(here("code", "limma_barcodeplot_custom.R"))
+# using customised version of the barcode plot function to make the font size bigger and change shade of background colour
+# as cannot pass cex arguments to the original barcodeplot function
+# https://support.bioconductor.org/p/119752/
+
+RERUN_ALL <- FALSE
+```
+
+Prepare colour schemes for the plots
+
+```{r}
+ALL_DONORS_COLOURS <- ALL_DONORS_COLOURS[-3]
+ALL_DONORS_COLOURS <- ALL_DONORS_COLOURS[1:5]
+
+DONOR.PAPER <- c("AF_1", "AF_2", "AF_3", "AF_4", "AF_5", "AF_6", "AF_7", 
+                 "AF_1.optref", "AF_2.optref", "AF_3.optref", "AF_4.optref", "AF_5.optref")
+names(DONOR.PAPER) <- c("1AF", "2AF", "4AF", "5AF", "6AF", "7AF", "8AF", 
+                        "1AF_optref", "2AF_optref", "4AF_optref", "5AF_optref", "6AF_optref")
+
+names(ALL_DONORS_COLOURS) <- DONOR.PAPER[names(ALL_DONORS_COLOURS)]
+
+ALL_DONORS_COLOURS <- c(ALL_DONORS_COLOURS[1:5], 
+                        "darkorange3", "mediumpurple", 
+                        "darkgreen", "deeppink2", "dodgerblue")
+names(ALL_DONORS_COLOURS) <- c(names(ALL_DONORS_COLOURS)[1:5], 
+                               "AF_1.optref", "AF_2.optref", 
+                               "AF_3.optref", "AF_4.optref", "AF_5.optref")
+```
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+The `seu_int.Gerli` object was generated on [this page](Gerli_et_al_2024.refined_annotations.html).
+
+```{r}
+seu_int.Gerli <- readRDS(here("data", "Gerli_et_al_2024",
+                              "Gerli_et_al_2024.Refined_labels.Seurat.rds"))
+seu_int.Gerli$Dataset_Source <- "Gerli et al. (2024) Dataset"
+```
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow",
+                                "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+seu_int.AmnioSC$Dataset_Source <- "Our Dataset"
+
+seu_int.AmnioSC$Donor <- DONOR.PAPER[seu_int.AmnioSC$Donor]
+seu_int.AmnioSC$Donor <- factor(seu_int.AmnioSC$Donor.Paper)
+```
+
+# Supplementary Figure 4
+
+## Generate the plots
+
+```{r, fig.width=12, fig.height=12, warning=FALSE, message=FALSE}
+supp_fig4.Gerli_n_cells_cluster <- plotNCells.Paper(seu_int.Gerli, x_var = "cluster_names",
+                                                    color_by = "cluster_names",
+                                                    colour_scheme = CLUSTER_NAME_COLOURS.GERLI,
+                                                    title = "Number of cells per cluster",
+                                                    subtitle = "Gerli et al. (2024) Dataset",
+                                                    xlab = "", ylab = "Number of cells", ymax = 25000)
+supp_fig4.Gerli_n_cells_cluster
+
+saveRDS(supp_fig4.Gerli_n_cells_cluster, 
+        here("output", "supp_figures", "supp_fig4.Gerli_n_cells_cluster.rds"))
+
+supp_fig4.Gerli_n_cells_pan_fetal <- plotNCells.Paper(seu_int.Gerli, x_var = "pan_fetal.majority_voting",
+                                                      color_by = "pan_fetal.majority_voting",
+                                                      colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                                      title = "Number of cells per<br>*Pan_Fetal_Human* annotation",
+                                                      subtitle = "Gerli et al. (2024) Dataset",
+                                                      xlab = "", ylab = "Number of cells", ymax = 20000)
+supp_fig4.Gerli_n_cells_pan_fetal
+
+saveRDS(supp_fig4.Gerli_n_cells_pan_fetal, 
+        here("output", "supp_figures", "supp_fig4.Gerli_n_cells_pan_fetal.rds"))
+
+supp_fig4.Gerli_n_cells_fetal_organ <- plotNCells.Paper(seu_int.Gerli, x_var = "fetal_organ.majority_voting",
+                                                        color_by = "fetal_organ.majority_voting",
+                                                        colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                                        title = "Number of cellls per<br>*Developing_Human_Organs* annotation",
+                                                        subtitle = "Gerli et al. (2024) Dataset",
+                                                        xlab = "", ylab = "Number of cells", ymax = 30000)
+supp_fig4.Gerli_n_cells_fetal_organ
+
+saveRDS(supp_fig4.Gerli_n_cells_fetal_organ, 
+        here("output", "supp_figures", "supp_fig4.Gerli_n_cells_fetal_organ.rds"))
+```
+
+```{r, fig.height=8, fig.width=8}
+supp_fig4.Gerli_umap_cluster <- plotUMAP.Paper(seu_int.Gerli, color_by = "cluster_names",
+                                               colour_scheme = CLUSTER_NAME_COLOURS.GERLI,
+                                               title = "Clusters", subtitle = "Gerli et al. (2024) Dataset",
+                                               label_size = 6)
+supp_fig4.Gerli_umap_cluster
+saveRDS(supp_fig4.Gerli_umap_cluster, here("output", "supp_figures", "supp_fig4.Gerli_umap_cluster.rds"))
+
+supp_fig4.Gerli_umap_pan_fetal <- plotUMAP.Paper(seu_int.Gerli, color_by = "pan_fetal.majority_voting",
+                                                 colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                                 title = "*Pan_Fetal_Human* Annotation", 
+                                                 subtitle = "Gerli et al. (2024) Dataset",
+                                                 label_size = 6)
+supp_fig4.Gerli_umap_pan_fetal
+saveRDS(supp_fig4.Gerli_umap_pan_fetal, 
+        here("output", "supp_figures", "supp_fig4.Gerli_umap_pan_fetal.rds"))
+
+supp_fig4.Gerli_umap_fetal_organ <- plotUMAP.Paper(seu_int.Gerli, color_by = "fetal_organ.majority_voting",
+                                                   colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                                   title = "*Developing_Human_Organs* Annotation", 
+                                                   subtitle = "Gerli et al. (2024) Dataset",
+                                                   label_size = 6)
+supp_fig4.Gerli_umap_fetal_organ
+saveRDS(supp_fig4.Gerli_umap_fetal_organ, 
+        here("output", "supp_figures", "supp_fig4.Gerli_umap_fetal_organ.rds"))
+```
+
+```{r, fig.height=10, fig.width=10}
+supp_fig4.Gerli_cluster_comp_pan_fetal <- seu_int.Gerli@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_linedraw(12) +
+  ylab("Proportion") + xlab("") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.Gerli$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + labs(fill="Pan_Fetal_Human\nAnnotation") + rotate_x_labels +
+  ggtitle("Cell type composition of each cluster<br>*using Pan_Fetal_Human* annotations") +
+  labs(subtitle = "Gerli et al. (2024) Dataset") + 
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"))
+supp_fig4.Gerli_cluster_comp_pan_fetal
+saveRDS(supp_fig4.Gerli_cluster_comp_pan_fetal, 
+        here("output", "supp_figures", "supp_fig4.Gerli_cluster_comp_pan_fetal.rds"))
+
+supp_fig4.Gerli_cluster_comp_fetal_organ <- seu_int.Gerli@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_linedraw(12) +
+  ylab("Proportion") + xlab("") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.Gerli$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels + labs(fill = "Developing_Human_Organs\nAnnotation") +
+  ggtitle("Cell type composition of each cluster<br>using *Developing_Human_Organs* annotations") +
+  labs(subtitle = "Gerli et al. (2024) Dataset") + 
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"))
+supp_fig4.Gerli_cluster_comp_fetal_organ
+saveRDS(supp_fig4.Gerli_cluster_comp_fetal_organ, 
+        here("output", "supp_figures", "supp_fig4.Gerli_cluster_comp_fetal_organ.rds"))
+```
+
+```{r, fig.width=24, fig.height=8}
+Gerli.canonical_markers.reduced <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.canonical_markers.reduced.rds"))
+Gerli.canonical_markers.reduced <- Gerli.canonical_markers.reduced[levels(seu_int.Gerli$cluster_names)]
+
+canonical_markers.reduced <- unique(unlist(Gerli.canonical_markers.reduced, use.names = FALSE))
+canonical_markers.reduced <- filterPresentGenes(canonical_markers.reduced, seu_int.Gerli)
+
+seu_int.Gerli$cluster_names.rev <- sortedFactor(seu_int.Gerli$cluster_names, decreasing = FALSE)
+
+DotPlot(object = seu_int.Gerli, features = canonical_markers.reduced, assay = "RNA",
+        group.by = "cluster_names.rev", col.max = 5) +
+  geom_point(aes(size=pct.exp), shape = 21, colour="black", stroke=0.5) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_color_gradient(low = "gray95", high = "#39157B",
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ggtitle("Selected canonical marker genes") + 
+  theme_linedraw() + rotate_x_labels +
+  labs(subtitle = "Gerli et al. (2024) Dataset") +
+   ylab("") + xlab("") +
+  theme(plot.title = element_markdown(size = 24, face = "bold", family = "arial"),
+        plot.subtitle = element_markdown(size = 22, face = "italic", family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22)) -> supp_fig4.Gerli_dot_plot
+supp_fig4.Gerli_dot_plot
+
+saveRDS(supp_fig4.Gerli_dot_plot, here("output", "supp_figures", "supp_fig4.Gerli_dot_plot.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+# supp_fig4.Gerli_umap_cluster <- readRDS(here("output", "supp_figures",
+#                                              "supp_fig4.Gerli_umap_cluster.rds"))
+# supp_fig4.Gerli_n_cells_cluster <- readRDS(here("output", "supp_figures",
+#                                                 "supp_fig4.Gerli_n_cells_cluster.rds"))
+# supp_fig4.Gerli_dot_plot <- readRDS(here("output", "supp_figures",
+#                                          "supp_fig4.Gerli_dot_plot.rds"))
+# supp_fig4.Gerli_umap_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                "supp_fig4.Gerli_umap_pan_fetal.rds"))
+# supp_fig4.Gerli_n_cells_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig4.Gerli_n_cells_pan_fetal.rds"))
+# supp_fig4.Gerli_umap_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                  "supp_fig4.Gerli_umap_fetal_organ.rds"))
+# supp_fig4.Gerli_n_cells_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                     "supp_fig4.Gerli_n_cells_fetal_organ.rds"))
+# supp_fig4.Gerli_cluster_comp_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                        "supp_fig4.Gerli_cluster_comp_pan_fetal.rds"))
+# supp_fig4.Gerli_cluster_comp_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                          "supp_fig4.Gerli_cluster_comp_fetal_organ.rds"))
+```
+
+```{r, fig.width=35, fig.height=45}
+layout = "
+AAAAAAAAAAAAABBBBBBBBB
+AAAAAAAAAAAAABBBBBBBBB
+AAAAAAAAAAAAABBBBBBBBB
+AAAAAAAAAAAAABBBBBBBBB
+AAAAAAAAAAAAABBBBBBBBB
+AAAAAAAAAAAAABBBBBBBBB
+CCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCC
+DDDDDDDDEEEEEEFFFFFFFF
+DDDDDDDDEEEEEEFFFFFFFF
+DDDDDDDDEEEEEEFFFFFFFF
+DDDDDDDDEEEEEEFFFFFFFF
+DDDDDDDDEEEEEEFFFFFFFF
+DDDDDDDDEEEEEEFFFFFFFF
+GGGGGGGGHHHHHHIIIIIIII
+GGGGGGGGHHHHHHIIIIIIII
+GGGGGGGGHHHHHHIIIIIIII
+GGGGGGGGHHHHHHIIIIIIII
+GGGGGGGGHHHHHHIIIIIIII
+GGGGGGGGHHHHHHIIIIIIII
+"
+
+wrap_elements(supp_fig4.Gerli_umap_cluster + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_n_cells_cluster + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_dot_plot + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_umap_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_n_cells_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_cluster_comp_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_umap_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_n_cells_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig4.Gerli_cluster_comp_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "H", "F", "G", "I"))) &
+  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig4
+
+supp_fig4
+
+ggsave(plot = supp_fig4, filename = here("output", "figures_png", "supp_fig4.png"),
+       height = 45, width = 35)
+```
+
+```{r}
+rm(supp_fig4.Gerli_umap_cluster)
+rm(supp_fig4.Gerli_n_cells_cluster)
+rm(supp_fig4.Gerli_umap_pan_fetal)
+rm(supp_fig4.Gerli_n_cells_pan_fetal)
+rm(supp_fig4.Gerli_umap_fetal_organ)
+rm(supp_fig4.Gerli_n_cells_fetal_organ)
+rm(supp_fig4.Gerli_cluster_comp_pan_fetal)
+rm(supp_fig4.Gerli_cluster_comp_fetal_organ)
+gc()
+```
+
+# Supplementary Figure 5
+
+## Generate the plots
+
+The `AmnioSC.sccomp_result` object was generated on [this page](AmnioSC_workflow_optref_cluster_proportions_sccomp.html).
+
+```{r}
+AmnioSC.sccomp_result <- readRDS(here("data", "workflow", "AmnioSC.sccomp_result.rds"))
+
+seu_int.AmnioSC_early_late <- seu_int.AmnioSC[,seu_int.AmnioSC$Donor != "AF_4"]
+seu_int.AmnioSC_early_late$Donor <- factor(seu_int.AmnioSC_early_late$Donor)
+seu_int.AmnioSC_early_late$early_late_gestation <- factor(seu_int.AmnioSC_early_late$early_late_gestation)
+
+AmnioSC.prop_df <- generateGroupProportionsDF(seu_int.AmnioSC_early_late,
+                                              group_var = "cluster_names")
+```
+
+```{r}
+supp_fig5.AmnioSC.clust08_prop <- plotProportion.Paper(AmnioSC.prop_df, curr_cluster = "T cells", 
+                                                 title = "T cells<br>*Our Dataset*", 
+                                                 AmnioSC.sccomp_result, font_scaling = 6)
+supp_fig5.AmnioSC.clust08_prop
+
+saveRDS(supp_fig5.AmnioSC.clust08_prop, 
+        here("output", "supp_figures", "supp_fig5.AmnioSC.clust08_prop.rds"))
+```
+
+```{r}
+supp_fig5.AmnioSC.clust07_prop <- plotProportion.Paper(AmnioSC.prop_df, curr_cluster = "ILC3", 
+                                                       title = "ILC3<br>*Our Dataset*", 
+                                                       AmnioSC.sccomp_result, font_scaling = 6)
+supp_fig5.AmnioSC.clust12_prop <- plotProportion.Paper(AmnioSC.prop_df, curr_cluster = "Lung epithelium", 
+                                                       title = "Lung epithelium<br>*Our Dataset*", 
+                                                       AmnioSC.sccomp_result, font_scaling = 6)
+
+supp_fig5.AmnioSC.clust07_prop
+supp_fig5.AmnioSC.clust12_prop
+
+saveRDS(supp_fig5.AmnioSC.clust07_prop, here("output", "supp_figures", "supp_fig5.AmnioSC.clust07_prop.rds"))
+saveRDS(supp_fig5.AmnioSC.clust12_prop, here("output", "supp_figures", "supp_fig5.AmnioSC.clust12_prop.rds"))
+```
+
+The `Gerli.sccomp_result` object was generated on [this page](Gerli_et_al_2024.cluster_proportions_sccomp.html).
+
+```{r}
+Gerli.sccomp_result <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.sccomp_result.rds"))
+
+Gerli.prop_df <- generateGroupProportionsDF(seu_int.Gerli[,seu_int.Gerli$early_late_gestation != "Mid"],
+                                            group_var = "cluster_names")
+```
+
+```{r}
+supp_fig5.Gerli.clust09_prop <- plotProportion.Paper(Gerli.prop_df, curr_cluster = "ILC3",
+                                                     title = "ILC3<br>*Gerli et al. (2024) Dataset*",
+                                                     Gerli.sccomp_result, font_scaling = 6)
+supp_fig5.Gerli.clust09_prop
+
+supp_fig5.Gerli.clust20_prop <- plotProportion.Paper(Gerli.prop_df, curr_cluster = "Lung epithelium",
+                                                     title = "Lung epithelium<br>*Gerli et al. (2024) Dataset*",
+                                                     Gerli.sccomp_result, font_scaling = 6)
+supp_fig5.Gerli.clust20_prop
+
+saveRDS(supp_fig5.Gerli.clust09_prop, 
+        here("output", "supp_figures", "supp_fig5.Gerli.clust09_prop.rds"))
+saveRDS(supp_fig5.Gerli.clust20_prop, 
+        here("output", "supp_figures", "supp_fig5.Gerli.clust20_prop.rds"))
+```
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow",
+                                "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+seu_int.AmnioSC$Dataset_Source <- "Our Dataset"
+
+seu_int.AmnioSC$Donor <- DONOR.PAPER[seu_int.AmnioSC$Donor]
+seu_int.AmnioSC$Donor <- factor(seu_int.AmnioSC$Donor.Paper)
+```
+
+```{r, fig.width=16, fig.height=10}
+seu_int.AmnioSC@meta.data %>% filter(Donor != "AF_4") %>%
+  ggplot(aes(x = cluster_names, fill = cluster_names)) +
+  geom_bar() + facet_grid(. ~ early_late_gestation) + theme_linedraw() +
+  rotate_x_labels + scale_fill_manual(values = CLUSTER_NAME_COLOURS) +
+  xlab("") + ylab("Number of cells") + no_legend +
+  geom_text(stat='count', aes(label=..count..), vjust=0.5,
+            hjust = -0.2, size = 6, angle = 90, family = "arial") +
+  ggtitle("Number of cells per cluster by<br>gestational age group") +
+  labs(subtitle = "Our Dataset") + ylim(0, 4000) +
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+          axis.title = element_text(size = 22, family = "arial", face = "bold"),
+          axis.text = element_text(size = 18, family = "arial"),
+          legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+          legend.text = element_text(size = 18, family = "arial"),
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig5.AmnioSC_n_cells_cluster
+supp_fig5.AmnioSC_n_cells_cluster
+
+seu_int.AmnioSC@meta.data %>% filter(Donor != "AF_4") %>% 
+  ggplot(aes(x = cluster_names, fill = pan_fetal.majority_voting)) +
+  geom_bar(position = "fill") + facet_grid(. ~ early_late_gestation) + theme_linedraw() + 
+  rotate_x_labels + scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) + 
+  xlab("") + ylab("Proportion") + labs(fill = "Pan_Fetal_Human\nAnnotation") +
+  ggtitle("Cell type composition of each cluster using<br>*Pan_Fetal_Human* annotations by gestational age group") +
+  labs(subtitle = "Our Dataset") + 
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+          axis.title = element_text(size = 22, family = "arial", face = "bold"),
+          axis.text = element_text(size = 18, family = "arial"),
+          legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+          legend.text = element_text(size = 18, family = "arial"),
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig5.AmnioSC_pan_comp
+supp_fig5.AmnioSC_pan_comp
+
+saveRDS(supp_fig5.AmnioSC_n_cells_cluster, 
+        here("output", "supp_figures", "supp_fig5.AmnioSC_n_cells_cluster.rds"))
+saveRDS(supp_fig5.AmnioSC_pan_comp, 
+        here("output", "supp_figures", "supp_fig5.AmnioSC_pan_comp.rds"))
+```
+
+```{r}
+ILC3_genes <- c("IL23R", "KLRB1", "KIT", "IL7R", "ZBTB16", "CD96", "CD69", "RORC", 
+                "IL17A", "NCR2", "LTB", "CD52")
+
+seu_int.AmnioSC.early_late <- seu_int.AmnioSC[, seu_int.AmnioSC$Donor.Paper != "AF_4"]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat <- as.matrix(seu_int.AmnioSC.early_late[["SCT"]]@data[ILC3_genes,])
+meta <- seu_int.AmnioSC.early_late@meta.data %>% dplyr::select(refined_clusters, early_late_gestation, cluster_names)
+
+meta <- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)
+
+meta <- pivot_longer(meta, -c(refined_clusters, early_late_gestation, cluster_names), 
+                     names_to="Gene", values_to="Expression")
+head(meta)
+
+meta_summary <- meta %>%
+  group_by(refined_clusters, early_late_gestation, cluster_names, Gene) %>%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression > 0) / length(Expression) * 100)
+
+meta_summary$Gene <- factor(meta_summary$Gene, levels=ILC3_genes)
+
+meta_summary$cluster_names <- as.character(meta_summary$cluster_names)
+
+supp_fig5.AmnioSC.ILC3_early_late <- ggplot(meta_summary %>% 
+                                         filter(cluster_names == "ILC3"), 
+                                                aes(x=Gene, y=cluster_names)) +
+  geom_point(aes(size = Pct, fill = Avg), color="black", shape=21) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_fill_gradient(low = "gray95", high = "#39157B",
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ylab("Cluster") + xlab("") +
+  theme_linedraw() + facet_grid(early_late_gestation ~ .) +
+  rotate_x_labels + 
+  labs(title = "Expression of ILC3 genes in the ILC3<br>cluster by gestational age group",
+       subtitle = "Our Dataset") +
+  theme(plot.title = element_markdown(size = 24, face = "bold", family = "arial"),
+        plot.subtitle = element_markdown(size = 22, face = "italic", family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22))
+
+supp_fig5.AmnioSC.ILC3_early_late
+
+saveRDS(supp_fig5.AmnioSC.ILC3_early_late,
+        here("output", "main_figures", "supp_fig5.AmnioSC.ILC3_early_late"))
+```
+
+```{r}
+cds.unknown_lung <- readRDS(here("data", "workflow", "AmnioSC.unknown_pseudotime.rds"))
+
+monocle3::plot_cells(cds.unknown_lung,
+          color_cells_by = "cluster_names",
+          label_groups_by_cluster = FALSE,
+          label_leaves = FALSE,
+          label_branch_points = FALSE,
+          cell_size = 2,
+          label_cell_groups = FALSE,
+          trajectory_graph_color = "black",
+          trajectory_graph_segment_size = 1.5) +
+  theme_linedraw() +
+  bottom_legend +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  labs(title = "UMAP of *Monocle3* trajectory for Lung Epithelium and Unknown clusters", 
+       subtitle = "Our Dataset") +
+  guides(color=guide_legend(title="Cluster")) +
+  theme(plot.title = element_markdown(face = "bold", size = 24, 
+                                      family = "arial"),
+        plot.subtitle = element_markdown(face = "italic", size = 22, 
+                                         family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial")) -> supp_fig5.AmnioSC.trajectory_unknown
+
+supp_fig5.AmnioSC.trajectory_unknown
+
+saveRDS(supp_fig5.AmnioSC.trajectory_unknown, 
+        here("output", "supp_figures", "supp_fig5.AmnioSC.trajectory_unknown.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+# supp_fig5.AmnioSC.clust08_prop <- readRDS(here("output", "supp_figures",
+#                                             "supp_fig5.AmnioSC.clust08_prop.rds"))
+# 
+# supp_fig5.AmnioSC_n_cells_cluster <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.AmnioSC_n_cells_cluster.rds"))
+# 
+# supp_fig5.AmnioSC_pan_comp <- readRDS(here("output", "supp_figures",
+#                                            "supp_fig5.AmnioSC_pan_comp.rds"))
+# 
+# supp_fig5.Gerli.clust09_prop <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.Gerli.clust09_prop.rds"))
+# supp_fig5.Gerli.clust20_prop <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.Gerli.clust20_prop.rds"))
+# 
+# supp_fig5.AmnioSC.clust07_prop <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.AmnioSC.clust07_prop.rds"))
+# supp_fig5.AmnioSC.clust12_prop <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.AmnioSC.clust12_prop.rds"))
+# supp_fig5.AmnioSC.ILC3_early_late <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig5.AmnioSC.ILC3_early_late.rds"))
+# supp_fig5.AmnioSC.trajectory_unknown <- readRDS(here("output", "supp_figures",
+#                                                      "supp_fig5.AmnioSC.trajectory_unknown.rds"))
+```
+
+```{r, fig.width=30, fig.height=30}
+layout = "
+AAAAABBBBBCCCCCDDDDDEEEEE
+AAAAABBBBBCCCCCDDDDDEEEEE
+FFFFFFFFFFGGGGGGGGGGGGGGG
+FFFFFFFFFFGGGGGGGGGGGGGGG
+FFFFFFFFFFGGGGGGGGGGGGGGG
+HHHHHHHHHHIIIIIIIIIIIIIII
+HHHHHHHHHHIIIIIIIIIIIIIII
+HHHHHHHHHHIIIIIIIIIIIIIII
+HHHHHHHHHHIIIIIIIIIIIIIII
+"
+
+supp_fig5.AmnioSC.clust08_prop + 
+  supp_fig5.AmnioSC.clust07_prop +
+  supp_fig5.Gerli.clust09_prop + 
+  supp_fig5.AmnioSC.clust12_prop +
+  supp_fig5.Gerli.clust20_prop +
+  wrap_elements(supp_fig5.AmnioSC.ILC3_early_late + theme(plot.margin = unit(rep(0,4), "cm")))  +
+  wrap_elements(supp_fig5.AmnioSC.trajectory_unknown + theme(plot.margin = unit(rep(0,4), "cm")))  +
+  wrap_elements(supp_fig5.AmnioSC_n_cells_cluster + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig5.AmnioSC_pan_comp + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c("A", "B", " ", "  ", "   ", "C", "D", "E", "F"))) &
+  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig5
+
+supp_fig5
+
+ggsave(plot = supp_fig5, filename = here("output", "figures_png", "supp_fig5.png"), 
+       height = 30, width = 30)
+```
+
+```{r}
+rm(supp_fig5.AmnioSC.clust08_prop)
+rm(supp_fig5.AmnioSC_n_cells_cluster)
+rm(supp_fig5.AmnioSC_pan_comp)
+rm(supp_fig5.AmnioSC.surfactant_expr)
+rm(supp_fig5.Gerli.clust09_prop)
+rm(supp_fig5.Gerli.clust20_prop)
+rm(supp_fig5.AmnioSC.clust07_prop)
+rm(supp_fig5.AmnioSC.clust12_prop)
+rm(supp_fig5.AmnioSC.ILC3_early_late)
+rm(supp_fig5.AmnioSC.trajectory_unknown)
+gc()
+```
+
+# Supplementary Figure 6
+
+## Generate the plots
+
+```{r}
+EDC_GENES <- read_tsv(file = here("data", "edc_genes.txt"))
+EDC_GENES <- EDC_GENES$`Approved symbol`
+EDC.ENTREZ <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = EDC_GENES, 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+```
+
+The `lrt.AmnioSC` and `fit.AmnioSC` objects were generated on [this page](AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html).
+
+```{r}
+fit.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.fit.rds"))
+lrt.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.lrt.rds"))
+
+# fix floating point representation issue
+lrt.AmnioSC$table$LR <- pmax(lrt.AmnioSC$table$LR, 0) # Converts all negative values to 0
+statistic.AmnioSC <- sign(lrt.AmnioSC$table$logFC) * sqrt(lrt.AmnioSC$table$LR)
+
+gns.AmnioSC <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(fit.AmnioSC),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+edc.id.AmnioSC <- ids2indices(EDC.ENTREZ, unname(gns.AmnioSC[rownames(lrt.AmnioSC)]))
+edc.cam.AmnioSC <- cameraPR(statistic.AmnioSC, edc.id.AmnioSC)
+edc.cam.AmnioSC
+```
+
+```{r, fig.width=10, fig.height=8}
+supp_fig6.AmnioSC_edc <- as.ggplot(~barcodeplot.custom(statistic.AmnioSC, 
+                     index = edc.id.AmnioSC$Set1,
+                     main = "",
+                     cex.main = 0.01),
+                     scale = 1, vjust = 0.05) +
+              labs(title = "Ranking of Epidermal Differentiation<br>Complex (EDC) genes",
+                   subtitle = "Our Dataset<br>P-value = 2.6867 x 10<sup>-13</sup>") + 
+              theme(plot.margin = unit(rep(0,4), "cm"),
+              plot.title = element_markdown(face = "bold", size = 24, 
+                                            family = "arial", hjust = 0.5),
+              plot.subtitle = element_markdown(face = "italic", size = 22, 
+                                              family = "arial", hjust = 0.5))
+supp_fig6.AmnioSC_edc
+
+saveRDS(supp_fig6.AmnioSC_edc, 
+        here("output", "supp_figures", "supp_fig6.AmnioSC_edc.rds"))
+```
+
+The `lrt.Gerli` and `fit.Gerli` objects were generated on [this page](Gerli_et_al_2024.dge_ruvseq.cluster_0.html).
+
+```{r}
+fit.Gerli <- readRDS(here("data", "Gerli_et_al_2024", 
+                          "Gerli_et_al_2024.dge_early_vs_late.fit.rds"))
+lrt.Gerli <- readRDS(here("data", "Gerli_et_al_2024",
+                          "Gerli_et_al_2024.dge_early_vs_late.lrt.rds"))
+
+# fix floating point representation issue
+lrt.Gerli$table$LR <- pmax(lrt.Gerli$table$LR, 0) # Converts all negative values to 0
+statistic.Gerli <- sign(lrt.Gerli$table$logFC) * sqrt(lrt.Gerli$table$LR)
+
+gns.Gerli <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(fit.Gerli),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+edc.id.Gerli <- ids2indices(EDC.ENTREZ, unname(gns.Gerli[rownames(lrt.Gerli)]))
+edc.cam.Gerli <- cameraPR(statistic.Gerli, edc.id.Gerli)
+edc.cam.Gerli
+```
+
+```{r, fig.width=10, fig.height=7}
+supp_fig6.Gerli_edc <- as.ggplot(~barcodeplot.custom(statistic.Gerli, 
+                     index = edc.id.Gerli$Set1,
+                     main = " ",
+                     cex.main = 0.01),
+                     scale = 1, vjust = 0.05) +
+              labs(title = "Ranking of Epidermal Differentiation<br>Complex (EDC) genes",
+                   subtitle = "Gerli et al. (2024) Dataset<br>P-value = 0.2891") + 
+              theme(plot.title = element_markdown(face = "bold", size = 24, 
+                                                  family = "arial", hjust = 0.5),
+                    plot.subtitle = element_markdown(face = "italic", size = 22, 
+                                                     family = "arial", hjust = 0.5))
+supp_fig6.Gerli_edc
+
+saveRDS(supp_fig6.Gerli_edc, here("output", "supp_figures", "supp_fig6.Gerli_edc.rds"))
+```
+
+The `contr.Gerli` object was generated on [this page]().
+
+```{r}
+contr.Gerli <- readRDS(here("data", "Gerli_et_al_2024",
+                            "Gerli_et_al_2024.dge_early_vs_late.contr.rds"))
+```
+
+```{r, fig.height=8, fig.width=8}
+pal <- c(paletteer::paletteer_d("RColorBrewer::Set1")[2:1], "grey")
+
+# DGE results summary
+cutoff <- 0.05
+
+# set index for current contrast
+i = 1
+  
+dt.Gerli <- lapply(1:ncol(contr.Gerli), function(i){
+  decideTests(glmLRT(fit.Gerli, contrast = contr.Gerli[,i]),
+                            p.value = cutoff)
+})
+
+lrt.Gerli <- glmLRT(fit.Gerli, contrast = contr.Gerli[,i])
+topTags(lrt.Gerli, n = Inf) %>% data.frame -> top.Gerli
+
+top_genes_to_label <- top.Gerli %>% filter(FDR < cutoff,
+                                     abs(logFC) > 3 | PValue < 0.0000001)
+
+top.Gerli$label_this <- rownames(top.Gerli) %in% rownames(top_genes_to_label)
+table(top.Gerli$label_this)
+
+top.Gerli %>% 
+  mutate(sig = ifelse(FDR <= cutoff, glue::glue("<= {cutoff}"), 
+                      glue::glue("> {cutoff}"))) %>%
+  rownames_to_column(var = "SYMBOL") %>%
+  left_join(dt.Gerli[[i]][,1] %>% 
+              data.frame %>%
+              rownames_to_column(var = "SYMBOL") %>%
+              dplyr::rename(status = 2)) %>%
+  mutate(status = ifelse(status == 1, "Up",
+                         ifelse(status == -1, "Down",
+                                "NotSig"))) %>%
+  mutate(status = as.factor(status)) %>%
+  mutate(status = fct_relevel(status, "NotSig", after = Inf)) %>%
+  ggplot(aes(x = logFC, y = -log10(PValue), color = status)) +
+  geom_point(alpha = 0.75, size = 2.5) +
+  ggrepel::geom_text_repel(data = function(x) subset(x, label_this == TRUE), 
+                           aes(x = logFC, y = -log10(PValue), 
+                               label = SYMBOL), 
+                           size = 6, colour = "black", max.overlaps = 50) +
+  scale_colour_manual(values = pal) +
+  theme_linedraw() + 
+  labs(title = "DEGs in Keratinocytes", 
+       subtitle = "Early vs Late Gestational Age Groups\nGerli et al. (2024) Dataset",
+       x = "log<sub>2</sub>(Fold Change)",
+       y = "-log<sub>10</sub>(P-value)",
+       colour = glue::glue("FDR < {cutoff}")) +
+  theme(legend.position = "bottom") +
+  theme(plot.title = element_text(face = "bold", size = 24, hjust = 0.5, family = "arial"),
+        plot.subtitle = element_text(face = "italic", size = 22, hjust = 0.5, family = "arial"),
+    axis.title.x = element_markdown(size = 22, face = "bold", family = "arial"),
+    axis.title.y = element_markdown(size = 22, face = "bold", family = "arial"),
+    axis.text = element_text(size = 18, family = "arial"),
+    legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+    legend.text = element_text(size = 18, family = "arial")) -> supp_fig6.Gerli_volcano
+supp_fig6.Gerli_volcano
+
+saveRDS(supp_fig6.Gerli_volcano, 
+        here("output", "supp_figures", "supp_fig6.Gerli_volcano.rds"))
+```
+
+The `c5.cam.Gerli_et_al_2024` and `c2.cam.Gerli_et_al_2024` objects were generated on [this page](Gerli_et_al_2024.dge_ruvseq.cluster_0.html).
+
+```{r}
+c5.cam.Gerli_et_al_2024 <- readRDS(here("data", "Gerli_et_al_2024",
+                                        "Gerli_et_al_2024.dge_early_vs_late.c5.cam.RDS"))
+c2.cam.Gerli_et_al_2024 <- readRDS(here("data", "Gerli_et_al_2024",
+                                        "Gerli_et_al_2024.dge_early_vs_late.c2.cam.RDS"))
+```
+
+```{r, fig.height = 12, fig.width = 10}
+c5.cam.Gerli_et_al_2024 %>%
+  dplyr::slice(1:10) %>%
+  rownames_to_column(var = "Set") %>%
+  mutate(Type = "GO",
+         Rank = 1:10) %>%
+  bind_rows(c2.cam.Gerli_et_al_2024 %>%
+              dplyr::slice(1:10) %>%
+              rownames_to_column(var = "Set") %>%
+              mutate(Type = "REACTOME",
+                     Rank = 1:10)) %>%
+  mutate(Set = str_wrap(str_replace_all(Set, "_", " "), width = 32),# was 75
+         Set = str_remove_all(Set, "GO |REACTOME |HALLMARK ")) %>%
+  ggplot(aes(x = -log10(FDR), y = fct_reorder(Set, -Rank),
+             colour = Direction)) +
+  geom_point(aes(size = NGenes)) +
+  facet_wrap(~Type, ncol = 1, scales = "free_y") +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dashed")  +
+  scale_colour_manual(values = pal) +
+  labs(y = "Gene Set", x = "-log<sub>10</sub>(FDR)") +
+  theme_linedraw(12) +
+  theme(legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22),
+        legend.box = "vertical") +
+  bottom_legend -> supp_fig6.Gerli_go
+supp_fig6.Gerli_go
+
+saveRDS(supp_fig6.Gerli_go, here("output", "supp_figures", "supp_fig6.Gerli_go.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+supp_fig6.Gerli_volcano <- readRDS(here("output", "supp_figures",
+                                        "supp_fig6.Gerli_volcano.rds"))
+supp_fig6.Gerli_go <- readRDS(here("output", "supp_figures",
+                                   "supp_fig6.Gerli_go.rds"))
+
+supp_fig6.AmnioSC_edc <- readRDS(here("output", "supp_figures",
+                                      "supp_fig6.AmnioSC_edc.rds"))
+supp_fig6.Gerli_edc <- readRDS(here("output", "supp_figures",
+                                    "supp_fig6.Gerli_edc.rds"))
+```
+
+```{r, fig.width=30, fig.height=20}
+layout = "
+AAAAAAABBBBBBBDDDDDDDDDDD
+AAAAAAABBBBBBBDDDDDDDDDDD
+AAAAAAABBBBBBBDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+"
+
+wrap_elements(supp_fig6.AmnioSC_edc + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig6.Gerli_edc + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig6.Gerli_volcano + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig6.Gerli_go + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c("A", " ", "B", "C"))) &
+  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig6
+
+supp_fig6
+
+ggsave(plot = supp_fig6, filename = here("output", "figures_png", "supp_fig6.png"), 
+       height = 20, width = 30)
+```
+
+```{r}
+rm(supp_fig6.Gerli_volcano)
+rm(supp_fig6.Gerli_go)
+rm(supp_fig6.AmnioSC_edc)
+rm(supp_fig6.Gerli_edc)
+gc()
+```
+
+# Supplementary Figure 7
+
+## Generate the plots
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+seu_int.AmnioSC$sample_type <- ifelse(seu_int.AmnioSC$sample_type == "fresh", "Fresh", "Frozen")
+```
+
+```{r}
+seu_int.AmnioSC@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor.Paper)) +
+  scale_y_log10() +
+  theme_linedraw(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  no_legend +
+  rotate_x_labels +
+  ylab("Library size") + xlab(" ") +
+  facet_grid(. ~ sample_type, space = "free_x", scale = "free_x") +
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+          axis.title = element_text(size = 22, family = "arial", face = "bold"),
+          axis.text = element_text(size = 18, family = "arial"),
+          legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+          legend.text = element_text(size = 18, family = "arial"),
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig7.fresh_frozen_sum
+
+seu_int.AmnioSC@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor.Paper)) +
+  scale_y_log10() +
+  theme_linedraw(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  no_legend + xlab("Donor") +
+  rotate_x_labels +
+  ylab("# of detected genes") +
+  facet_grid(. ~ sample_type, space = "free_x", scale = "free_x") +
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+          axis.title = element_text(size = 22, family = "arial", face = "bold"),
+          axis.text = element_text(size = 18, family = "arial"),
+          legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+          legend.text = element_text(size = 18, family = "arial"),
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig7.fresh_frozen_detected
+
+seu_int.AmnioSC@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             fill = Donor.Paper)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=after_stat(count)), vjust=0.5, hjust = -0.2, size = 6, angle = 90) +
+  theme_linedraw(12) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  no_legend +
+  rotate_x_labels + xlab(" ") +
+  ylab("# of cells") + ylim(0, 4000) +
+  ggtitle("QC metrics by fresh/frozen sample processing") +
+  facet_grid(. ~ sample_type, space = "free_x", scale = "free_x") +
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+          axis.title = element_text(size = 22, family = "arial", face = "bold"),
+          axis.text = element_text(size = 18, family = "arial"),
+          legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+          legend.text = element_text(size = 18, family = "arial"),
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig7.fresh_frozen_count
+
+supp_fig7.fresh_frozen_sum
+supp_fig7.fresh_frozen_detected
+supp_fig7.fresh_frozen_count
+
+saveRDS(supp_fig7.fresh_frozen_sum, here("output", "supp_figures", "supp_fig7.fresh_frozen_sum.RDS"))
+saveRDS(supp_fig7.fresh_frozen_detected, here("output", "supp_figures", "supp_fig7.fresh_frozen_detected.RDS"))
+saveRDS(supp_fig7.fresh_frozen_count, here("output", "supp_figures", "supp_fig7.fresh_frozen_count.RDS"))
+```
+
+The `MDS.housekeeping` object was generated on [this page](AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html)
+
+```{r}
+MDS.housekeeping <- readRDS(here("data", "workflow", "AmnioSC.MDS_housekeeping.Keratinocyte_DGE.rds"))
+MDS.housekeeping$sample_type <- ifelse(MDS.housekeeping$sample_type == "fresh", "Fresh", "Frozen")
+```
+
+```{r, fig.asp=1}
+MDS_plot_theme <- theme_linedraw(12) + no_legend + 
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_text(face = "italic", size = 22, family = "arial"),
+        axis.title.x = element_markdown(size = 22, face = "bold", family = "arial"),
+        axis.title.y = element_markdown(size = 22, face = "bold", family = "arial"),
+        axis.text = element_text(size = 18, family = "arial"),
+        legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+        legend.text = element_text(size = 18, family = "arial"))
+
+ggplot(MDS.housekeeping, aes(x = Dim_1, y = Dim_2, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme + 
+      labs(title = "MDS plots for housekeeping genes used by *RUVSeq*",
+           subtitle = "Our Dataset") -> supp_fig7.MDS_housekeeping_1
+ggplot(MDS.housekeeping, aes(x = Dim_2, y = Dim_3, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme -> supp_fig7.MDS_housekeeping_2
+ggplot(MDS.housekeeping, aes(x = Dim_3, y = Dim_4, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme -> supp_fig7.MDS_housekeeping_3
+ggplot(MDS.housekeeping, aes(x = Dim_4, y = Dim_5, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme + bottom_legend + 
+  theme(legend.box = "vertical", legend.box.just = "top") +
+  labs(color = "Gestational Age Group", shape = "Sample Processing") -> supp_fig7.MDS_housekeeping_4
+
+supp_fig7.MDS_housekeeping_1
+supp_fig7.MDS_housekeeping_2
+supp_fig7.MDS_housekeeping_3
+supp_fig7.MDS_housekeeping_4
+
+saveRDS(supp_fig7.MDS_housekeeping_1, here("output", "supp_figures", "supp_fig7.MDS_housekeeping_1.RDS"))
+saveRDS(supp_fig7.MDS_housekeeping_2, here("output", "supp_figures", "supp_fig7.MDS_housekeeping_2.RDS"))
+saveRDS(supp_fig7.MDS_housekeeping_3, here("output", "supp_figures", "supp_fig7.MDS_housekeeping_3.RDS"))
+saveRDS(supp_fig7.MDS_housekeeping_4, here("output", "supp_figures", "supp_fig7.MDS_housekeeping_4.RDS"))
+```
+
+The `` object was generated on [this page](AmnioSC_workflow_optref_cluster_proportions_sccomp.html).
+
+```{r}
+MDS.Donor.prop <- readRDS(here("data", "workflow", "AmnioSC.MDS_Donor_Proportions.rds"))
+MDS.Donor.prop$sample_type <- ifelse(MDS.Donor.prop$sample_type == "fresh", "Fresh", "Frozen")
+```
+
+```{r, fig.asp=1}
+MDS_plot_theme <- theme_linedraw(12) + no_legend + 
+  theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
+        plot.subtitle = element_text(face = "italic", size = 22, family = "arial"),
+        axis.title.x = element_markdown(size = 22, face = "bold", family = "arial"),
+        axis.title.y = element_markdown(size = 22, face = "bold", family = "arial"),
+        axis.text = element_text(size = 18, family = "arial"),
+        legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
+        legend.text = element_text(size = 18, family = "arial"))
+
+ggplot(MDS.Donor.prop, aes(x = Dim_1, y = Dim_2, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme + 
+      labs(title = "MDS plots of cluster proportions by donor",
+           subtitle = "Our Dataset") -> supp_fig7.MDS_proportion_1
+ggplot(MDS.Donor.prop, aes(x = Dim_2, y = Dim_3, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme -> supp_fig7.MDS_proportion_2
+ggplot(MDS.Donor.prop, aes(x = Dim_3, y = Dim_4, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme -> supp_fig7.MDS_proportion_3
+ggplot(MDS.Donor.prop, aes(x = Dim_4, y = Dim_5, color = early_late_gestation,
+                                   shape = sample_type)) +
+      geom_point(size = 8) + scale_color_manual(values = ALL_GEST_COLOURS) +
+      MDS_plot_theme + bottom_legend + 
+  theme(legend.box = "vertical", legend.box.just = "top") +
+  labs(color = "Gestational Age Group", shape = "Sample Processing") -> supp_fig7.MDS_proportion_4
+
+supp_fig7.MDS_proportion_1
+supp_fig7.MDS_proportion_2
+supp_fig7.MDS_proportion_3
+supp_fig7.MDS_proportion_4
+
+saveRDS(supp_fig7.MDS_proportion_1, here("output", "supp_figures", "supp_fig7.MDS_proportion_1.RDS"))
+saveRDS(supp_fig7.MDS_proportion_2, here("output", "supp_figures", "supp_fig7.MDS_proportion_2.RDS"))
+saveRDS(supp_fig7.MDS_proportion_3, here("output", "supp_figures", "supp_fig7.MDS_proportion_3.RDS"))
+saveRDS(supp_fig7.MDS_proportion_4, here("output", "supp_figures", "supp_fig7.MDS_proportion_4.RDS"))
+```
+
+## Arrange the plots
+
+```{r}
+# supp_fig7.fresh_frozen_sum <- readRDS(here("output", "supp_figures", "supp_fig7.fresh_frozen_sum.RDS"))
+# supp_fig7.fresh_frozen_detected <- readRDS(here("output", "supp_figures", "supp_fig7.fresh_frozen_detected.RDS"))
+# supp_fig7.fresh_frozen_count <- readRDS(here("output", "supp_figures", "supp_fig7.fresh_frozen_count.RDS"))
+# 
+# supp_fig7.MDS_housekeeping_1 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_housekeeping_1.RDS"))
+# supp_fig7.MDS_housekeeping_2 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_housekeeping_2.RDS"))
+# supp_fig7.MDS_housekeeping_3 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_housekeeping_3.RDS"))
+# supp_fig7.MDS_housekeeping_4 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_housekeeping_4.RDS"))
+# 
+# supp_fig7.MDS_proportion_1 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_proportion_1.RDS"))
+# supp_fig7.MDS_proportion_2 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_proportion_2.RDS"))
+# supp_fig7.MDS_proportion_3 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_proportion_3.RDS"))
+# supp_fig7.MDS_proportion_4 <- readRDS(here("output", "supp_figures", "supp_fig7.MDS_proportion_4.RDS"))
+```
+
+```{r, fig.width=25, fig.height=20}
+layout = "
+AAAAAAAAAAAAAA
+AAAAAAAAAAAAAA
+BBBBBBBCCCCCCC
+BBBBBBBCCCCCCC
+BBBBBBBCCCCCCC
+BBBBBBBCCCCCCC
+"
+
+wrap_elements(supp_fig7.fresh_frozen_count + supp_fig7.fresh_frozen_sum +
+                supp_fig7.fresh_frozen_detected + 
+                plot_layout(nrow = 1) +
+                theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig7.MDS_housekeeping_1 + supp_fig7.MDS_housekeeping_2 + supp_fig7.MDS_housekeeping_3 + 
+                  supp_fig7.MDS_housekeeping_4 + theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm"))) +
+  wrap_elements(supp_fig7.MDS_proportion_1 + supp_fig7.MDS_proportion_2 + supp_fig7.MDS_proportion_3 + 
+                  supp_fig7.MDS_proportion_4 + theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm"))) +
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c("A", "B", "C"))) &
+  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig7
+
+supp_fig7
+
+ggsave(plot = supp_fig7, filename = here("output", "figures_png", "supp_fig7.png"),
+       height = 20, width = 25)
+```
+
+```{r}
+rm(supp_fig7.fresh_frozen_sum)
+rm(supp_fig7.fresh_frozen_detected)
+rm(supp_fig7.fresh_frozen_count)
+rm(supp_fig7.MDS_housekeeping_1)
+rm(supp_fig7.MDS_housekeeping_2)
+rm(supp_fig7.MDS_housekeeping_3)
+rm(supp_fig7.MDS_housekeeping_4)
+rm(supp_fig7.MDS_proportion_1)
+rm(supp_fig7.MDS_proportion_2)
+rm(supp_fig7.MDS_proportion_3)
+rm(supp_fig7.MDS_proportion_4)
+gc()
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

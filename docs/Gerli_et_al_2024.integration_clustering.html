@@ -1,0 +1,4694 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Calandra Grima" />
+
+<meta name="date" content="2026-08-05" />
+
+<title>Data integration and clustering</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">AmnioSC Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Data integration and clustering</h1>
+<h4 class="author">Calandra Grima</h4>
+<h4 class="date">2026-08-05</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-05
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>amniosinglecell/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220125code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220125)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220125code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220125)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreea26da1fcc6ea5a3390cbd0a2995275d522595098targetblanka26da1fa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/a26da1fcc6ea5a3390cbd0a2995275d522595098" target="_blank">a26da1f</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreea26da1fcc6ea5a3390cbd0a2995275d522595098targetblanka26da1fa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/a26da1fcc6ea5a3390cbd0a2995275d522595098" target="_blank">a26da1f</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/generate_site.R
+    Ignored:    analysis/knit_docs.R
+    Ignored:    analysis/run_as_job.R
+    Ignored:    analysis/sccomp_draws_files/
+    Ignored:    celltypist/output_Gerli_et_al_2024_fetal_organ/
+    Ignored:    celltypist/output_Gerli_et_al_2024_pan_fetal/
+    Ignored:    data/
+    Ignored:    excluded_analysis/
+    Ignored:    output/
+    Ignored:    renv/.DS_Store
+    Ignored:    renv/library/
+    Ignored:    renv/staging/
+    Ignored:    sccomp_draws_files/
+
+Untracked files:
+    Untracked:  Paper Draft - Claude - Single-cell RNA-seq of amniotic fluid - gaining unique insight into foetal development.docx
+    Untracked:  claude_log/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/Gerli_et_al_2024.integration_clustering.Rmd</code>) and
+HTML (<code>docs/Gerli_et_al_2024.integration_clustering.html</code>)
+files. If you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b525baaff3433078fca330c78568d08cd6786ccb/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">b525baa</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9854bb656c012206632a5c2bd0e17a7d7932317b/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">9854bb6</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-04
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3a8ca131d6cb9de7ab34e67c92fd526bc4aa2024/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">3a8ca13</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c9240fbbe598f52f1410d606c96aa7ffb7c104d9/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">c9240fb</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/31a8c2356bc4735017333a3084276c236ddb36c7/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">31a8c23</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-21
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3c122be3e231a1a794e2a01f4356afdf4b587dbe/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">3c122be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/eafc8161f0d7865ec9ca2dd39397b682e43265c1/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">eafc816</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5a9a749e0b8676c551388f90efc3828e13b6a02d/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">5a9a749</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-15
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/456734bbe6cd0bdeeb14a158e5477482c440fbb7/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">456734b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a4c37abf4af3f9d7aedc8ab1dc76155c6d714250/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">a4c37ab</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a0a2be2d40ab821f6e03dd74093d617f1f1dbc4/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">8a0a2be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f7a7e0b5b9bc8c48006f492ca0e4a6b631695198/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">f7a7e0b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ab0dfe32bafb112e86022f5a3fc565552ea573ca/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">ab0dfe3</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/855fe7aacb2651211e2d7e7a1e56be42be8330d3/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">855fe7a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+<td>
+wflow_publish(here("analysis",
+"Gerli_et_al_2024.integration_clustering.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d8c14fe1240bff8859a4a7dc4d191073067f142e/analysis/Gerli_et_al_2024.integration_clustering.Rmd" target="_blank">d8c14fe</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Rename Gerli analysis pages to a less confusing naming scheme
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d8c14fe1240bff8859a4a7dc4d191073067f142e/docs/Gerli_et_al_2024.integration_clustering.html" target="_blank">d8c14fe</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Rename Gerli analysis pages to a less confusing naming scheme
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="load-libraries" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Load libraries</h1>
+<pre class="r"><code>library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here(&quot;code&quot;, &quot;helper_functions.R&quot;))
+source(here(&quot;code&quot;, &quot;load_colour_schemes.R&quot;))
+
+RERUN_ALL &lt;- FALSE</code></pre>
+</div>
+<div id="perform-data-integration-using-seurat" class="section level1"
+number="2">
+<h1><span class="header-section-number">2</span> Perform data
+integration using <em>Seurat</em></h1>
+<div id="prepare-the-datasets-for-integration" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Prepare the datasets
+for integration</h2>
+<pre class="r"><code>seu &lt;- readRDS(here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;,
+                     &quot;Gerli_et_al_2024.Celltypist_annotated.Seurat.rds&quot;))
+
+# use the provided integrated assay
+seu_int &lt;- seu
+DefaultAssay(seu_int) &lt;- &quot;integrated&quot;
+
+seu_int &lt;- RunPCA(seu_int, npcs = 30, verbose = FALSE)
+seu_int &lt;- RunUMAP(seu_int, dims = 1:30, verbose = FALSE)</code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+<pre class="r"><code>combined_metadata &lt;- read.csv(here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;, &quot;combined_metadata.csv&quot;))
+rownames(combined_metadata) &lt;- combined_metadata$Sample
+
+cols_to_add &lt;- setdiff(colnames(seu_int@meta.data), colnames(combined_metadata))
+
+seu_int@meta.data &lt;- cbind(seu_int@meta.data[,cols_to_add], 
+                           combined_metadata[seu_int@meta.data$Donor,])
+
+dim(seu_int)</code></pre>
+<pre><code>[1]  2000 34568</code></pre>
+<pre class="r"><code># remove cells annotated as HIGH_MITO or DOUBLETS
+seu_int &lt;- seu_int[, which(seu_int$pan_fetal.majority_voting != &quot;HIGH_MITO&quot;)]
+seu_int &lt;- seu_int[, which(seu_int$pan_fetal.majority_voting != &quot;DOUBLET_LYMPHOID_MACROPHAGE&quot;)]
+
+dim(seu_int)</code></pre>
+<pre><code>[1]  2000 33634</code></pre>
+</div>
+<div id="plot-the-integrated-dataset" class="section level2"
+number="2.2">
+<h2><span class="header-section-number">2.2</span> Plot the integrated
+dataset</h2>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;Sample&quot;) +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample])</code></pre>
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette(&quot;ggplot2-in-packages&quot;)` for more information.
+ℹ The deprecated feature was likely used in the Seurat package.
+  Please report the issue at &lt;https://github.com/satijalab/seurat/issues&gt;.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;foetal_sex&quot;) +
+  scale_colour_manual(values = ALL_FOETAL_SEX_COLOURS)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-2">
+Past versions of unnamed-chunk-2-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-2.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-2.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;gest_age_weeks&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-3">
+Past versions of unnamed-chunk-2-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-3.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-3.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-3.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;trimester&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-4">
+Past versions of unnamed-chunk-2-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-4.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-4.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-4.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;abnormalities&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-5">
+Past versions of unnamed-chunk-2-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-5.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-5.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-5.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;outcome&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-6.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-6">
+Past versions of unnamed-chunk-2-6.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-6" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-6.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-6.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-6.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;early_late_gestation&quot;) + 
+  scale_color_manual(values = ALL_GEST_COLOURS)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-7.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-7">
+Past versions of unnamed-chunk-2-7.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-7" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-7.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-7.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-7.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-7.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;procedure&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-8.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-8">
+Past versions of unnamed-chunk-2-8.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-8" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-8.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-8.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-2-8.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>FeaturePlot(seu_int, reduction = &#39;umap&#39;, features = &quot;nCount_RNA&quot;) +
+  scale_color_viridis(option = &quot;turbo&quot;, trans = &quot;log10&quot;)</code></pre>
+<pre><code>Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>FeaturePlot(seu_int, reduction = &#39;umap&#39;, features = &quot;nFeature_RNA&quot;) +
+  scale_color_viridis(option = &quot;turbo&quot;, trans = &quot;log10&quot;)</code></pre>
+<pre><code>Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
+Past versions of unnamed-chunk-3-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-2.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-3-2.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="perform-clustering-using-seurat" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Perform clustering
+using <em>Seurat</em></h1>
+<pre class="r"><code>object &lt;- here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;,
+               &quot;Gerli_et_al_2024.Integrated_clustered_all_res.Seurat.rds&quot;)
+if (!file.exists(object) | RERUN_ALL) {
+  seu_int &lt;- FindNeighbors(seu_int, reduction = &quot;pca&quot;, dims = 1:30)
+  seu_int &lt;- FindClusters(seu_int, algorithm = 3, 
+                         resolution = seq(0.01, 0.1, by = 0.01))
+  seu_int &lt;- RunUMAP(seu_int, dims = 1:30)
+  saveRDS(seu_int, object)
+} else {
+  seu_int &lt;- readRDS(object)
+}</code></pre>
+<pre class="r"><code>clustree(seu_int, prefix = &quot;integrated_snn_res.&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-5-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-5-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-5-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-5-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;integrated_snn_res.0.01&quot;) +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.01)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;integrated_snn_res.0.04&quot;) +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.04)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
+Past versions of unnamed-chunk-6-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-2.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-2.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-2.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;integrated_snn_res.0.05&quot;) +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.05)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-3">
+Past versions of unnamed-chunk-6-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-3.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-3.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;integrated_snn_res.0.1&quot;) +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.1)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-4">
+Past versions of unnamed-chunk-6-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-4.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-6-4.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A resolution of 0.04 looks best.</p>
+<pre class="r"><code>seu_int$seurat_clusters &lt;- as.factor(seu_int$integrated_snn_res.0.04)
+Idents(seu_int) &lt;- seu_int$seurat_clusters</code></pre>
+<pre class="r"><code>table(seu_int$seurat_clusters)</code></pre>
+<pre><code>
+    0     1     2     3     4 
+25003  3722  3096  1075   738 </code></pre>
+<pre class="r"><code># find subclusters
+seu_int.0 &lt;- FindSubCluster(seu_int, 0, &quot;integrated_snn&quot;, algorithm = 3,
+                            resolution = 0.3)</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 25003
+Number of edges: 1014685
+
+Running smart local moving algorithm...
+Maximum modularity in 10 random starts: 0.8823
+Number of communities: 9
+Elapsed time: 14 seconds</code></pre>
+<pre><code>1 singletons identified. 8 final clusters.</code></pre>
+<pre class="r"><code>seu_int.1 &lt;- FindSubCluster(seu_int, 1, &quot;integrated_snn&quot;, algorithm = 3,
+                            resolution = 0.3)</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 3722
+Number of edges: 135996
+
+Running smart local moving algorithm...
+Maximum modularity in 10 random starts: 0.9035
+Number of communities: 8
+Elapsed time: 0 seconds</code></pre>
+<pre class="r"><code>seu_int.2 &lt;- FindSubCluster(seu_int, 2, &quot;integrated_snn&quot;, algorithm = 3,
+                            resolution = 0.3)</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 3096
+Number of edges: 121634
+
+Running smart local moving algorithm...
+Maximum modularity in 10 random starts: 0.9055
+Number of communities: 7
+Elapsed time: 0 seconds</code></pre>
+<pre class="r"><code>seu_int.3 &lt;- FindSubCluster(seu_int, 3, &quot;integrated_snn&quot;, algorithm = 3,
+                            resolution = 0.3)</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 1075
+Number of edges: 29490
+
+Running smart local moving algorithm...
+Maximum modularity in 10 random starts: 0.9144
+Number of communities: 8
+Elapsed time: 0 seconds</code></pre>
+<pre class="r"><code>seu_int.4 &lt;- FindSubCluster(seu_int, 4, &quot;integrated_snn&quot;, algorithm = 3,
+                            resolution = 0.3)</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 738
+Number of edges: 19191
+
+Running smart local moving algorithm...
+Maximum modularity in 10 random starts: 0.9354
+Number of communities: 6
+Elapsed time: 0 seconds</code></pre>
+<pre class="r"><code>DimPlot(seu_int.0, reduction = &#39;umap&#39;, label = TRUE, label.size = 5,
+        group.by = &quot;sub.cluster&quot;) +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int.1, reduction = &#39;umap&#39;, label = TRUE, label.size = 5,
+        group.by = &quot;sub.cluster&quot;) +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-2">
+Past versions of unnamed-chunk-10-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int.2, reduction = &#39;umap&#39;, label = TRUE, label.size = 5,
+        group.by = &quot;sub.cluster&quot;) +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-3.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-3">
+Past versions of unnamed-chunk-10-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-3.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int.3, reduction = &#39;umap&#39;, label = TRUE, label.size = 5,
+        group.by = &quot;sub.cluster&quot;) +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-4.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-4">
+Past versions of unnamed-chunk-10-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-4.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int.4, reduction = &#39;umap&#39;, label = TRUE, label.size = 5,
+        group.by = &quot;sub.cluster&quot;) +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-5.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-5">
+Past versions of unnamed-chunk-10-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-10-5.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>table(seu_int.0$sub.cluster)</code></pre>
+<pre><code>
+ 0_0  0_1  0_2  0_3  0_4  0_5  0_6  0_7    1    2    3    4 
+4766 4476 4168 3036 2941 2740 1479 1397 3722 3096 1075  738 </code></pre>
+<pre class="r"><code>table(seu_int.1$sub.cluster)</code></pre>
+<pre><code>
+    0   1_0   1_1   1_2   1_3   1_4   1_5   1_6   1_7     2     3     4 
+25003   970   807   613   489   403   315    84    41  3096  1075   738 </code></pre>
+<pre class="r"><code>table(seu_int.2$sub.cluster)</code></pre>
+<pre><code>
+    0     1   2_0   2_1   2_2   2_3   2_4   2_5   2_6     3     4 
+25003  3722   744   577   484   423   357   302   209  1075   738 </code></pre>
+<pre class="r"><code>table(seu_int.3$sub.cluster)</code></pre>
+<pre><code>
+    0     1     2   3_0   3_1   3_2   3_3   3_4   3_5   3_6   3_7     4 
+25003  3722  3096   214   182   161   137   134   116   107    24   738 </code></pre>
+<pre class="r"><code>table(seu_int.4$sub.cluster)</code></pre>
+<pre><code>
+    0     1     2     3   4_0   4_1   4_2   4_3   4_4   4_5 
+25003  3722  3096  1075   171   157   115   115    92    88 </code></pre>
+<pre class="r"><code># merge all the subcluster labels into one variable
+seu_int$all_clusters &lt;- as.character(seu_int$seurat_clusters)
+
+seu_int$all_clusters &lt;- ifelse(seu_int$all_clusters == &quot;0&quot;,
+                               seu_int.0$sub.cluster,
+                               seu_int$all_clusters)
+seu_int$all_clusters &lt;- ifelse(seu_int$all_clusters == &quot;1&quot;,
+                                  seu_int.1$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters &lt;- ifelse(seu_int$all_clusters == &quot;2&quot;,
+                                  seu_int.2$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters &lt;- ifelse(seu_int$all_clusters == &quot;3&quot;,
+                                  seu_int.3$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters &lt;- ifelse(seu_int$all_clusters == &quot;4&quot;,
+                                  seu_int.4$sub.cluster,
+                                  seu_int$all_clusters)
+table(seu_int$all_clusters)</code></pre>
+<pre><code>
+ 0_0  0_1  0_2  0_3  0_4  0_5  0_6  0_7  1_0  1_1  1_2  1_3  1_4  1_5  1_6  1_7 
+4766 4476 4168 3036 2941 2740 1479 1397  970  807  613  489  403  315   84   41 
+ 2_0  2_1  2_2  2_3  2_4  2_5  2_6  3_0  3_1  3_2  3_3  3_4  3_5  3_6  3_7  4_0 
+ 744  577  484  423  357  302  209  214  182  161  137  134  116  107   24  171 
+ 4_1  4_2  4_3  4_4  4_5 
+ 157  115  115   92   88 </code></pre>
+<pre class="r"><code>length(unique(seu_int$all_clusters))</code></pre>
+<pre><code>[1] 37</code></pre>
+<pre class="r"><code>object &lt;- here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;, &quot;Gerli_et_al_2024.Integrated_clustered.Seurat.rds&quot;)
+if (!file.exists(object) | RERUN_ALL) {
+  # update the default clustering resolution to our chosen one
+  seu_int$seurat_clusters &lt;- as.factor(seu_int$all_clusters)
+  Idents(seu_int) &lt;- seu_int$seurat_clusters
+  
+  saveRDS(seu_int, object)
+} else {
+  seu_int &lt;- readRDS(object)
+}</code></pre>
+<pre class="r"><code>ALL_CLUSTER_COLOURS &lt;- c(light.colors(n = 24), sky.colors(n = 13))
+names(ALL_CLUSTER_COLOURS) &lt;- levels(seu_int$seurat_clusters)</code></pre>
+<div id="visualise-the-clustered-dataset" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> Visualise the
+clustered dataset</h2>
+<div id="cluster-and-sample" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Cluster and
+sample</h3>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;seurat_clusters&quot;) +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend + blank_axes + ggtitle(&quot;Seurat Clusters&quot;)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
+Past versions of unnamed-chunk-15-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-15-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-15-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  geom_text(stat=&#39;count&#39;, aes(label=..count..), vjust=-0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() +
+  ylim(0, 11000) +
+  xlab(&quot;Seurat clusters&quot;) + rotate_x_labels +
+  ylab(&quot;Number of cells&quot;) + ggtitle(&quot;Seurat Clusters&quot;)</code></pre>
+<pre><code>Warning: The dot-dot notation (`..count..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(count)` instead.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" alt="" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4ed3bae77c4eff3f737481ec4ab7d8f92b9b2a7e/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-16-1.png" target="_blank">4ed3bae</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = seurat_clusters)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = seurat_clusters)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() -&gt; p2
+
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" alt="" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-17-1.png" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p3 &lt;- seu_int@meta.data %&gt;%
+        ggplot(aes(x = seurat_clusters, fill = Sample)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample])  +
+        no_legend + rotate_x_labels +
+        ggtitle(&quot;Number of cells per capture by cluster&quot;)
+
+p4 &lt;- seu_int@meta.data %&gt;%
+        ggplot(aes(x = seurat_clusters, fill = Sample)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample]) +
+        guides(fill = guide_legend(ncol = 1)) + rotate_x_labels +
+        ggtitle(&quot;Propotion of capture by cluster&quot;)
+
+p3 + p4</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-1">
+Past versions of unnamed-chunk-18-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-18-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-18-1.png" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu_int@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = seurat_clusters)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)])  +
+        no_legend +
+        ggtitle(&quot;Number of cells per cluster by donor&quot;) +
+        rotate_x_labels
+
+p2 &lt;- seu_int@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = seurat_clusters)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+        guides(fill = guide_legend(ncol = 2)) +
+        ggtitle(&quot;Propotion of clusters by donor&quot;) +
+        rotate_x_labels
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
+Past versions of unnamed-chunk-19-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-19-1.png" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="cell-type" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Cell type</h3>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;pan_fetal.majority_voting&quot;,) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-20-1">
+Past versions of unnamed-chunk-20-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-20-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-1.png" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;fetal_organ.majority_voting&quot;,) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-20-2">
+Past versions of unnamed-chunk-20-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-20-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-2.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bc7d4388155668894e865b3ff49e325c1e4434b/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-20-2.png" target="_blank">1bc7d43</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;pan_fetal.majority_voting&quot;,) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) + ggtitle(&quot;Pan_Fetal_Human&quot;) +
+  bottom_legend + blank_axes -&gt; p1
+
+DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;fetal_organ.majority_voting&quot;,) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) + ggtitle(&quot;Developing_Human_Organs&quot;) +
+  bottom_legend + blank_axes -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b87fbf5606c79026d7a32489c20b70fc992219a/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-21-1.png" target="_blank">6b87fbf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab(&quot;Number of cells&quot;) + xlab(&quot;Cell Type Annotations&quot;) +
+        ggtitle(&quot;Pan_Fetal_Human&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab(&quot;Number of cells&quot;) + xlab(&quot;Cell Type Annotations&quot;) +
+        ggtitle(&quot;Developing_Human_Organs&quot;) -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-22-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-22-1">
+Past versions of unnamed-chunk-22-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-22-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-22-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-22-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-22-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-22-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab(&quot;Count&quot;) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  no_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle(&quot;Number of cells per cell type by cluster&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  no_y_labels +
+  ylab(&quot;Proportion&quot;) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  bottom_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle(&quot;Proportion of cells per cell type by cluster&quot;) -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-23-1.png" alt="" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-23-1">
+Past versions of unnamed-chunk-23-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-23-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-23-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-23-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-23-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-23-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab(&quot;Count&quot;) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  no_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle(&quot;Number of cells per cell type by cluster&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  no_y_labels +
+  ylab(&quot;Proportion&quot;) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  bottom_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle(&quot;Proportion of cells per cell type by cluster&quot;) -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-24-1.png" alt="" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
+Past versions of unnamed-chunk-24-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-24-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-24-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-24-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-24-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab(&quot;Count&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  no_legend + rotate_x_labels +
+  ggtitle(&quot;Number of cells per cluster by cell type&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels +
+  ggtitle(&quot;Proportion of cells per cluster by cell type&quot;) -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-25-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-1">
+Past versions of unnamed-chunk-25-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-25-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-25-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8e13a1a615c8afbe4f05d9d7cf1303d931674679/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-25-1.png" target="_blank">8e13a1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc8ddbc0ab4cba607ae262f0d76cb142d3b55977/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-25-1.png" target="_blank">dc8ddbc</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab(&quot;Count&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  no_legend + rotate_x_labels +
+  ggtitle(&quot;Number of cells per cluster by cell type&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels +
+  ggtitle(&quot;Proportion of cells per cluster by cell type&quot;) -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-26-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
+Past versions of unnamed-chunk-26-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-26-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-26-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-26-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) + xlab(&quot;Seurat Clusters&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 3)) + bottom_legend + theme(legend.title = element_blank()) + rotate_x_labels +
+  ggtitle(&quot;Pan_Fetal_Human&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) + xlab(&quot;Seurat Clusters&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 3)) + bottom_legend + theme(legend.title = element_blank()) + rotate_x_labels +
+  ggtitle(&quot;Developing_Human_Organs&quot;) -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-27-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-27-1">
+Past versions of unnamed-chunk-27-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-27-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-27-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-27-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  NoLegend() -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-28-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-1">
+Past versions of unnamed-chunk-28-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-28-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-28-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-28-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  NoLegend() -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-29-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
+Past versions of unnamed-chunk-29-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-29-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-29-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-29-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="gestational-age" class="section level3" number="3.1.3">
+<h3><span class="header-section-number">3.1.3</span> Gestational
+age</h3>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;gest_age_weeks&quot;,) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-30-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-30-1">
+Past versions of unnamed-chunk-30-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-30-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-30-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-30-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = factor(gest_age_weeks),
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab(&quot;Count&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  no_legend +
+  ggtitle(&quot;Number of cells per gestational age by cell type&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = factor(gest_age_weeks),
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle(&quot;Proportion of cells per gestational age by cell type&quot;) -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-31-1.png" alt="" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-31-1">
+Past versions of unnamed-chunk-31-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-31-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-31-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c77675f97aedf619b17956dd2fbbe0b76d1eebd9/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-31-1.png" target="_blank">c77675f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="other-characteristics" class="section level3" number="3.1.4">
+<h3><span class="header-section-number">3.1.4</span> Other
+characteristics</h3>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;Trimester&quot;,) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-1">
+Past versions of unnamed-chunk-32-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-1.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;foetal_sex&quot;,) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-2.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-2">
+Past versions of unnamed-chunk-32-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-2.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;outcome&quot;,) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-3.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-3">
+Past versions of unnamed-chunk-32-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-3.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;abnormalities&quot;,) +
+  bottom_legend + guides(color=guide_legend(ncol = 3, override.aes = list(size=2)))</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-4.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-4">
+Past versions of unnamed-chunk-32-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-4.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;early_late_gestation&quot;,) +
+  bottom_legend + scale_color_manual(values = ALL_GEST_COLOURS)</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-5.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-5">
+Past versions of unnamed-chunk-32-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-5.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, group.by = &quot;procedure&quot;,) +
+  bottom_legend</code></pre>
+<p><img src="figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-6.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-6">
+Past versions of unnamed-chunk-32-6.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-6" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65e2af089d54cdc793f197997d71f76665481ded/docs/figure/Gerli_et_al_2024.integration_clustering.Rmd/unnamed-chunk-32-6.png" target="_blank">65e2af0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="session-info" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Session info</h1>
+<summary>
+This analysis was performed using the following software (click triangle
+to expand)
+</summary>
+<details>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.0 (2025-04-11)
+ os       macOS 26.6
+ system   aarch64, darwin20
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Australia/Melbourne
+ date     2026-08-05
+ pandoc   3.8.3 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown)
+ quarto   1.9.38 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ ! package              * version  date (UTC) lib source
+ P abind                  1.4-8    2024-09-12 [?] RSPM
+   backports              1.5.0    2024-05-23 [1] RSPM (R 4.5.0)
+ P beachmat               2.26.0   2025-10-29 [?] Bioconduc~
+ P beeswarm               0.4.0    2021-06-01 [?] RSPM
+ P Biobase              * 2.70.0   2025-10-29 [?] Bioconduc~
+ P BiocGenerics         * 0.56.0   2025-10-29 [?] Bioconduc~
+ P BiocManager            1.30.27  2025-11-14 [?] RSPM
+ P BiocNeighbors          2.4.0    2025-10-29 [?] Bioconduc~
+ P BiocParallel           1.44.0   2025-10-29 [?] Bioconduc~
+ P BiocSingular           1.26.1   2025-11-17 [?] Bioconduc~
+ P bluster                1.20.0   2025-10-29 [?] Bioconduc~
+ P bslib                  0.10.0   2026-01-26 [?] RSPM
+ P cachem                 1.1.0    2024-05-16 [?] RSPM
+ P callr                  3.7.6    2024-03-25 [?] CRAN (R 4.5.0)
+ P checkmate              2.3.3    2025-08-18 [?] RSPM
+ P cli                    3.6.6    2026-04-09 [?] RSPM
+ P cluster                2.1.8.1  2025-03-12 [?] CRAN (R 4.5.0)
+ P clustree             * 0.5.1    2023-11-05 [?] RSPM
+ P codetools              0.2-20   2024-03-31 [?] CRAN (R 4.5.0)
+   colorspace             2.1-2    2025-09-22 [1] RSPM (R 4.5.0)
+ P cowplot              * 1.2.0    2025-07-07 [?] RSPM
+ P data.table             1.18.2.1 2026-01-27 [?] RSPM
+   DelayedArray           0.36.1   2026-03-31 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P deldir                 2.0-4    2024-02-28 [?] RSPM
+ P digest                 0.6.39   2025-11-19 [?] RSPM
+   dplyr                  1.2.0    2026-02-03 [1] RSPM (R 4.5.0)
+ P dqrng                  0.4.1    2024-05-28 [?] CRAN (R 4.5.0)
+ P edgeR                  4.8.2    2025-12-23 [?] https://bioc-release.r-universe.dev (R 4.5.2)
+ P egg                  * 0.4.5    2019-07-13 [?] RSPM
+ P evaluate               1.0.5    2025-08-27 [?] RSPM
+ P farver                 2.1.2    2024-05-13 [?] RSPM
+ P fastmap                1.2.0    2024-05-15 [?] RSPM
+ P fitdistrplus           1.2-6    2026-01-24 [?] RSPM
+ P fs                     2.1.0    2026-04-18 [?] RSPM
+ P future                 1.69.0   2026-01-16 [?] RSPM
+ P future.apply           1.20.1   2025-12-09 [?] RSPM
+ P generics             * 0.1.4    2025-05-09 [?] CRAN (R 4.5.0)
+ P GenomicRanges        * 1.62.1   2025-12-08 [?] Bioconduc~
+ P getPass                0.2-4    2023-12-10 [?] CRAN (R 4.5.0)
+ P ggalluvial           * 0.12.5   2023-02-22 [?] RSPM
+ P ggbeeswarm           * 0.7.3    2025-11-29 [?] RSPM
+ P ggforce                0.5.0    2025-06-18 [?] RSPM
+ P ggplot2              * 4.0.2    2026-02-03 [?] RSPM
+ P ggraph               * 2.2.2    2025-08-24 [?] RSPM
+ P ggrepel                0.9.6    2024-09-07 [?] CRAN (R 4.5.0)
+ P ggridges               0.5.7    2025-08-27 [?] RSPM
+ P git2r                  0.36.2   2025-03-29 [?] CRAN (R 4.5.0)
+ P globals                0.19.0   2026-02-02 [?] RSPM
+ P glue                   1.8.0    2024-09-30 [?] RSPM
+ P goftest                1.2-3    2021-10-07 [?] CRAN (R 4.5.0)
+ P graphlayouts           1.2.2    2025-01-23 [?] RSPM
+ P gridExtra            * 2.3      2017-09-09 [?] RSPM
+ P gtable                 0.3.6    2024-10-25 [?] RSPM
+ P here                 * 1.0.2    2025-09-15 [?] RSPM
+ P htmltools              0.5.9    2025-12-04 [?] RSPM
+ P htmlwidgets            1.6.4    2023-12-06 [?] RSPM
+ P httpuv                 1.6.16   2025-04-16 [?] CRAN (R 4.5.0)
+ P httr                   1.4.7    2023-08-15 [?] RSPM
+ P ica                    1.0-3    2022-07-08 [?] CRAN (R 4.5.0)
+ P igraph                 2.2.1    2025-10-27 [?] RSPM
+ P IRanges              * 2.44.0   2025-10-29 [?] Bioconduc~
+ P irlba                  2.3.7    2026-01-30 [?] RSPM
+ P jquerylib              0.1.4    2021-04-26 [?] RSPM
+ P jsonlite               2.0.0    2025-03-27 [?] RSPM
+ P KernSmooth             2.23-26  2025-01-01 [?] CRAN (R 4.5.0)
+ P knitr                  1.51     2025-12-20 [?] RSPM
+ P labeling               0.4.3    2023-08-29 [?] RSPM
+ P later                  1.4.5    2026-01-08 [?] RSPM
+ P lattice                0.22-7   2025-04-02 [?] RSPM
+ P lazyeval               0.2.2    2019-03-15 [?] RSPM
+   leiden                 0.4.3.1  2023-11-17 [1] RSPM (R 4.5.0)
+ P lifecycle              1.0.5    2026-01-08 [?] RSPM
+ P limma                  3.66.0   2025-10-29 [?] Bioconduc~
+ P listenv                0.10.0   2025-11-02 [?] RSPM
+ P lmtest                 0.9-40   2022-03-21 [?] CRAN (R 4.5.0)
+ P locfit                 1.5-9.12 2025-03-05 [?] RSPM
+ P magrittr               2.0.4    2025-09-12 [?] RSPM
+ P MASS                   7.3-65   2025-02-28 [?] CRAN (R 4.5.0)
+ P Matrix                 1.7-4    2025-08-28 [?] RSPM
+ P MatrixGenerics       * 1.22.0   2025-10-29 [?] Bioconduc~
+ P matrixStats          * 1.5.0    2025-01-07 [?] RSPM
+ P memoise                2.0.1    2021-11-26 [?] RSPM
+ P metapod                1.18.0   2025-10-29 [?] Bioconduc~
+ P mime                   0.13     2025-03-17 [?] RSPM
+ P miniUI                 0.1.2    2025-04-17 [?] CRAN (R 4.5.0)
+ P nlme                   3.1-168  2025-03-31 [?] CRAN (R 4.5.0)
+ P otel                   0.2.0    2025-08-29 [?] RSPM
+ P parallelly             1.46.1   2026-01-08 [?] RSPM
+ P patchwork            * 1.3.2    2025-08-25 [?] RSPM
+ P pbapply                1.7-4    2025-07-20 [?] RSPM
+ P pillar                 1.11.1   2025-09-17 [?] RSPM
+ P pkgconfig              2.0.3    2019-09-22 [?] RSPM
+ P plotly                 4.12.0   2026-01-24 [?] RSPM
+ P plyr                   1.8.9    2023-10-02 [?] RSPM
+ P png                    0.1-8    2022-11-29 [?] RSPM
+ P Polychrome           * 1.5.4    2025-04-06 [?] RSPM
+ P polyclip               1.10-7   2024-07-23 [?] CRAN (R 4.5.0)
+ P processx               3.8.6    2025-02-21 [?] CRAN (R 4.5.0)
+ P progressr              0.18.0   2025-11-06 [?] RSPM
+ P promises               1.5.0    2025-11-01 [?] RSPM
+ P ps                     1.9.1    2025-04-12 [?] CRAN (R 4.5.0)
+ P purrr                  1.2.1    2026-01-09 [?] RSPM
+ P R6                     2.6.1    2025-02-15 [?] RSPM
+ P RANN                   2.6.2    2024-08-25 [?] CRAN (R 4.5.0)
+ P RColorBrewer           1.1-3    2022-04-03 [?] RSPM
+ P Rcpp                   1.1.1    2026-01-10 [?] RSPM
+ P RcppAnnoy              0.0.23   2026-01-12 [?] RSPM
+ P renv                   1.1.7    2026-01-27 [?] RSPM
+ P reshape2             * 1.4.5    2025-11-12 [?] RSPM
+ P reticulate             1.44.1   2025-11-14 [?] RSPM
+ P rlang                  1.2.0    2026-04-06 [?] RSPM
+ P rmarkdown              2.30     2025-09-28 [?] RSPM
+ P ROCR                   1.0-12   2026-01-23 [?] RSPM
+ P rprojroot              2.1.1    2025-08-26 [?] RSPM
+ P RSpectra               0.16-2   2024-07-18 [?] CRAN (R 4.5.0)
+ P rstudioapi             0.18.0   2026-01-16 [?] RSPM
+ P rsvd                   1.0.5    2021-04-16 [?] RSPM
+ P Rtsne                  0.17     2023-12-07 [?] CRAN (R 4.5.0)
+ P S4Arrays               1.10.1   2025-12-08 [?] Bioconduc~
+   S4Vectors            * 0.48.1   2026-04-04 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P S7                     0.2.1    2025-11-14 [?] RSPM
+ P sass                   0.4.10   2025-04-11 [?] RSPM
+ P ScaledMatrix           1.18.0   2025-10-29 [?] Bioconduc~
+ P scales                 1.4.0    2025-04-24 [?] RSPM
+ P scater               * 1.38.0   2025-10-29 [?] Bioconduc~
+ P scattermore            1.2      2023-06-12 [?] CRAN (R 4.5.0)
+ P scatterplot3d          0.3-44   2023-05-05 [?] RSPM
+ P scran                * 1.38.0   2025-10-29 [?] Bioconduc~
+ P sctransform            0.4.3    2026-01-10 [?] RSPM
+ P scuttle              * 1.20.0   2025-10-29 [?] Bioconduc~
+ P Seqinfo              * 1.0.0    2025-10-29 [?] Bioconduc~
+ P sessioninfo          * 1.2.3    2025-02-05 [?] RSPM
+   Seurat               * 4.4.0    2024-01-10 [1] https://satijalab.r-universe.dev (R 4.5.0)
+   SeuratObject         * 4.1.4    2023-09-27 [1] https://satijalab.r-universe.dev (R 4.5.0)
+ P shiny                  1.12.1   2025-12-09 [?] RSPM
+ P SingleCellExperiment * 1.32.0   2025-10-29 [?] Bioconduc~
+ P sp                     2.2-0    2025-02-01 [?] CRAN (R 4.5.0)
+ P SparseArray            1.10.8   2025-12-18 [?] Bioconduc~
+ P spatstat.data          3.1-9    2025-10-18 [?] RSPM
+ P spatstat.explore       3.7-0    2026-01-22 [?] RSPM
+ P spatstat.geom          3.7-0    2026-01-20 [?] RSPM
+ P spatstat.random        3.4-4    2026-01-21 [?] RSPM
+ P spatstat.sparse        3.1-0    2024-06-21 [?] CRAN (R 4.5.0)
+ P spatstat.univar        3.1-6    2026-01-17 [?] RSPM
+ P spatstat.utils         3.2-1    2026-01-10 [?] RSPM
+ P statmod                1.5.1    2025-10-09 [?] RSPM
+ P stringi                1.8.7    2025-03-27 [?] RSPM
+ P stringr              * 1.6.0    2025-11-04 [?] RSPM
+ P SummarizedExperiment * 1.40.0   2025-10-29 [?] Bioconduc~
+ P survival               3.8-6    2026-01-16 [?] RSPM
+ P tensor                 1.5.1    2025-06-17 [?] RSPM
+ P tibble                 3.3.1    2026-01-11 [?] RSPM
+ P tidygraph              1.3.1    2024-01-30 [?] RSPM
+ P tidyr                  1.3.2    2025-12-19 [?] RSPM
+ P tidyselect             1.2.1    2024-03-11 [?] RSPM
+ P tweenr                 2.0.3    2024-02-26 [?] RSPM
+ P uwot                   0.2.4    2025-11-10 [?] RSPM
+ P vctrs                  0.7.1    2026-01-23 [?] RSPM
+ P vipor                  0.4.7    2023-12-18 [?] RSPM
+ P viridis              * 0.6.5    2024-01-29 [?] RSPM
+ P viridisLite          * 0.4.2    2023-05-02 [?] RSPM
+ P whisker                0.4.1    2022-12-05 [?] CRAN (R 4.5.0)
+ P withr                  3.0.2    2024-10-28 [?] RSPM
+ P workflowr            * 1.7.2    2025-08-18 [?] RSPM
+ P xfun                   0.56     2026-01-18 [?] RSPM
+ P xtable                 1.8-4    2019-04-21 [?] RSPM
+ P XVector                0.50.0   2025-10-29 [?] Bioconduc~
+ P yaml                   2.3.12   2025-12-10 [?] RSPM
+ P zoo                    1.8-15   2025-12-15 [?] RSPM
+
+ [1] &lt;project&gt;/renv/library/macos/R-4.5/aarch64-apple-darwin20
+ [2] &lt;renv-cache&gt;/sandbox/macos/R-4.5/aarch64-apple-darwin20/4cd76b74
+
+ * ── Packages attached to the search path.
+ P ── Loaded and on-disk path mismatch.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</details>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS 26.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Australia/Melbourne
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices datasets  utils     methods  
+[8] base     
+
+other attached packages:
+ [1] scran_1.38.0                Polychrome_1.5.4           
+ [3] viridis_0.6.5               viridisLite_0.4.2          
+ [5] reshape2_1.4.5              ggalluvial_0.12.5          
+ [7] sessioninfo_1.2.3           here_1.0.2                 
+ [9] egg_0.4.5                   gridExtra_2.3              
+[11] patchwork_1.3.2             cowplot_1.2.0              
+[13] ggbeeswarm_0.7.3            stringr_1.6.0              
+[15] scater_1.38.0               scuttle_1.20.0             
+[17] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
+[19] Biobase_2.70.0              GenomicRanges_1.62.1       
+[21] Seqinfo_1.0.0               IRanges_2.44.0             
+[23] S4Vectors_0.48.1            BiocGenerics_0.56.0        
+[25] generics_0.1.4              MatrixGenerics_1.22.0      
+[27] matrixStats_1.5.0           clustree_0.5.1             
+[29] ggraph_2.2.2                ggplot2_4.0.2              
+[31] SeuratObject_4.1.4          Seurat_4.4.0               
+[33] workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.23       splines_4.5.0          later_1.4.5           
+  [4] tibble_3.3.1           polyclip_1.10-7        lifecycle_1.0.5       
+  [7] edgeR_4.8.2            rprojroot_2.1.1        globals_0.19.0        
+ [10] processx_3.8.6         lattice_0.22-7         MASS_7.3-65           
+ [13] backports_1.5.0        magrittr_2.0.4         limma_3.66.0          
+ [16] plotly_4.12.0          sass_0.4.10            rmarkdown_2.30        
+ [19] jquerylib_0.1.4        yaml_2.3.12            metapod_1.18.0        
+ [22] httpuv_1.6.16          otel_0.2.0             sctransform_0.4.3     
+ [25] sp_2.2-0               spatstat.sparse_3.1-0  reticulate_1.44.1     
+ [28] pbapply_1.7-4          RColorBrewer_1.1-3     abind_1.4-8           
+ [31] Rtsne_0.17             purrr_1.2.1            tweenr_2.0.3          
+ [34] git2r_0.36.2           ggrepel_0.9.6          irlba_2.3.7           
+ [37] listenv_0.10.0         spatstat.utils_3.2-1   RSpectra_0.16-2       
+ [40] goftest_1.2-3          dqrng_0.4.1            spatstat.random_3.4-4 
+ [43] fitdistrplus_1.2-6     parallelly_1.46.1      leiden_0.4.3.1        
+ [46] codetools_0.2-20       DelayedArray_0.36.1    ggforce_0.5.0         
+ [49] tidyselect_1.2.1       farver_2.1.2           ScaledMatrix_1.18.0   
+ [52] spatstat.explore_3.7-0 jsonlite_2.0.0         BiocNeighbors_2.4.0   
+ [55] tidygraph_1.3.1        progressr_0.18.0       ggridges_0.5.7        
+ [58] survival_3.8-6         tools_4.5.0            ica_1.0-3             
+ [61] Rcpp_1.1.1             glue_1.8.0             SparseArray_1.10.8    
+ [64] xfun_0.56              dplyr_1.2.0            withr_3.0.2           
+ [67] BiocManager_1.30.27    fastmap_1.2.0          bluster_1.20.0        
+ [70] callr_3.7.6            digest_0.6.39          rsvd_1.0.5            
+ [73] R6_2.6.1               mime_0.13              colorspace_2.1-2      
+ [76] scattermore_1.2        tensor_1.5.1           spatstat.data_3.1-9   
+ [79] tidyr_1.3.2            renv_1.1.7             data.table_1.18.2.1   
+ [82] graphlayouts_1.2.2     httr_1.4.7             htmlwidgets_1.6.4     
+ [85] S4Arrays_1.10.1        scatterplot3d_0.3-44   whisker_0.4.1         
+ [88] uwot_0.2.4             pkgconfig_2.0.3        gtable_0.3.6          
+ [91] lmtest_0.9-40          S7_0.2.1               XVector_0.50.0        
+ [94] htmltools_0.5.9        scales_1.4.0           png_0.1-8             
+ [97] spatstat.univar_3.1-6  knitr_1.51             rstudioapi_0.18.0     
+[100] checkmate_2.3.3        nlme_3.1-168           cachem_1.1.0          
+[103] zoo_1.8-15             KernSmooth_2.23-26     parallel_4.5.0        
+[106] miniUI_0.1.2           vipor_0.4.7            pillar_1.11.1         
+[109] grid_4.5.0             vctrs_0.7.1            RANN_2.6.2            
+[112] promises_1.5.0         BiocSingular_1.26.1    beachmat_2.26.0       
+[115] xtable_1.8-4           cluster_2.1.8.1        beeswarm_0.4.0        
+[118] evaluate_1.0.5         locfit_1.5-9.12        cli_3.6.6             
+[121] compiler_4.5.0         rlang_1.2.0            future.apply_1.20.1   
+[124] labeling_0.4.3         ps_1.9.1               getPass_0.2-4         
+[127] plyr_1.8.9             fs_2.1.0               stringi_1.8.7         
+[130] deldir_2.0-4           BiocParallel_1.44.0    lazyeval_0.2.2        
+[133] spatstat.geom_3.7-0    Matrix_1.7-4           future_1.69.0         
+[136] statmod_1.5.1          shiny_1.12.1           ROCR_1.0-12           
+[139] igraph_2.2.1           memoise_2.0.1          bslib_0.10.0          </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

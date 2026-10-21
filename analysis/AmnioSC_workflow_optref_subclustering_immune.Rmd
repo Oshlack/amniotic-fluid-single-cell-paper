@@ -1,0 +1,514 @@
+---
+title: "Subclustering immune cells - Optimised Reference"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(limma)
+library(edgeR)
+library(org.Hs.eg.db)
+library(GO.db)
+library(pheatmap)
+library(rmarkdown)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(viridis)
+library(Polychrome)
+library(tidyverse)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load in the integrated dataset
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Integrated_clustered.Seurat.rds"))
+```
+
+# Select relevant cells
+
+Redo the subclustering for the T-cell and ILC3 cell clusters again - but this time recompute the HVGs given how inherently similar these cell types are.
+
+```{r, fig.height=8, fig.width=8}
+highlight_cells <- colnames(seu_int.AmnioSC)[seu_int.AmnioSC$seurat_clusters %in% c("2_0", "2_1", "2_2", "2_3", "2_4", "2_5")]
+
+DimPlot(seu_int.AmnioSC, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "seurat_clusters", cells.highlight = highlight_cells) +
+  guides(color = guide_legend(nrow = 2, override.aes = list(size = 2))) +
+  no_legend +
+  ggtitle("Cluster 2 subclusters (ILC3 and T cells)")
+```
+
+# Subcluster Cluster 2 (subset and recompute)
+
+As an alternative to using `FindSubCluster()` on the existing `integrated_snn` graph, here we instead subset the object to just the cells in Cluster 2, then recompute PCA, neighbours, UMAP and clustering on this subset alone.
+
+```{r}
+seu_int.sub2 <- seu_int.AmnioSC[, highlight_cells]
+seu_int.sub2$seurat_clusters <- droplevels(factor(seu_int.sub2$seurat_clusters))
+
+res_cols <- grep("^integrated_snn_res\\.", colnames(seu_int.sub2@meta.data))
+seu_int.sub2@meta.data <- seu_int.sub2@meta.data[, -res_cols]
+
+DefaultAssay(seu_int.sub2) <- "RNA"
+
+table(seu_int.sub2$seurat_clusters)
+```
+
+```{r}
+seu_int.sub2 <- integrateDataset(seu_int.sub2, k.weight=45, npcs=45)
+```
+
+```{r}
+ElbowPlot(seu_int.sub2, ndims = 30)
+```
+
+```{r}
+seu_int.sub2 <- FindNeighbors(seu_int.sub2, reduction = "pca", dims = 1:30)
+seu_int.sub2 <- RunUMAP(seu_int.sub2, dims = 1:30)
+
+seu_int.sub2 <- FindClusters(seu_int.sub2, algorithm = 3,
+                              resolution = seq(0.1, 1, by = 0.1))
+```
+
+```{r, fig.asp=1.5}
+clustree(seu_int.sub2, prefix = "integrated_snn_res.")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.1") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.1)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.2") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.2)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.3") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.3)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.4") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.4)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.5") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.5)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.0.6") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 0.6)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "integrated_snn_res.1") +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (resolution = 1)")
+```
+
+We will go with resolution = 0.6 for downstream analysis.
+
+```{r}
+seu_int.sub2$seurat_clusters <- seu_int.sub2$integrated_snn_res.0.6
+Idents(seu_int.sub2) <- seu_int.sub2$seurat_clusters
+```
+
+```{r}
+SUBSET_CLUSTER_COLOURS <- light.colors(n = nlevels(seu_int.sub2$seurat_clusters))
+names(SUBSET_CLUSTER_COLOURS) <- levels(seu_int.sub2$seurat_clusters)
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "seurat_clusters") +
+  scale_colour_manual(values = SUBSET_CLUSTER_COLOURS) +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (recomputed)")
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.sub2, reduction = 'umap', label = FALSE, label.size = 5,
+        group.by = "Donor") +
+  guides(color = guide_legend(nrow = 2, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters of Cluster 2 (recomputed)")
+```
+
+```{r}
+table(seu_int.sub2$seurat_clusters)
+```
+
+# Identify marker genes for the subset & recomputed subclusters
+
+We will use the same *limma* one-vs-rest marker gene approach used in the [Cluster marker gene and GO analysis](AmnioSC_workflow_optref_cluster_marker_gene_analysis.html) workflow, this time using the clusters found by subsetting and recomputing PCA/UMAP/clustering on just Cluster 2 cells.
+
+```{r}
+counts <- as.matrix(seu_int.sub2[["RNA"]]@counts)
+sample <- seu_int.sub2$Sample
+
+subclusters <- seu_int.sub2$seurat_clusters
+
+fit.cont <- findMarkerGenes(counts, subclusters, sample)
+
+summary(decideTests(fit.cont))
+```
+
+```{r}
+# picks genes above given logFC threshold
+treat.all <- treat(fit.cont, lfc = 0.5)
+
+dt <- decideTests(treat.all)
+summary(dt)
+```
+
+### Extract marker genes
+
+```{r}
+subcluster_names <- levels(subclusters)
+
+subcluster_markers_top10 <- extractMarkerGenes(treat.all, subcluster_names)
+subcluster_markers_top20 <- extractMarkerGenes(treat.all, subcluster_names,
+                                               n_markers = 20)
+subcluster_markers_top50 <- extractMarkerGenes(treat.all, subcluster_names,
+                                               n_markers = 50)
+
+paged_table(as.data.frame(subcluster_markers_top10))
+
+saveRDS(subcluster_markers_top10,
+        here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_markers_top10.rds"))
+
+write.csv(subcluster_markers_top10,
+          file = here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_markers_top10.csv"),
+          quote = FALSE)
+
+write.csv(subcluster_markers_top20,
+          file = here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_markers_top20.csv"),
+          quote = FALSE)
+```
+
+### Plot heatmap
+
+```{r}
+annotation_df <- data.frame(clusters = seu_int.sub2$seurat_clusters,
+                            cell = colnames(seu_int.sub2),
+                            Donor = seu_int.sub2$Donor)
+annotation_df <- annotation_df[order(annotation_df$clusters),]
+
+annotation_colours <- list(clusters = SUBSET_CLUSTER_COLOURS[levels(subclusters)])
+
+cluster_markers_seu <- seu_int.sub2[unique(unname(unlist(subcluster_markers_top10))), annotation_df$cell]
+```
+
+```{r, fig.width=12, fig.height=10}
+pheatmap(GetAssayData(cluster_markers_seu, "data"), show_colnames = FALSE,
+         color = viridis(14), annotation_col = annotation_df[, "clusters", drop = FALSE],
+         annotation_colors = annotation_colours["clusters"],
+         cluster_cols = FALSE, cluster_rows = TRUE,
+         gaps_col = cumsum(table(cluster_markers_seu$seurat_clusters)))
+```
+
+```{r, fig.width=24, fig.height=6}
+DotPlot(object = seu_int.sub2, features = unique(unlist(subcluster_markers_top10)),
+        group.by = "seurat_clusters", assay = "SCT") + 
+  theme_bw() + rotate_x_labels + 
+  ggtitle("Expression of subcluster marker genes - top 10 per cluster - Subclustering analysis")
+```
+
+```{r, fig.width=40, fig.height=6}
+DotPlot(object = seu_int.sub2, features = unique(unlist(subcluster_markers_top20)),
+        group.by = "seurat_clusters", assay = "SCT") + 
+  theme_bw() + rotate_x_labels + 
+  ggtitle("Expression of subcluster marker  - top 20 per cluster - Subclustering analysis")
+```
+
+# Gene ontology analysis for the subset & recomputed subclusters
+
+```{r}
+subcluster_go <- performGO(subcluster_markers_top50, subcluster_names)
+
+subcluster_go <- as.data.frame(subcluster_go)
+
+write.table(subcluster_go, sep = "\t", row.names = FALSE,
+            file = here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_go_top10.tsv"),
+            quote = FALSE)
+```
+
+```{r}
+paged_table(subcluster_go)
+```
+
+# Plotting subclusters in the full dataset
+
+```{r}
+# map the sub78 (subset & recomputed) subclusters back onto the full dataset, leaving every
+# other cell labelled by its refined cluster so it can be greyed out below
+seu_int.AmnioSC$sub2_cluster <- as.character(seu_int.AmnioSC$seurat_clusters)
+seu_int.AmnioSC$sub2_cluster[colnames(seu_int.sub2)] <- paste0("Sub2_", seu_int.sub2$seurat_clusters)
+seu_int.AmnioSC$sub2_cluster <- factor(seu_int.AmnioSC$sub2_cluster)
+```
+
+```{r}
+# colour only the sub78 subclusters brightly, grey out everything else
+sub2_levels <- levels(seu_int.AmnioSC$sub2_cluster)
+sub2_target_clusters <- grep("^Sub2_", sub2_levels, value = TRUE)
+
+SUB2_FULL_COLOURS <- rep("grey80", length(sub2_levels))
+names(SUB2_FULL_COLOURS) <- sub2_levels
+SUB2_FULL_COLOURS[sub2_target_clusters] <- light.colors(n = length(sub2_target_clusters))
+```
+
+```{r, fig.height=8, fig.width=8}
+DimPlot(seu_int.AmnioSC, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub2_cluster") +
+  scale_colour_manual(values = SUB2_FULL_COLOURS) +
+  guides(color = guide_legend(ncol = 11, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Cluster 2 subclusters (recomputed) in the full dataset")
+```
+
+# Gene expression
+
+```{r, fig.height=8, fig.width=8}
+DefaultAssay(seu_int.AmnioSC) <- "SCT"
+FeaturePlot(seu_int.AmnioSC, features = c("FOXP3","TIGIT"), reduction = "umap")
+FeaturePlot(seu_int.AmnioSC, features = c("CD4","CD8A"), reduction = "umap")
+
+DefaultAssay(seu_int.sub2) <- "RNA"
+FeaturePlot(seu_int.sub2, features = c("CD4","CD8A", "CD69", "TOP2A"), reduction = "umap",
+            slot = "count")
+```
+
+# Plotting canonical marker genes
+
+```{r}
+marker_genes <- list(
+  "0"  = c("IL23R","ITGAE","KIT"),
+  "1"  = c("ZBTB16","IKZF2","RORA"),
+  "2"  = c("IL7R","CCR6","ITGAE","IL23R","KLRB1"),
+  "3"  = c("TMSB4X","EEF1A1","ACTB","ACTG1","RACK1","FAU","UBA52","COX7C","PFN1"),
+  "4"  = c("LEF1","SATB1","IL32"),
+  "5"  = c("LEF1","TCF7","CD27","CD8B","MAL"),
+  "6"  = c("FOS","FOSB","JUN","JUND","CD69","DUSP1"),
+  "7"  = c("RORA","CCR6","KIT","CD44"),
+  "8"  = character(0),
+  "9"  = c("MKI67","TOP2A","CDK1","TYMS","RRM2","BUB1B","TPX2","STMN1","NUSAP1","PCLAF"),
+  "10" = c("GNLY","NKG7","GZMA","GZMK","KLRD1","KLRC1","KLRC2","KLRC4","TYROBP","CCL3","CCL4","CCL5"),
+  "11" = c("LAMP3","IDO1","IDO2","FLT3","CSF2RA")
+)
+
+cluster_names.full <- c(
+  "0"  = "Th17-like / ILC3 (IL23R+ITGAE+KIT)",
+  "1"  = "Innate-like T / ILC / Treg-associated (ZBTB16+IKZF2+RORA)",
+  "2"  = "Th17 / mucosal-associated T cells (CCR6+IL23R+KLRB1)",
+  "3"  = "Low-quality / housekeeping (ribosomal-cytoskeletal)",
+  "4"  = "Naive/early T cells (LEF1+SATB1)",
+  "5"  = "Naive/stem-like CD8 T cells (TCF7+LEF1+CD27+CD8B)",
+  "6"  = "Activated T cells (AP-1/immediate-early: FOS/JUN/CD69)",
+  "7"  = "Th17 / ILC3 (RORA+CCR6+KIT)",
+  "8"  = "Unclear / unannotated",
+  "9"  = "Proliferating cells (MKI67+TOP2A+CDK1)",
+  "10" = "NK cells / cytotoxic lymphocytes (GNLY+NKG7+GZMA/K)",
+  "11" = "Mature/regulatory dendritic cells - mregDC (LAMP3+IDO1)"
+)
+
+cluster_names <- c(
+  "0"  = "Th17-like / ILC3",
+  "1"  = "Innate-like T / ILC / Treg-associated",
+  "2"  = "Th17 / mucosal-associated T cells",
+  "3"  = "Low-quality / housekeeping",
+  "4"  = "Naive/early T cells",
+  "5"  = "Naive/stem-like CD8 T cells",
+  "6"  = "Activated T cells",
+  "7"  = "Th17 / ILC3",
+  "8"  = "Unknown",
+  "9"  = "Proliferating cells",
+  "10" = "NK cells / cytotoxic lymphocytes",
+  "11" = "Dendritic cells"
+)
+
+
+seu_int.sub2$cluster_names.sub <- unname(unlist(cluster_names)[seu_int.sub2$seurat_clusters])
+seu_int.sub2$cluster_names.sub <- factor(seu_int.sub2$cluster_names.sub, 
+                                          levels = rev(unname(unlist(cluster_names))))
+
+SUBSET_CLUSTER_COLOURS.NAMES <- SUBSET_CLUSTER_COLOURS
+names(SUBSET_CLUSTER_COLOURS.NAMES) <- levels(seu_int.sub2$cluster_names.sub)
+
+subcluster_markers_top20.named <- subcluster_markers_top20
+names(subcluster_markers_top20.named) <- cluster_names[names(subcluster_markers_top20)]
+                                                
+write.csv(subcluster_markers_top20.named,
+          file = here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_markers_top20.named.csv"),
+          quote = FALSE)
+
+subcluster_go.named <- subcluster_go
+cluster_names.X <- cluster_names
+names(cluster_names.X) <- paste0("X", names(cluster_names))
+names(subcluster_go.named) <- cluster_names.X[names(subcluster_go)]
+subcluster_go.named
+
+write.table(subcluster_go.named, sep = "\t", row.names = FALSE,
+            file = here("data", "workflow", "AmnioSC.cluster02_subset_subcluster_go_top10.named.tsv"),
+            quote = FALSE)
+```
+
+
+```{r, fig.width=24, fig.height=6}
+DotPlot(object = seu_int.sub2, features = unique(unlist(marker_genes)),
+        group.by = "cluster_names.sub", assay = "SCT") +
+  theme_bw() + rotate_x_labels + 
+  ggtitle("Expression of canonical literature marker genes - Subclustering analysis") -> p1
+
+ggsave(filename = here("output", "collab_figures", "AmnioSC.subclustering.dot_plot.canonical.png"), plot = p1,
+       height = 6, width = 24)
+
+DotPlot(object = seu_int.sub2, features = unique(unlist(subcluster_markers_top10)),
+        group.by = "cluster_names.sub", assay = "SCT") + 
+  theme_bw() + rotate_x_labels + 
+  ggtitle("Expression of subcluster marker genes - top 10 per cluster - Subclustering analysis") -> p1
+p1
+
+ggsave(filename = here("output", "collab_figures", "AmnioSC.subclustering.dot_plot.top10.png"), plot = p1,
+       height = 6, width = 24)
+
+DotPlot(object = seu_int.sub2, features = unique(unlist(subcluster_markers_top20)),
+        group.by = "cluster_names.sub", assay = "SCT") + 
+  theme_bw() + rotate_x_labels + 
+  ggtitle("Expression of subcluster marker  - top 20 per cluster - Subclustering analysis") -> p1
+p1
+
+ggsave(filename = here("output", "collab_figures", "AmnioSC.subclustering.dot_plot.top20.png"), plot = p1,
+       height = 6, width = 40)
+```
+
+```{r, fig.height=10, fig.width=10}
+DimPlot(seu_int.sub2, reduction = 'umap', label = FALSE, label.size = 5,
+        group.by = "cluster_names.sub") +
+  scale_colour_manual(values = SUBSET_CLUSTER_COLOURS.NAMES) +
+  bottom_legend +
+  guides(color = guide_legend(ncol = 3, override.aes = list(size = 2))) +
+  ggtitle("Subclusters") -> p1
+p1
+
+ggsave(filename = here("output", "collab_figures", "AmnioSC.subclustering.UMAP.subclusters.png"), plot = p1,
+       height = 10, width = 10)
+```
+
+```{r}
+# map the sub78 (subset & recomputed) subclusters back onto the full dataset, leaving every
+# other cell labelled by its refined cluster so it can be greyed out below
+seu_int.AmnioSC$sub2_cluster.names <- "None"
+seu_int.AmnioSC$sub2_cluster.names[colnames(seu_int.sub2)] <- as.character(seu_int.sub2$cluster_names.sub)
+seu_int.AmnioSC$sub2_cluster.names <- factor(seu_int.AmnioSC$sub2_cluster.names)
+```
+
+```{r}
+# colour only the sub78 subclusters brightly, grey out everything else
+SUB2_NAMES_COLOURS <- light.colors(n = 13)
+SUB2_NAMES_COLOURS[8] <- "grey"
+names(SUB2_NAMES_COLOURS) <- levels(seu_int.AmnioSC$sub2_cluster.names)
+```
+
+```{r, fig.height=10, fig.width=10}
+DimPlot(seu_int.AmnioSC, reduction = 'umap', label = FALSE, label.size = 5,
+        group.by = "sub2_cluster.names") +
+  scale_colour_manual(values = SUB2_NAMES_COLOURS) +
+  guides(color = guide_legend(ncol = 2, override.aes = list(size = 2))) +
+  bottom_legend +
+  ggtitle("Subclusters in entire dataset UMAP") -> p1
+p1
+
+ggsave(filename = here("output", "collab_figures", "AmnioSC.subclustering.UMAP.entire_dataset.png"), plot = p1,
+       height = 10, width = 10)
+```
+
+# Merge overclustered clusters
+
+Most of the clusters are just the same cell type but overclustered, so we shall just grab the distinct ones and use the original cluster names for the rest.
+
+```{r}
+seu_int.AmnioSC$sub2_cluster <- NULL
+seu_int.AmnioSC$sub2_cluster.names <- NULL
+```
+
+```{r}
+seu_int.sub2$final_clusters <- as.character(seu_int.AmnioSC$seurat_clusters[colnames(seu_int.sub2)])
+seu_int.sub2$final_clusters <- ifelse(seu_int.sub2$seurat_clusters %in% 9:11, 
+                                      as.character(seu_int.sub2$cluster_names.sub),
+                                      seu_int.sub2$final_clusters)
+table(seu_int.sub2$final_clusters)
+```
+
+
+```{r}
+seu_int.AmnioSC$seurat_clusters <- as.character(seu_int.AmnioSC$seurat_clusters)
+seu_int.AmnioSC$seurat_clusters[colnames(seu_int.sub2)] <- seu_int.sub2$final_clusters
+
+table(seu_int.AmnioSC$seurat_clusters)
+```
+
+```{r}
+saveRDS(seu_int.AmnioSC, here("data", "workflow", 
+                              "AmnioSC_ALL_optimised_ref.Integrated_clustered.Subclustered.Seurat.rds"))
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

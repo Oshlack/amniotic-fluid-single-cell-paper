@@ -1,0 +1,355 @@
+---
+title: 'Preprocessing of Dataset #1'
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(SingleCellExperiment)
+library(Seurat)
+library(SeuratObject)
+library(DropletUtils)
+library(scater)
+library(scuttle)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(rmarkdown)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load in the dataset
+
+```{r}
+out <- here("data", "workflow", "AmnioSC_01.CellRanger.SCE.rds")
+
+capture_names <- c("1AFa", "1AFb", "2AF")
+names(capture_names) <- capture_names
+
+if(!file.exists(out)){
+  # this holds the paths to the raw data
+  # replace this with your own paths
+  source(here("code", "load_paths.R"))
+  # Construct SingleCellExperiment object
+  captures <- setNames(c(paste0(AF_1A_PATH, "/outs/raw_feature_bc_matrix"),
+                       paste0(AF_1B_PATH, "/outs/raw_feature_bc_matrix"),
+                       paste0(AF_2_PATH, "/outs/raw_feature_bc_matrix")),
+                       capture_names)
+
+  sce <- read10xCounts(samples = captures, col.names = TRUE)
+  stopifnot(!anyDuplicated(colnames(sce)))
+
+  saveRDS(sce, file = out)
+} else {
+  sce <- readRDS(out)
+}
+sce$capture <- factor(sce$Sample)
+
+sce$Sample.Paper <- SAMPLE.PAPER[sce$Sample]
+sce$Sample.Paper <- factor(sce$Sample.Paper)
+
+sce
+```
+
+# Sample information
+
+**Sample AF_1 (1AF):**
+
+- 2 captures (1AFa, 1AFb) performed using scRNA-seq on fresh amniotic fluid sample (collected via amniocentesis)
+- Female foetus
+- CMV positive
+- Normal karyotype
+- 23 weeks gestational age
+
+**Sample AF_2 (2AF):**
+
+- 1 capture performed using scRNA-seq on fresh amniotic fluid sample (collected via amniocentesis)
+- Male foetus
+- CMV negative
+- Normal karyotype
+- 25 weeks gestational age
+
+# Preprocessing workflow
+
+To preprocess this dataset, the following steps will be performed:
+
+* filtering empty droplets using `emptyDrops()`
+* filtering cells with high mitochondrial proportion using adaptive thresholds
+* filtering out cells with low library size and few detected genes
+* feature selection
+* conversion from a *SingleCellExperiment* object to a *Seurat* object for downstream analysis
+
+# Calling cells from empty droplets
+
+## Using *DropletUtils*
+
+Droplet-based single-cell datasets contain numerous droplets that lack cells (known as empty droplets). These are distinguished from droplets containing cells and removed from the dataset based on their expression profile. This is done separately for each 10x run.
+
+This process is complicated as empty droplets contain ambient (extracellular) RNA that is captured and sequenced, so therefore the distribution of total UMI counts vs. barcode rank is examined. A sharp transition between barcodes of large total counts to barcodes of small total counts is indicative of a transition from droplets containing cells to empty droplets. 
+```{r, fig.asp = 1, message=FALSE, warning=FALSE}
+par(mfrow = c(2, 2))
+lapply(levels(sce$capture), function(s) {
+  sce <- sce[, sce$capture == s]
+  bcrank <- barcodeRanks(counts(sce))
+
+  # Only showing unique points for plotting speed.
+  uniq <- !duplicated(bcrank$rank)
+  plot(
+    x = bcrank$rank[uniq],
+    y = bcrank$total[uniq],
+    log = "xy",
+    xlab = "Rank",
+    ylab = "Total UMI count",
+    main = s,
+    cex.lab = 1.2,
+    xlim = c(1, 500000),
+    ylim = c(1, 200000))
+  abline(h = metadata(bcrank)$inflection, col = "darkgreen", lty = 2)
+  abline(h = metadata(bcrank)$knee, col = "dodgerblue", lty = 2)
+  legend("bottomleft", legend=c("Inflection", "Knee"), 
+        col=c("darkgreen", "dodgerblue"), lty=2, cex=1.2)
+})
+```
+
+```{r, warning=FALSE}
+set.seed(100)
+limit <- 80 # lower bound on the total UMI count (anything below = empty); 100 = default value
+out.1AFa <- emptyDrops(counts(sce)[, sce$Sample == "1AFa"], lower=limit, test.ambient=TRUE)
+limit <- 80
+out.1AFb <- emptyDrops(counts(sce)[, sce$Sample == "1AFb"], lower=limit, test.ambient=TRUE)
+limit <- 80
+out.2AF <- emptyDrops(counts(sce)[, sce$Sample == "2AF"], lower=limit, test.ambient=TRUE)
+```
+
+```{r}
+hist(out.1AFa$PValue[out.1AFa$Total <= limit & out.1AFa$Total > 0],
+    xlab="P-value", main="", col="grey80")
+hist(out.1AFb$PValue[out.1AFb$Total <= limit & out.1AFb$Total > 0],
+    xlab="P-value", main="", col="grey80")
+hist(out.2AF$PValue[out.2AF$Total <= limit & out.2AF$Total > 0],
+    xlab="P-value", main="", col="grey80")
+```
+
+This histogram shows the p-value distribution for `emptyDrops()`. Peaks near zero suggest that `lower` should be decreased as cells with library sizes below this value are being flagged as empty droplets.
+
+Cells are called at a false discovery rate of 0.1%, meaning that no more than 0.1% of the called barcodes should be empty droplets on average.
+
+```{r}
+# exclude mitochondrial and ribosomal genes
+keep <- !(grepl("^MT-", rowData(sce)$Symbol) | grepl("^RP[SL]", rowData(sce)$Symbol))
+
+# each capture done separately
+set.seed(100)
+list_of_empties <- lapply(capture_names, function(cn) {
+  message(cn)
+  emptyDrops(counts(sce)[keep, sce$Sample == cn], lower = 90,
+             BPPARAM = BiocParallel::MulticoreParam(workers = BiocParallel::multicoreWorkers() - 1))
+})
+
+summary(list_of_empties$`1AFa`$FDR <= 0.001)
+summary(list_of_empties$`1AFb`$FDR <= 0.001)
+summary(list_of_empties$`2AF`$FDR <= 0.001)
+```
+
+```{r}
+# There are no barcodes where the computed p-value is bounded by the number of iterations
+# http://bioconductor.org/books/3.15/OSCA.advanced/droplet-processing.html#qc-droplets
+table(Sig=list_of_empties$`1AFa`$FDR <= 0.001, Limited=list_of_empties$`1AFa`$Limited)
+table(Sig=list_of_empties$`1AFb`$FDR <= 0.001, Limited=list_of_empties$`1AFb`$Limited)
+table(Sig=list_of_empties$`2AF`$FDR <= 0.001, Limited=list_of_empties$`2AF`$Limited)
+```
+
+```{r}
+empties <- do.call(rbind, lapply(capture_names, function(cn) {
+    message(cn)
+    empties <- list_of_empties[[cn]]
+    empties$capture <- cn
+    empties
+}))
+```
+
+```{r}
+# filter out the empty droplets
+sce <- sce[, which(empties$FDR <= 0.001)]
+
+object <- here("data", "workflow", "AmnioSC_01.emptyDrops.SCE.rds")
+if (!file.exists(object)) {
+  saveRDS(sce, object)
+}
+```
+
+# Initial quality control
+
+There are initially `r length(colnames(sce))` cells present in the dataset.
+
+```{r, message=FALSE, warning=FALSE}
+ggcells(sce, aes(x=Sample.Paper, fill = Sample.Paper)) +
+  geom_bar() +
+  geom_text(stat="count", aes(label = ..count..), position = position_stack(vjust = 0.5)) +
+  theme_cowplot(12) +
+  no_legend +
+  scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+  ggtitle("Number of droplets per sample")
+```
+
+Donor 1 had two captures (1AFa and 1AFb) and a total of `r sum(table(sce$Sample)[1:2])` cells. Donor 2 had one capture and a total of `r as.numeric(table(sce$Sample)[3])` cells.
+
+Before progressing further, we will convert from Ensembl to symbol gene names for convenience and identify the mitochondrial and ribosomal genes. We will also add some QC statistics into the *SingleCellExperiment* object.
+
+```{r}
+# converting from Ensembl to Symbol gene names
+rownames(sce) <- uniquifyFeatureNames(
+    rowData(sce)$ID, rowData(sce)$Symbol)
+
+# finding all the mitochondrial and ribosomal genes
+is.mito <- grep(pattern = "^MT-", x = rownames(sce), value = TRUE)
+is.ribo <- grep(pattern = "^RP(S|L)", x = rownames(sce), value = TRUE)
+
+sce <- addPerCellQC(sce, subsets=list(Mito=is.mito, Ribo=is.ribo))
+```
+
+The below plots display the library size (`sum`), number of expressed genes (`detected`), mitochondrial proportion (`subsets_Mito_percent`) and ribosomal proportion (`subsets_Ribo_percent`) for each cell in the dataset. All samples are considered together.
+
+```{r, fig.asp=1, message=FALSE, warning=FALSE}
+ggarrange(
+  plotColData(sce, x = "Sample.Paper", y="sum", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+    ggtitle("QC metrics by sample"),
+  plotColData(sce, x = "Sample.Paper", y="detected", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Mito_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Ribo_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  ncol=2
+)
+```
+
+The dataset appears bimodal for library size (`sum`) and the number of expressed genes (`detected`).
+
+## Filtering out cells with high mitochondrial proportion
+
+```{r}
+summary(sce$subsets_Mito_percent)
+
+# using adaptive thresholds to flag the cells with high mitochondrial proportion
+high.mito <- isOutlier(sce$subsets_Mito_percent,  type="higher", batch = sce$Sample)
+table(high.mito)
+attr(high.mito, "thresholds")
+
+sce <- sce[, which(!high.mito)]
+summary(sce$subsets_Mito_percent)
+```
+
+There are `r length(colnames(sce))` cells remaining after removing high mitochondrial cells.
+
+```{r, fig.asp=1, message=FALSE, warning=FALSE}
+ggarrange(
+  plotColData(sce, x = "Sample.Paper", y="sum", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+    ggtitle("QC metrics after removing high mitochondrial cells"),
+  plotColData(sce, x = "Sample.Paper", y="detected", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Mito_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Ribo_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  ncol=2
+)
+```
+
+## Filtering out cells with low library size and few detected genes
+
+Adaptive thresholds do not work well with this dataset for library size and detected genes, therefore manual thresholds will be used for these QC metrics
+
+```{r}
+qc.stats <- data.frame(
+  low_lib_size = sce$sum < 500,
+  low_n_features = sce$detected < 300,
+  row.names = colnames(sce)
+)
+
+colSums(as.matrix(qc.stats))
+
+sce <- sce[, which(!qc.stats$low_lib_size & !qc.stats$low_n_features)]
+```
+
+There are `r length(colnames(sce))` cells remaining after removing cells with low library size and/or few detected genes.
+
+```{r, fig.asp=1, message=FALSE, warning=FALSE}
+ggarrange(
+  plotColData(sce, x = "Sample.Paper", y="sum", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+    ggtitle("QC metrics after removing high mitochondrial cells"),
+  plotColData(sce, x = "Sample.Paper", y="detected", colour_by = "Sample.Paper") +
+    no_legend + scale_y_log10()  +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Mito_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  plotColData(sce, x = "Sample.Paper", y="subsets_Ribo_percent", 
+              colour_by = "Sample.Paper") +
+    no_legend +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER),
+  ncol=2
+)
+```
+
+## Feature selection - removing unwanted genes
+
+The goal of this section is to flag genes that are uninformative prior to clustering, such as mitochondrial and ribosomal genes.
+
+```{r}
+keep.genes <- setdiff(rownames(sce), c(is.mito, is.ribo))
+
+# remove unwanted genes
+sce <- sce[keep.genes, ]
+```
+
+# Save the *SingleCellExperiment* object
+
+```{r}
+saveRDS(sce, here("data", "workflow", "AmnioSC_01.Preprocess.SCE.rds"))
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

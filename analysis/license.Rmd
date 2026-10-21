@@ -1,0 +1,11 @@
+---
+title: "License"
+output:
+  workflowr::wflow_html:
+    toc: false
+    number_sections: false
+editor_options:
+  chunk_output_type: console
+---
+
+The code in this analysis is covered by the [MIT license](https://choosealicense.com/licenses/mit/ "MIT License") and the written content on this website is covered by a [Creative Commons CC-BY](https://choosealicense.com/licenses/cc-by-4.0/ "CC-BY License") license.

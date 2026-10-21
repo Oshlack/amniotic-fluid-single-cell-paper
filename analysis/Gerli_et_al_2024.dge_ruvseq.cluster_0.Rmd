@@ -1,0 +1,1067 @@
+---
+title: "Differential Gene Expression with RUVSeq and edgeR - Cluster 0 (Keratinocytes)"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(stringr)
+library(ggplot2)
+library(ggrepel)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(Polychrome)
+library(dplyr)
+library(tidyverse)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(RUVSeq)
+library(edgeR)
+library(tidyHeatmap)
+library(grid)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load in the integrated dataset
+
+```{r}
+seu_int.Gerli <- readRDS(here("data", "Gerli_et_al_2024",
+                              "Gerli_et_al_2024.Refined_labels.Seurat.rds"))
+```
+
+```{r}
+combined_metadata <- read.csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+rownames(combined_metadata) <- combined_metadata$Sample
+
+cols_to_add <- setdiff(colnames(combined_metadata),  colnames(seu_int.Gerli@meta.data))
+seu_int.Gerli@meta.data <- cbind(seu_int.Gerli@meta.data,
+                                   combined_metadata[seu_int.Gerli@meta.data$Sample,cols_to_add])
+```
+
+```{r}
+table(seu_int.Gerli$Donor, seu_int.Gerli$gest_age_weeks)
+
+table(seu_int.Gerli$Donor, seu_int.Gerli$early_late_gestation)
+
+seu_int.Gerli <- seu_int.Gerli[, seu_int.Gerli$early_late_gestation != "Mid"]
+
+seu_int.Gerli$early_late_gestation <- factor(seu_int.Gerli$early_late_gestation,
+                                             levels = c("Early", "Late"))
+
+ALL_GEST_COLOURS <- ALL_GEST_COLOURS[levels(seu_int.Gerli$early_late_gestation)]
+```
+
+```{r, fig.asp=1}
+DimPlot(seu_int.Gerli, reduction = 'umap', label = FALSE, label.size = 5, 
+        group.by = "cluster_names") +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS.GERLI) +
+  guides(color=guide_legend(nrow = 2, override.aes = list(size=2))) +
+  bottom_legend
+```
+
+# Create pseudobulk samples by cluster (cluster_names)
+
+```{r}
+DefaultAssay(seu_int.Gerli) <- "RNA"
+dim(seu_int.Gerli)
+```
+
+```{r}
+sce <- SingleCellExperiment(list(counts = seu_int.Gerli[["RNA"]]@counts),
+                            colData = seu_int.Gerli@meta.data)
+
+pseudobulk <- aggregateAcrossCells(sce, id = colData(sce)[, c("Donor", "cluster_names")])
+pseudobulk
+```
+
+```{r}
+# Generate metadata for plotting
+meta <- as.data.frame(colData(sce)) %>% group_by(Donor, cluster_names) %>% 
+                                summarise(Donor = unique(Donor),
+                                          n_cells = n(),
+                                          gest_age_weeks = unique(gest_age_weeks),
+                                          foetal_sex = unique(foetal_sex),
+                                          cmv_status = unique(cmv_status),
+                                          Dataset = unique(Dataset),
+                                          cluster_names = unique(cluster_names),
+                                          dataset_source = unique(dataset_source),
+                                          trimester = unique(trimester),
+                                          abnormalities = unique(abnormalities),
+                                          outcome = unique(outcome),
+                                          early_late_gestation = unique(early_late_gestation),
+                                          procedure = unique(procedure))
+
+meta <- as.data.frame(meta)
+rownames(meta) <- paste(meta$Donor, 
+                        meta$cluster_names, sep = "_")
+meta$Donor_Label <- rownames(meta)
+```
+
+```{r, fig.width=20, fig.height=8}
+as.data.frame(colData(sce)) %>%
+  ggplot(aes(x = cluster_names, fill = cluster_names)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  facet_wrap(. ~ Donor) +
+  scale_y_log10() + rotate_x_labels +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS) + no_legend
+```
+
+```{r, fig.width=20, fig.height=20}
+as.data.frame(colData(sce)) %>%
+  ggplot(aes(x = Donor, fill = Donor)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  facet_wrap(. ~ cluster_names) +
+  scale_y_log10() +
+  geom_hline(yintercept = 50) +
+  rotate_x_labels + no_legend +
+  scale_fill_manual(values = ALL_DONORS_COLOURS)
+```
+
+```{r, fig.width=20, fig.height=8}
+min_cells <- 50
+
+as.data.frame(colData(sce)) %>%
+  ggplot(aes(x = cluster_names, fill = early_late_gestation)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  facet_wrap(. ~ Donor) +
+  scale_y_log10() + 
+  scale_fill_manual(values = ALL_GEST_COLOURS) + 
+  geom_hline(yintercept = min_cells) +
+  rotate_x_labels + no_legend
+```
+
+```{r, fig.width=20, fig.height=20}
+as.data.frame(colData(sce)) %>%
+  ggplot(aes(x = Donor, fill = early_late_gestation)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  facet_wrap(. ~ cluster_names) +
+  scale_y_log10() +
+  geom_hline(yintercept = 50) +
+  scale_fill_manual(values = ALL_GEST_COLOURS) + 
+  rotate_x_labels + bottom_legend
+```
+
+# Prepare data for DGE
+
+```{r}
+# convert to DGEList object
+yPB <- DGEList(counts = counts(pseudobulk),
+                              samples = colData(pseudobulk) %>% data.frame)
+
+colnames(yPB) <- paste0(yPB$samples$Donor, "_", as.character(yPB$samples$cluster_names))
+
+dim(yPB)
+```
+
+```{r}
+# remove genes with zero counts in all samples
+keep <- rowSums(yPB$counts) > 0
+yFlt <- yPB[keep, ]
+dim(yFlt)
+
+chosen_cells <- "Keratinocytes"
+n_celltypes <- 1
+
+# max_k <- 2 * length(chosen_cells)
+max_k <- 6
+# may cause issues if there is a cell type not all in samples --> might need to set a warning for this later if it causes issues
+
+ySub <- yFlt[, yFlt$samples$cluster_names %in% chosen_cells]
+
+# filter samples with less than min_cells
+ySub <- ySub[, ySub$samples$ncells > min_cells]
+
+dim(ySub)
+```
+
+## MDS plots and filtering samples and genes
+
+```{r}
+# Perform MDS
+MDS <- calcMDS(ySub, 5, "Donor_Label")
+
+meta <- meta[intersect(meta$Donor_Label, rownames(MDS)),]
+MDS <- MDS[rownames(meta),]
+MDS <- cbind(MDS, meta[, !(colnames(meta) %in% colnames(MDS))])
+MDS$cluster_names <- factor(MDS$cluster_names)
+
+MDS
+```
+
+```{r, fig.height=10, fig.width=10}
+plotMDS.Dims1_5(MDS, "Donor", ALL_DONORS_COLOURS, makeFactor = T)
+plotMDS.Dims1_5(MDS, "dataset_source", makeFactor = T)
+plotMDS.Dims1_5(MDS, "foetal_sex", ALL_FOETAL_SEX_COLOURS, makeFactor = T)
+plotMDS.Dims1_5(MDS, "gest_age_weeks", makeFactor = F)
+plotMDS.Dims1_5(MDS, "early_late_gestation", ALL_GEST_COLOURS)
+plotMDS.Dims1_5(MDS, "cmv_status", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS, "n_cells")
+plotMDS.Dims1_5(MDS, "outcome", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS, "abnormalities", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS, "procedure", makeFactor = TRUE)
+```
+
+```{r}
+# filter genes with no ENTREZ IDs and very low expression
+
+gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(ySub),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+keep <- !is.na(gns)
+ySub <- ySub[keep,]
+
+thresh <- 0
+m <- rowMedians(edgeR::cpm(ySub$counts, log = TRUE))
+plot(density(m))
+abline(v = thresh, lty = 2)
+```
+
+```{r}
+keep <- m > thresh
+table(keep)
+
+ySub <- ySub[keep, ]
+dim(ySub)
+```
+
+## Examine covariates
+
+Use PCA to investigate if sources of variation in the data correlate with specified covariates.
+
+```{r}
+PCs <- prcomp(t(edgeR::cpm(ySub$counts, log = TRUE)), 
+              center = TRUE, retx = TRUE)
+loadings = PCs$x # pc loadings
+
+nGenes = nrow(ySub)
+nSamples = ncol(ySub)
+
+meta$Donor <- factor(meta$Donor)
+meta$early_late_gestation <- factor(meta$early_late_gestation)
+meta$foetal_sex <- factor(meta$foetal_sex)
+meta$cmv_status <- factor(meta$cmv_status)
+meta$Dataset <- factor(meta$Dataset)
+meta$Donor_Label <- factor(meta$Donor_Label)
+meta$outcome <- factor(meta$outcome)
+meta$procedure <- factor(meta$procedure)
+meta$trimester <- factor(meta$trimester)
+meta$abnormalities <- factor(meta$abnormalities)
+meta$dataset_source <- factor(meta$dataset_source)
+
+meta.numeric <- meta %>% mutate(across(everything(), as.numeric))
+
+moduleTraitCor <- suppressWarnings(cor(loadings[, 1:min(10, nSamples)], 
+                                       meta.numeric, use = "p"))
+moduleTraitPvalue <- WGCNA::corPvalueStudent(moduleTraitCor, (nSamples-2))
+
+textMatrix <- paste(signif(moduleTraitCor, 2), "\n(", 
+                    signif(moduleTraitPvalue, 1), ")", sep = "")
+dim(textMatrix) <- dim(moduleTraitCor)
+```
+
+```{r, fig.width = 5, fig.height = 5}
+par(mfrow = c(1, 1))
+plot(PCs, type="lines", main = chosen_cells) # scree plot
+```
+
+```{r, fig.width = 12, fig.height = 8}
+# Display the correlation values within a heatmap plot
+par(cex=0.75, mar = c(3, 5, 2, 1))
+WGCNA::labeledHeatmap(Matrix = t(moduleTraitCor),
+                            xLabels = colnames(loadings)[1:min(10, nSamples)],
+                            yLabels = names(meta.numeric),
+                            colorLabels = FALSE,
+                            colors = WGCNA::blueWhiteRed(6),
+                            textMatrix = t(textMatrix),
+                            setStdMargins = TRUE,
+                            cex.text = 1,
+                            cex.lab = 1,
+                            zlim = c(-1,1),
+                            main = paste0("PCA-trait relationships: Top ", 
+                                          min(10, nSamples), 
+                                          " PCs"))
+```
+
+# Statistical analysis with *RUVSeq*
+
+## Define negative control genes
+
+Use house-keeping genes identified from human scRNA-seq experiments.
+
+```{r}
+data("segList", package = "scMerge")
+
+housekeepingGenes <- segList$human$bulkRNAseqHK
+ctl <- rownames(ySub) %in% housekeepingGenes
+table(ctl)
+```
+
+```{r}
+# Plot house keeping genes across samples
+edgeR::cpm(ySub$counts, log = TRUE) %>% 
+  data.frame %>%
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(-gene, names_to = "sample") %>%
+  mutate(sample = gsub("^X", "", sample)) %>%
+  left_join(rownames_to_column(ySub$samples, 
+                               var = "sample")) %>%
+  dplyr::filter(gene %in% housekeepingGenes) %>%
+  dplyr::filter(cluster_names %in% chosen_cells) %>%
+  mutate(Dataset = as.factor(Dataset)) -> dat
+```
+
+```{r, fig.width = 15, fig.height = 20}
+dat %>%
+  heatmap(gene, sample, value,
+          scale = "row",
+          show_row_names = FALSE,
+          show_column_names = FALSE) %>%
+  annotation_tile(Dataset) %>%
+  annotation_tile(Donor) %>%
+  annotation_tile(gest_age_weeks) %>%
+  annotation_tile(foetal_sex) %>%
+  annotation_tile(cluster_names)
+```
+
+```{r}
+# Perform MDS
+MDS.housekeeping <- calcMDS(ySub[rownames(ySub) %in% housekeepingGenes,], 5, "Donor_Label")
+
+meta <- meta[intersect(meta$Donor_Label, rownames(MDS.housekeeping)),]
+MDS.housekeeping <- MDS.housekeeping[rownames(meta),]
+MDS.housekeeping <- cbind(MDS.housekeeping, meta[, !(colnames(meta) %in% colnames(MDS.housekeeping))])
+MDS.housekeeping$cluster_names <- factor(MDS.housekeeping$cluster_names)
+
+MDS.housekeeping
+```
+
+```{r, fig.height=10, fig.width=10}
+plotMDS.Dims1_5(MDS.housekeeping, "Donor", ALL_DONORS_COLOURS, makeFactor = T)
+plotMDS.Dims1_5(MDS.housekeeping, "Dataset", ALL_DATASETS_COLOURS, makeFactor = T)
+plotMDS.Dims1_5(MDS.housekeeping, "foetal_sex", ALL_FOETAL_SEX_COLOURS, makeFactor = T)
+plotMDS.Dims1_5(MDS.housekeeping, "gest_age_weeks", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS.housekeeping, "early_late_gestation", ALL_GEST_COLOURS)
+plotMDS.Dims1_5(MDS.housekeeping, "cmv_status", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS.housekeeping, "n_cells")
+plotMDS.Dims1_5(MDS.housekeeping, "outcome", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS.housekeeping, "abnormalities", makeFactor = TRUE)
+plotMDS.Dims1_5(MDS.housekeeping, "procedure", makeFactor = TRUE)
+```
+
+### Examining covariates vs. housekeeping genes
+
+Investigate whether housekeeping genes correlate with any known covariates.
+
+```{r}
+PCs <- prcomp(t(edgeR::cpm(ySub$counts[ctl, ], log = TRUE)), 
+              center = TRUE, retx = TRUE)
+loadings = PCs$x # pc loadings
+
+nGenes = nrow(ySub)
+nSamples = ncol(ySub)
+
+datTraits <- ySub$samples %>% dplyr::select(Dataset, Donor, 
+                                            gest_age_weeks, foetal_sex, 
+                                            ncells, cluster_names,
+                                            outcome, abnormalities, procedure) %>%
+  mutate(Dataset = factor(Dataset),
+         Donor = factor(Donor),
+         foetal_sex = factor(foetal_sex),
+         cluster_names = factor(cluster_names),
+         outcome = factor(outcome),
+         abnormalities = factor(abnormalities),
+         procedure = factor(procedure)) %>%
+  mutate(across(everything(), as.numeric))
+
+moduleTraitCor <- suppressWarnings(cor(loadings[, 1:min(10, nSamples)], 
+                                       datTraits, use = "p"))
+moduleTraitPvalue <- WGCNA::corPvalueStudent(moduleTraitCor, (nSamples-2))
+
+textMatrix <- paste(signif(moduleTraitCor, 2), "\n(", 
+                    signif(moduleTraitPvalue, 1), ")", sep = "")
+dim(textMatrix) <- dim(moduleTraitCor)
+```
+
+```{r, fig.height=12, fig.width=8}
+par(mfrow = c(2, 1))
+plot(PCs, type="lines", main = chosen_cells) # scree plot
+
+## Display the correlation values within a heatmap plot
+par(cex=0.75, mar = c(3, 5, 2, 1))
+WGCNA::labeledHeatmap(Matrix = t(moduleTraitCor),
+                            xLabels = colnames(loadings)[1:min(10, nSamples)],
+                            yLabels = names(datTraits),
+                            colorLabels = FALSE,
+                            colors = WGCNA::blueWhiteRed(6),
+                            textMatrix = t(textMatrix),
+                            setStdMargins = FALSE,
+                            cex.text = 1,
+                            zlim = c(-1,1),
+                            main = paste0("PCA-trait relationships: Top ", 
+                                          min(10, nSamples), 
+                                          " PCs"))
+```
+
+## Select k value
+
+First, we need to select k for use with RUVseq. Examine the structure of the raw pseudobulk data.
+
+```{r, fig.width = 10, fig.height=5}
+x1 <- ySub$samples$Donor
+cols1 <- ALL_DONORS_COLOURS
+
+par(mfrow = c(1,3))
+EDASeq::plotRLE(edgeR::cpm(ySub$counts), 
+                col = cols1[x1], ylim = c(-0.5, 0.5),
+                main = "Raw RLE by Donor", las = 2)
+EDASeq::plotPCA(edgeR::cpm(ySub$counts), 
+                col = cols1[x1], labels = FALSE,
+                pch = 19, main = "Raw PCA by Donor")
+
+x2 <- ySub$samples$early_late_gestation
+cols2 <- ALL_GEST_COLOURS
+EDASeq::plotPCA(edgeR::cpm(ySub$counts), 
+                col = cols2[x2], labels = FALSE,
+                pch = 19, main = "Raw PCA by early_late_gestation")
+```
+
+Select the value for the k parameter i.e. the number of columns of the W matrix that will be included in the modelling.
+
+```{r}
+# define the sample groups
+gest_age_weeks <- ySub$samples$gest_age_weeks
+cluster_names <- factor(ySub$samples$cluster_names)
+foetal_sex <- factor(ySub$samples$foetal_sex)
+Donor <- factor(ySub$samples$Donor)
+dataset_source <- factor(ySub$samples$dataset_source)
+early_late_gestation <- factor(gsub(" ", "_", ySub$samples$early_late_gestation))
+
+for(k in 1:max_k){
+  adj <- RUVg(ySub$counts, ctl, k = k)
+  W <- adj$W
+  
+  # create the design matrix
+  design <- model.matrix(~0 + early_late_gestation + W + foetal_sex)
+  colnames(design)[1:length(levels(early_late_gestation))] <- levels(early_late_gestation)
+  
+  contr <- makeContrasts(EarlyvLate = Early - Late,
+                         levels = design)
+  
+  y <- DGEList(counts = ySub$counts)
+  y <- calcNormFactors(y)
+  y <- estimateGLMCommonDisp(y, design)
+  y <- estimateGLMTagwiseDisp(y, design)
+  fit <- glmFit(y, design)
+  
+  x1 <- ySub$samples$Donor
+  cols1 <- ALL_DONORS_COLOURS
+  
+  par(mfrow = c(2,3))
+  EDASeq::plotRLE(edgeR::cpm(adj$normalizedCounts), 
+                  col = cols1[x1], ylim = c(-0.5, 0.5),
+                  main = paste0("K = ", k, " RLE by Donor"))
+  EDASeq::plotPCA(edgeR::cpm(adj$normalizedCounts), 
+                  col = cols1[x1], labels = FALSE,
+                  pch = 19,
+                  main = paste0("K = ", k, " PCA by Donor"))
+  
+  x2 <- ySub$samples$early_late_gestation
+  cols2 <- ALL_GEST_COLOURS
+  EDASeq::plotPCA(edgeR::cpm(adj$normalizedCounts), 
+                  col = cols2[x2], labels = FALSE,
+                  pch = 19,
+                  main = paste0("K = ", k, " PCA by early_late_gestation"))
+  
+  lrt <- glmLRT(fit, contrast = contr[, 1])
+  hist(lrt$table$PValue, main = paste0("K = ", k, " ", colnames(contr)[1]),
+       cex.main = 0.8)
+
+}
+```
+
+Test for DGE using RUVSeq and edgeR.
+
+```{r}
+# use RUVSeq to identify the factors of unwanted variation
+adj <- RUVg(ySub$counts, ctl, k = 2)
+W <- adj$W
+
+# create the design matrix
+design <- model.matrix(~ 0 + early_late_gestation + W + foetal_sex)
+colnames(design)[1:length(levels(early_late_gestation))] <- levels(early_late_gestation)
+
+design %>% knitr::kable()
+```
+
+```{r, fig.width = 10, fig.height = 10}
+edgeR::cpm(ySub$counts, log = TRUE) %>% 
+      data.frame %>%
+      rownames_to_column(var = "gene") %>%
+      pivot_longer(-gene, 
+                   names_to = "sample", 
+                   values_to = "raw") %>%
+      inner_join(edgeR::cpm(adj$normalizedCounts, log = TRUE) %>% 
+                   data.frame %>%
+                   rownames_to_column(var = "gene") %>%
+                   pivot_longer(-gene, 
+                                names_to = "sample", 
+                                values_to = "norm")) %>%
+      mutate(sample = gsub("^X", "", sample)) %>%
+      left_join(rownames_to_column(ySub$samples, 
+                                   var = "sample")) %>%
+      mutate(Dataset = as.factor(Dataset)) %>%
+      dplyr::filter(gene %in% c("ZFY", "EIF1AY", "XIST")) %>%
+      ggplot(aes(x = foetal_sex,
+                 y = norm,
+                 colour = foetal_sex)) +
+      geom_boxplot(outlier.shape = NA, colour = "grey") +
+      geom_jitter(stat = "identity",
+                  width = 0.15,
+                  size = 1.25) +
+      geom_jitter(aes(x = foetal_sex,
+                      y = raw), stat = "identity",
+                  width = 0.15,
+                  size = 2, 
+                  alpha = 0.2,
+                  stroke = 0) +
+     ggrepel::geom_text_repel(aes(label = sample),
+                             size = 2) +
+      theme_classic() +
+      theme(axis.text.x = element_text(angle = 90,
+                                       hjust = 1,
+                                       vjust = 0.5),
+            legend.position = "bottom",
+            legend.direction = "horizontal",
+            strip.text = element_text(size = 7),
+            axis.text.y = element_text(size = 6)) +
+      labs(x = "Group", y = "log2 CPM") +
+      facet_wrap(~gene, scales = "free_y") + 
+      scale_color_brewer(palette = "Set2") +
+      ggtitle("Sex gene expression check") -> p2
+
+p2
+```
+
+```{r}
+# Make the contrast matrix for the comparisons
+
+contr <- makeContrasts(EarlyvLate = Early - Late, levels = design)
+contr %>% knitr::kable()
+
+saveRDS(contr, here("data", "Gerli_et_al_2024",
+                            "Gerli_et_al_2024.dge_early_vs_late.contr.rds"))
+```
+
+### Fit the model
+
+```{r}
+y <- DGEList(counts = ySub$counts)
+y <- calcNormFactors(y)
+y <- estimateGLMCommonDisp(y, design)
+y <- estimateGLMTagwiseDisp(y, design)
+fit <- glmFit(y, design)
+
+saveRDS(fit, here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.fit.rds"))
+```
+
+## Results summary
+
+Note that Up (red) means more highly expressed in Early Gestation and Down (blue) means more highly expressed in Late Gestation.
+
+```{r, fig.width=9, fig.height=6}
+# DGE results summary
+
+cutoff <- 0.05
+  
+dt <- lapply(1:ncol(contr), function(i){
+  decideTests(glmLRT(fit, contrast = contr[,i]),
+                            p.value = cutoff)
+})
+
+s <- sapply(dt, function(d){
+  summary(d)
+})
+colnames(s) <- colnames(contr)
+rownames(s) <- c("Down", "NotSig", "Up")
+
+pal <- c(paletteer::paletteer_d("RColorBrewer::Set1")[2:1], "grey") 
+
+s[-2,] %>% 
+  data.frame %>%
+  rownames_to_column(var = "Direction") %>% 
+  pivot_longer(-Direction) %>% mutate(name = "Early vs. Late") %>%
+  ggplot(aes(x = name, y = value, fill = Direction)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = value), 
+            position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3) +
+  labs(y = glue::glue("No. DGE (FDR < {cutoff})"),
+       x = "Contrast") +
+      scale_fill_manual(values = pal) +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1,
+                                   vjust = 1)) +
+      scale_fill_manual(values = pal) +
+  theme_cowplot(12) + bottom_legend
+```
+
+Explore results of statistical analysis for each contrast with significant DGEs. Also, perform gene set enrichment analysis (GSEA) using the `cameraPR` method. `cameraPR` tests whether a set of genes is highly ranked relative to other genes in terms of differential expression, accounting for inter-gene correlation. Prepare the Broad MSigDB Gene Ontology, Hallmark gene sets and Reactome pathways.
+
+```{r}
+if(!file.exists(here("data/workflow/GSEA/Hs.c5.all.v7.1.entrez.rds")))
+  download.file("https://bioinf.wehi.edu.au/MSigDB/v7.1/Hs.c5.all.v7.1.entrez.rds",
+                here("data/workflow/GSEA/Hs.c5.all.v7.1.entrez.rds"))
+Hs.c5.all <- readRDS(here("data/workflow/GSEA/Hs.c5.all.v7.1.entrez.rds"))
+
+if(!file.exists(here("data/workflow/GSEA/Hs.c2.cp.reactome.v7.1.entrez.rds")))
+  download.file("https://bioinf.wehi.edu.au/MSigDB/v7.1/Hs.c2.cp.reactome.v7.1.entrez.rds",
+                here("data/workflow/GSEA/Hs.c2.cp.reactome.v7.1.entrez.rds"))
+Hs.c2.reactome <- readRDS(here("data/workflow/GSEA/Hs.c2.cp.reactome.v7.1.entrez.rds"))
+
+if(!file.exists(here("data/workflow/GSEA/Hs.h.all.v7.1.entrez.rds")))
+  download.file("https://bioinf.wehi.edu.au/MSigDB/v7.1/Hs.h.all.v7.1.entrez.rds",
+                here("data/workflow/GSEA/Hs.h.all.v7.1.entrez.rds"))
+Hs.h.all <- readRDS(here("data/workflow/GSEA/Hs.h.all.v7.1.entrez.rds"))
+```
+
+```{r}
+# translate gene SYMBOLS to entrez gene IDs 
+gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = rownames(fit), 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+# get transcript lengths
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+txlen <- GenomicFeatures::transcriptLengths(txdb)
+txlen %>%
+  dplyr::select(gene_id, tx_len) %>%
+  group_by(gene_id) %>%
+  summarise(max_len = max(tx_len)) %>%
+  dplyr::filter(gene_id %in% gns) -> supertxlen
+
+m <- match(supertxlen$gene_id, gns)
+all(supertxlen$gene_id == gns[m])
+```
+
+```{r}
+# Write significant DGEs for this comparison to file.
+
+# set index for current contrast
+i = 1
+
+lrt <- glmLRT(fit, contrast = contr[,i])
+topTags(lrt, n = Inf) %>%
+  data.frame -> top
+```
+
+```{r}
+# run camera competitive gene set test  
+# use signed likelihood ratio test statistic as recommended by GS here: https://support.bioconductor.org/p/112937/
+
+# fix floating point representation issue
+lrt$table$LR <- pmax(lrt$table$LR, 0) # Converts all negative values to 0
+
+statistic <- sign(lrt$table$logFC) * sqrt(lrt$table$LR)
+
+# get gene indices for all gene set genes
+h.id <- ids2indices(Hs.h.all, unname(gns[rownames(lrt)]))
+c2.id <- ids2indices(Hs.c2.reactome, unname(gns[rownames(lrt)]))
+c5.id <- ids2indices(Hs.c5.all, unname(gns[rownames(lrt)]))
+
+h.cam <- cameraPR(statistic, h.id)
+c2.cam <- cameraPR(statistic, c2.id)
+c5.cam <- cameraPR(statistic, c5.id)
+
+saveRDS(c5.cam, here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.c5.cam.RDS"))
+saveRDS(c2.cam, here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.c2.cam.RDS"))
+```
+
+```{r, fig.height=10, fig.width=10}
+# Volcano plot
+
+top %>% 
+  mutate(sig = ifelse(FDR <= cutoff, glue::glue("<= {cutoff}"), 
+                      glue::glue("> {cutoff}"))) %>%
+  rownames_to_column(var = "SYMBOL") %>%
+  left_join(dt[[i]][,1] %>% 
+              data.frame %>%
+              rownames_to_column(var = "SYMBOL") %>%
+              dplyr::rename(status = 2)) %>%
+  mutate(status = ifelse(status == 1, "Up",
+                         ifelse(status == -1, "Down",
+                                "NotSig"))) %>%
+  mutate(status = as.factor(status)) %>%
+  mutate(status = fct_relevel(status, "NotSig", after = Inf)) %>%
+  ggplot(aes(x = logFC, y = -log10(PValue), color = status)) +
+  geom_point(alpha = 0.75) +
+  ggrepel::geom_text_repel(data = function(x) subset(x, FDR < cutoff), 
+                           aes(x = logFC, y = -log10(PValue), 
+                               label = SYMBOL), 
+                           size = 2, colour = "black", max.overlaps = 15) +
+  labs(x = expression(~log[2]~"(Fold Change)"), 
+       y = expression(~-log[10]~"(P-value)"),
+       colour = glue::glue("FDR < {cutoff}")) +
+  scale_colour_manual(values = pal) +
+  theme_cowplot(12) +
+  theme(legend.position = "bottom") -> p1
+
+p1
+```
+
+```{r, fig.height = 10, fig.width = 10}
+#  GSEA top 10 plots
+h.cam %>%
+  dplyr::slice(1:10) %>%
+  rownames_to_column(var = "Set") %>%
+  mutate(Type = "HALLMARK",
+         Rank = 1:10) %>%
+  bind_rows(c2.cam %>%
+              dplyr::slice(1:10) %>%
+              rownames_to_column(var = "Set") %>%
+              mutate(Type = "REACTOME",
+                     Rank = 1:10)) %>%
+  bind_rows(c5.cam %>%
+              dplyr::slice(1:10) %>%
+              rownames_to_column(var = "Set") %>%
+              mutate(Type = "GO",
+                     Rank = 1:10)) %>%
+  mutate(Set = str_wrap(str_replace_all(Set, "_", " "), width = 75),
+         Set = str_remove_all(Set, "GO |REACTOME |HALLMARK ")) %>%
+  ggplot(aes(x = -log10(FDR), y = fct_reorder(Set, -Rank),
+             colour = Direction)) +
+  geom_point(aes(size = NGenes)) +
+  facet_wrap(~Type, ncol = 1, scales = "free_y") +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dashed")  +
+  scale_colour_manual(values = pal) +
+  labs(y = "Gene set") +
+  theme_classic(base_size = 10) -> p5
+
+p5
+```
+
+```{r, fig.height = 10, fig.width = 9}
+c5.cam %>%
+  dplyr::slice(1:10) %>%
+  rownames_to_column(var = "Set") %>%
+  mutate(Type = "GO",
+         Rank = 1:10) %>%
+  bind_rows(c2.cam %>%
+              dplyr::slice(1:10) %>%
+              rownames_to_column(var = "Set") %>%
+              mutate(Type = "REACTOME",
+                     Rank = 1:10)) %>%
+  mutate(Set = str_wrap(str_replace_all(Set, "_", " "), width = 35),
+         Set = str_remove_all(Set, "GO |REACTOME |HALLMARK ")) %>%
+  ggplot(aes(x = -log10(FDR), y = fct_reorder(Set, -Rank),
+             colour = Direction)) +
+  geom_point(aes(size = NGenes)) +
+  facet_wrap(~Type, ncol = 1, scales = "free_y") +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dashed")  +
+  scale_colour_manual(values = pal) +
+  labs(y = "Gene set") +
+  theme_cowplot(12) +
+  bottom_legend
+```
+
+```{r, fig.height = 8, fig.width = 8}
+# Top DGE stripchart
+
+# plot up to top 9 DGE
+grps <- strsplit2(colnames(contr)[i], "v")[1,]
+
+edgeR::cpm(ySub$counts, log = TRUE) %>%
+  data.frame %>%
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(-gene,
+               names_to = "sample",
+               values_to = "raw") %>%
+  inner_join(edgeR::cpm(adj$normalizedCounts, log = TRUE) %>%
+               data.frame %>%
+               rownames_to_column(var = "gene") %>%
+               pivot_longer(-gene,
+                            names_to = "sample",
+                            values_to = "norm")) %>%
+  mutate(sample = gsub("^X", "", sample)) %>%
+  left_join(rownames_to_column(ySub$samples,
+                               var = "sample")) %>%
+  mutate(Dataset = as.factor(Dataset),
+         early_late_gestation = gsub(" ", "_", early_late_gestation)) %>%
+  dplyr::filter(early_late_gestation %in% names(contr[,i])[abs(contr[,i]) > 0],
+                gene %in% rownames(top)[1:min(9, max(which(top$FDR < cutoff)))]) %>%
+  mutate(Group = early_late_gestation) %>%
+  ggplot(aes(x = Group,
+             y = norm,
+             colour = Group)) +
+  geom_boxplot(outlier.shape = NA, colour = "grey") +
+  geom_jitter(stat = "identity",
+              width = 0.15,
+              size = 1.25) +
+  geom_jitter(aes(x = Group,
+                  y = raw), stat = "identity",
+              width = 0.15,
+              size = 1.25,
+              alpha = 0.2) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   hjust = 1,
+                                   vjust = 0.5),
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        strip.text = element_text(size = 7),
+        axis.text.y = element_text(size = 6)) +
+  labs(x = "Group", y = "log2 CPM") +
+  facet_wrap(~gene, scales = "free_y") +
+  scale_color_brewer(palette = "Set2") +
+  ggtitle(colnames(contr)[i]) -> p2
+
+p2
+```
+
+# Gene Ontology Analysis with goanna
+
+## Examine all DEGs
+
+```{r}
+# Examine all genes
+deg <- rownames(top)[top$FDR < cutoff]
+deg.entrez <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = deg,
+              column = "ENTREZID", keytype = "SYMBOL")
+
+go_terms.all <- goana(unique(deg.entrez), species = "Hs", universe = NULL)
+go_terms <- go_terms.all
+go_terms <- go_terms[order(go_terms$P.DE),]
+
+# Only keeping biological process terms that are not overly general.
+go_terms <- go_terms[go_terms$Ont=="BP",]
+go_terms <- go_terms[go_terms$N <= 500,]
+go_terms <- as.data.frame(go_terms)
+rmarkdown::paged_table(go_terms)
+```
+
+## Examine Up genes (higher expression in Early Gestation)
+
+```{r}
+# Examine Up genes (higher expression in Early Gestation)
+deg.up <- rownames(top)[top$FDR < cutoff & top$logFC > 0]
+deg.up.entrez <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = deg.up,
+              column = "ENTREZID", keytype = "SYMBOL")
+
+go_terms.up <- goana(unique(deg.up.entrez), species = "Hs", universe = NULL)
+go_terms.up <- go_terms.up[order(go_terms.up$P.DE),]
+
+# Only keeping biological process terms that are not overly general.
+go_terms.up <- go_terms.up[go_terms.up$Ont=="BP",]
+go_terms.up <- go_terms.up[go_terms.up$N <= 500,]
+go_terms.up <- as.data.frame(go_terms.up)
+rmarkdown::paged_table(go_terms.up)
+```
+
+## Examine Down genes (higher expression in Late Gestation)
+
+```{r}
+# Examine Down genes (higher expression in Late Gestation)
+deg.down <- rownames(top)[top$FDR < cutoff & top$logFC < 0]
+deg.down.entrez <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, keys = deg.down,
+              column = "ENTREZID", keytype = "SYMBOL")
+
+go_terms.down <- goana(unique(deg.down.entrez), species = "Hs", universe = NULL)
+go_terms.down <- go_terms.down[order(go_terms.down$P.DE),]
+
+# Only keeping biological process terms that are not overly general.
+go_terms.down <- go_terms.down[go_terms.down$Ont=="BP",]
+go_terms.down <- go_terms.down[go_terms.down$N <= 500,]
+go_terms.down <- as.data.frame(go_terms.down)
+rmarkdown::paged_table(go_terms.down)
+```
+
+# Testing our DEG gene set in the Gerli et al. (2024) dataset using *cameraPR*
+
+cameraPR performed competitive gene rank tests
+
+```{r}
+dge_early_vs_late <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.top.rds"))
+
+dge_early_vs_late.up <- dge_early_vs_late %>% filter(FDR < 0.05, logFC > 0)
+dim(dge_early_vs_late.up)
+
+dge_early_vs_late.down <- dge_early_vs_late %>% filter(FDR < 0.05, logFC < 0)
+dim(dge_early_vs_late.down)
+
+# translate gene SYMBOLS to entrez gene IDs 
+dge_early_vs_late.up.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = rownames(dge_early_vs_late.up), 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+dge_early_vs_late.down.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = rownames(dge_early_vs_late.down), 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+fit.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = rownames(fit), 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+```
+
+```{r}
+# get transcript lengths
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene::TxDb.Hsapiens.UCSC.hg38.knownGene
+txlen <- GenomicFeatures::transcriptLengths(txdb)
+txlen %>%
+  dplyr::select(gene_id, tx_len) %>%
+  group_by(gene_id) %>%
+  summarise(max_len = max(tx_len)) %>%
+  dplyr::filter(gene_id %in% gns) -> supertxlen
+
+m <- match(supertxlen$gene_id, gns)
+all(supertxlen$gene_id == gns[m])
+```
+
+```{r}
+# Write significant DGEs for this comparison to file.
+
+# set index for current contrast
+i = 1
+
+lrt <- glmLRT(fit, contrast = contr[,1])
+topTags(lrt, n = Inf) %>%
+  data.frame -> top
+top
+
+saveRDS(top, here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.top.rds"))
+saveRDS(lrt, here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.lrt.rds"))
+```
+
+```{r}
+# run camera competitive gene set test  
+# use signed likelihood ratio test statistic as recommended by GS here: https://support.bioconductor.org/p/112937/
+
+# fix floating point representation issue
+lrt$table$LR <- pmax(lrt$table$LR, 0) # Converts all negative values to 0
+
+statistic <- sign(lrt$table$logFC) * sqrt(lrt$table$LR)
+
+# get gene indices for all gene set genes
+dge_early_vs_late.up.id <- ids2indices(dge_early_vs_late.up.gns, 
+                                       unname(fit.gns[rownames(lrt)]))
+dge_early_vs_late.up.cam <- cameraPR(statistic, dge_early_vs_late.up.id)
+dge_early_vs_late.up.cam
+
+dge_early_vs_late.down.id <- ids2indices(dge_early_vs_late.down.gns,
+                                         unname(fit.gns[rownames(lrt)]))
+dge_early_vs_late.down.cam <- cameraPR(statistic, dge_early_vs_late.down.id)
+dge_early_vs_late.down.cam
+```
+
+## Barcode Plot
+
+```{r, fig.width=10, fig.height=6}
+barcodeplot(statistic, 
+            index = dge_early_vs_late.up.id$Set1, 
+            index2 = dge_early_vs_late.down.id$Set1,
+            main = "Ranking of significant DEGs in our dataset in Gerli et al. (2024) dataset")
+```
+
+```{r}
+up_genes <- intersect(rownames(dge_early_vs_late.up), rownames(lrt$table))
+table(lrt$table[up_genes,]$PValue < 0.05)
+table(top[up_genes,]$FDR < 0.05)
+
+down_genes <- intersect(rownames(dge_early_vs_late.down), rownames(lrt$table))
+table(lrt$table[down_genes,]$PValue < 0.05)
+table(top[down_genes,]$FDR < 0.05)
+```
+
+# Examine genes in the Epidermal Differentiation Complex
+
+https://en.wikipedia.org/wiki/Epidermal_differentiation_complex
+
+```{r}
+# examine genes in the Epidermal Differentiation Complex
+
+# gene list from here:
+# https://www.genenames.org/data/genegroup/#!/group/1354
+
+# general information
+# https://en.wikipedia.org/wiki/Epidermal_differentiation_complex
+
+EDC_GENES <- read_tsv(file = here("data", "edc_genes.txt"))
+EDC_GENES <- EDC_GENES$`Approved symbol`
+
+edc.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+                             keys = EDC_GENES, 
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+```
+
+```{r}
+gerli.edc <- ids2indices(edc.gns, unname(fit.gns[rownames(lrt)]))
+
+edc.cam <- cameraPR(statistic, gerli.edc)
+edc.cam
+```
+
+This is not significant.
+
+```{r, fig.width=10, fig.height=6}
+barcodeplot(statistic, 
+            index = gerli.edc$Set1,
+            main = "EDC in Gerli et al. (2024) dataset")
+```
+
+```{r}
+edc.stats <- data.frame(edc_gene = rownames(lrt$table[gerli.edc$Set1,]), 
+                        stat = statistic[gerli.edc$Set1])
+
+edc.stats %>% arrange(stat)
+```
+
+```{r, fig.width=20, fig.height=8}
+seu_int.Gerli <- AddModuleScore(seu_int.Gerli, features = list(EDC_GENES), name = "EDC_genes", ctrl = 5)
+
+FeaturePlot(seu_int.Gerli, "EDC_genes1", split.by = "Sample") + bottom_legend
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

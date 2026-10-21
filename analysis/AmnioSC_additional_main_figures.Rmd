@@ -1,0 +1,665 @@
+---
+title: "Main figures for manuscript"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(viridis)
+library(Polychrome)
+library(magick)
+library(png)
+library(ggplot2)
+library(grid)
+library(limma)
+library(edgeR)
+library(ggtext)
+library(dplyr)
+library(tidyverse)
+library(ggplotify)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+source(here("code", "limma_barcodeplot_custom.R"))
+# using customised version of the barcodeplot function to make the font size bigger and change shade of background colour
+# as cannot pass cex arguments to the original barcodeplot function
+# https://support.bioconductor.org/p/119752/
+source(here("code", "seurat_dotplot_custom.R"))
+# using customised version of DotPlot function to fix the ggplot2 facet_grid() defunct error
+# https://github.com/satijalab/seurat/issues/10143
+
+RERUN_ALL <- FALSE
+```
+
+# Figure 1
+
+## Generate the plots
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+```{r, fig.width=12, fig.height=12, warning=FALSE, message=FALSE}
+fig1.n_cells_clusters <- plotNCells.Paper(seu_int.AmnioSC, x_var = "cluster_names", 
+                                          color_by = "cluster_names", 
+                                          colour_scheme = CLUSTER_NAME_COLOURS, 
+                                          title = "Number of cells per cluster", 
+                                          subtitle="",
+                                          xlab = "", ylab = "Number of cells", ymax = 6200)
+fig1.n_cells_clusters
+saveRDS(fig1.n_cells_clusters, here("output", "main_figures", "fig1.n_cells_clusters.rds"))
+```
+
+```{r, fig.height=12, fig.width=12}
+fig1.umap_clusters <- plotUMAP.Paper(seu_int.AmnioSC, color_by = "cluster_names", 
+                                     colour_scheme = CLUSTER_NAME_COLOURS, 
+                                     title = "", subtitle="", label_size = 6) 
+fig1.umap_clusters
+saveRDS(fig1.umap_clusters, here("output", "main_figures", "fig1.umap_clusters.rds"))
+```
+
+```{r, fig.width=20, fig.height=8}
+AmnioSC.canonical_markers.reduced <- readRDS(here("data", "workflow", "AmnioSC.canonical_markers.reduced.rds"))
+AmnioSC.canonical_markers.reduced <- AmnioSC.canonical_markers.reduced[levels(seu_int.AmnioSC$cluster_names)]
+
+canonical_markers.reduced <- unique(unlist(AmnioSC.canonical_markers.reduced, use.names = FALSE))
+canonical_markers.reduced <- filterPresentGenes(canonical_markers.reduced, seu_int.AmnioSC)
+
+seu_int.AmnioSC$cluster_names.rev <- sortedFactor(seu_int.AmnioSC$cluster_names, decreasing = FALSE)
+
+DotPlot.custom(object = seu_int.AmnioSC, features = canonical_markers.reduced, assay = "SCT",
+        group.by = "cluster_names.rev", col.max = 5) +
+  geom_point(aes(size=pct.exp), shape = 21, colour="black", stroke=0.5) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_color_gradient(low = "gray95", high = "#39157B",
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ggtitle("Selected canonical marker genes") + 
+  theme_linedraw() + rotate_x_labels +
+  labs(subtitle = "Our Dataset") +
+   ylab("") + xlab("") +
+  theme(plot.title = element_markdown(size = 24, face = "bold", family = "arial"),
+        plot.subtitle = element_markdown(size = 22, face = "italic", family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22)) -> fig1.dotplot_clusters
+
+fig1.dotplot_clusters
+
+saveRDS(fig1.dotplot_clusters, here("output", "main_figures", "fig1.dotplot_clusters.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+diagram1 <- image_read(here("output", "main_figures", "AmnioSC_diagram.png"))
+fig1.diagram1<- rasterGrob(diagram1, interpolate = TRUE)
+
+diagram2 <- image_read(here("output", "main_figures", "CombinedMeta_Diagram.png"))
+fig1.diagram2 <- rasterGrob(diagram2, interpolate = TRUE)
+
+# fig1.n_cells_clusters <- readRDS(here("output", "main_figures", 
+#                                       "fig1.n_cells_clusters.rds"))
+# fig1.umap_clusters <- readRDS(here("output", "main_figures", 
+#                                    "fig1.umap_clusters.rds"))
+# fig1.dotplot_clusters <- readRDS(here("output", "main_figures", 
+#                                       "fig1.dotplot_clusters.rds"))
+```
+
+```{r, fig.width=25, fig.height=30}
+layout = "
+AAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAA
+BBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBBBBBBBBBBBBBBBBBBBBBB
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+"
+wrap_elements(full = fig1.diagram1) + wrap_elements(full = fig1.diagram2) +
+  wrap_elements(fig1.umap_clusters + theme(plot.margin = unit(rep(0,4), "cm"))) + 
+  wrap_elements(fig1.n_cells_clusters + theme(plot.margin = unit(rep(0,4), "cm"))) + 
+  wrap_elements(fig1.dotplot_clusters + theme(plot.margin = unit(rep(0,4), "cm"))) + 
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c("A", " ", "B", "C", "D", "E", "F", "G", "H"))) &
+  theme(
+    plot.tag = element_text(size = 30, face = "bold", family = "arial"),
+    axis.title = element_text(size = 20, face = "bold", family = "arial"),
+    axis.text = element_text(size = 16, family = "arial"),
+    legend.title = element_text(size = 16, face = "bold", family = "arial"),
+    legend.text = element_text(size = 16, family = "arial")) -> fig1
+fig1
+
+ggsave(plot = fig1, filename = here("output", "figures_png", "fig1.png"), height = 30, width = 25)
+```
+
+# Figure 2
+
+## Generate the plots
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+seu_int.AmnioSC <- seu_int.AmnioSC[, seu_int.AmnioSC$Donor != "5AF"]
+
+CLUSTER_NAME_COLOURS.SELECTED <- c(CLUSTER_NAME_COLOURS[c(7, 10, 12)], "grey")
+names(CLUSTER_NAME_COLOURS.SELECTED) <- c("ILC3", "Lung epithelium (low confidence)", "Lung epithelium", "Other Clusters")
+
+seu_int.AmnioSC$cluster_names.selected <- ifelse(as.character(seu_int.AmnioSC$cluster_names) %in% c("ILC3", 
+                                                                                          "Lung epithelium (low confidence)", 
+                                                                                          "Lung epithelium"),
+                                            as.character(seu_int.AmnioSC$cluster_names), 
+                                            "Other Clusters")
+
+table(seu_int.AmnioSC$cluster_names, seu_int.AmnioSC$cluster_names.selected) # sanity check 
+```
+
+```{r}
+fig2.umap_early_late <- DimPlot(seu_int.AmnioSC, reduction = 'umap', group.by = "cluster_names.selected",
+        split.by = "early_late_gestation", pt.size = 1) + 
+  scale_color_manual(values = CLUSTER_NAME_COLOURS.SELECTED) +
+  theme_linedraw(base_size = 16) + blank_axes + bottom_legend +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+        strip.text = element_text(face = "bold", family = "arial", size = 18),
+        plot.title = element_text(face = "bold", family = "arial", hjust = 0.5, size = 24),
+        legend.text = element_text(size = 18, family = "arial")) +
+  ggtitle("Clusters by Gestational Age Group") + 
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=3)))
+
+fig2.umap_early_late
+
+saveRDS(fig2.umap_early_late, here("output", "main_figures", "fig2.umap_early_late.rds"))
+```
+
+The `sccomp_result` object was generated on [this page](AmnioSC_workflow_optref_cluster_proportions_sccomp.html).
+
+```{r}
+sccomp_result <- readRDS(here("data", "workflow", "AmnioSC.sccomp_result.rds"))
+
+prop_df <- generateGroupProportionsDF(seu_int.AmnioSC[,seu_int.AmnioSC$Donor != "5AF"],
+                                      group_var = "cluster_names")
+```
+
+```{r, fig.width=4, fig.height=6}
+fig2.prop_cluster07 <- plotProportion.Paper(prop_df, curr_cluster = "ILC3", 
+                                            title = "ILC3<br>", 
+                                            sccomp_result, font_scaling = 4)
+fig2.prop_cluster10 <- plotProportion.Paper(prop_df, curr_cluster = "Lung epithelium (low confidence)", 
+                                            title = "Lung epithelium<br>(low confidence)", 
+                                            sccomp_result, font_scaling = 4)
+fig2.prop_cluster12 <- plotProportion.Paper(prop_df, curr_cluster = "Lung epithelium", 
+                                            title = "Lung epithelium<br>", 
+                                            sccomp_result, font_scaling = 4)
+
+fig2.prop_cluster07
+fig2.prop_cluster10
+fig2.prop_cluster12
+
+saveRDS(fig2.prop_cluster07, here("output", "main_figures", "fig2.prop_cluster07.rds"))
+saveRDS(fig2.prop_cluster10, here("output", "main_figures", "fig2.prop_cluster10.rds"))
+saveRDS(fig2.prop_cluster12, here("output", "main_figures", "fig2.prop_cluster12.rds"))
+```
+
+The `cds` object was generated on [this page](AmnioSC_workflow_optref_trajectory_lung.html).
+
+```{r}
+cds <- readRDS(here("data", "workflow", "AmnioSC.lung_pseudotime.rds"))
+
+seu_int.AmnioSC$lung_pseudotime <- NA
+seu_int.AmnioSC$lung_pseudotime[names(monocle3::pseudotime(cds))] <- monocle3::pseudotime(cds)
+```
+
+```{r, fig.width=8, fig.height=12}
+FeaturePlot(seu_int.AmnioSC, reduction = "umap", features = "lung_pseudotime", pt.size = 4) +
+  scale_color_viridis(option = "viridis", direction = 1, na.value = "grey") +
+  theme_void() + blank_axes + 
+  ggtitle("Pseudotime for Lung Epithelium Clusters<br>") +
+  bottom_legend +
+  labs(color = "Pseudotime\n") +
+  theme(plot.title = element_markdown(face = "bold", size = 24, hjust = 0.5, family = "arial"),
+        legend.key.width=unit(0.05,"npc"),
+        legend.title = element_text(face = "bold.italic", size = 16),
+        legend.text = element_text(size = 14)) +
+  coord_cartesian(xlim = c(-4, 2), ylim = c(-15, -9)) -> fig2.lung_pseudotime
+fig2.lung_pseudotime
+
+saveRDS(fig2.lung_pseudotime, here("output", "main_figures", "fig2.lung_pseudotime"))
+```
+
+```{r}
+lung_genes <- c("SFTPB", "SFTPC", "SFTPD", "ABCA3", "NKX2-1", "SCGB3A2", "VEGFA")
+
+seu_int.AmnioSC.early_late <- seu_int.AmnioSC[, seu_int.AmnioSC$Donor.Paper != "AF_4"]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat <- as.matrix(seu_int.AmnioSC.early_late[["SCT"]]@data[lung_genes,])
+meta <- seu_int.AmnioSC.early_late@meta.data %>% dplyr::select(refined_clusters, early_late_gestation, cluster_names)
+
+meta <- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)
+
+meta <- pivot_longer(meta, -c(refined_clusters, early_late_gestation, cluster_names), names_to="Gene", values_to="Expression")
+head(meta)
+
+meta_summary <- meta %>%
+  group_by(refined_clusters, early_late_gestation, cluster_names, Gene) %>%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression > 0) / length(Expression) * 100)
+
+meta_summary$Gene <- factor(meta_summary$Gene, levels=lung_genes)
+
+meta_summary$cluster_names <- as.character(meta_summary$cluster_names)
+meta_summary$cluster_names <- gsub("Lung epithelium (low confidence)", 
+                                   "Lung epithelium\n(low confidence)", 
+                                   meta_summary$cluster_names, fixed = TRUE)
+
+fig2.AmnioSC.surfactant_expr <- ggplot(meta_summary %>% 
+                                         filter(refined_clusters %in% c("Cluster_10", "Cluster_12")), 
+                                                aes(x=Gene, y=cluster_names)) +
+  geom_point(aes(size = Pct, fill = Avg), color="black", shape=21) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_fill_gradient(low = "gray95", high = "#39157B",
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ylab("Cluster") + xlab("") +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels + 
+  labs(title = "Expression of surfactant and lung development<br>genes per cluster by gestational age group",
+       subtitle = "Our Dataset") +
+  theme(plot.title = element_markdown(size = 24, face = "bold", family = "arial"),
+        plot.subtitle = element_markdown(size = 22, face = "italic", family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22))
+
+fig2.AmnioSC.surfactant_expr
+
+saveRDS(fig2.AmnioSC.surfactant_expr,
+        here("output", "main_figures", "fig2.AmnioSC.surfactant_expr.rds"))
+```
+
+```{r, fig.width=10, fig.height=5}
+ILC3_genes <- c("IL23R", "KLRB1", "KIT", "IL7R", "ZBTB16", "CD96", "CD69", "RORC", "IL17A", "NCR2", "LTB", "CD52")
+
+seu_int.AmnioSC.early_late <- seu_int.AmnioSC[, seu_int.AmnioSC$Donor.Paper != "AF_4"]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat <- as.matrix(seu_int.AmnioSC.early_late[["SCT"]]@data[ILC3_genes,])
+meta <- seu_int.AmnioSC.early_late@meta.data %>% dplyr::select(refined_clusters, early_late_gestation, cluster_names)
+
+meta <- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)
+
+meta <- pivot_longer(meta, -c(refined_clusters, early_late_gestation, cluster_names), names_to="Gene", values_to="Expression")
+head(meta)
+
+meta_summary <- meta %>%
+  group_by(refined_clusters, early_late_gestation, cluster_names, Gene) %>%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression > 0) / length(Expression) * 100)
+
+meta_summary$Gene <- factor(meta_summary$Gene, levels=ILC3_genes)
+
+meta_summary$cluster_names <- as.character(meta_summary$cluster_names)
+
+fig2.AmnioSC.ILC3_expr <- ggplot(meta_summary %>% 
+                                         filter(refined_clusters %in% c("Cluster_07")), 
+                                                aes(x=Gene, y=cluster_names)) +
+  geom_point(aes(size = Pct, fill = Avg), color="black", shape=21) +
+  scale_size("% detected", range = c(0,6)) +
+  scale_fill_gradient(low = "gray95", high = "#39157B",
+                       guide = guide_colorbar(ticks.colour = "black",
+                                              frame.colour = "black"),
+                       name = "Average\nexpression") +
+  ylab("Cluster") + xlab("") +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels + 
+  labs(title = "Expression of ILC3 genes by gestational age group",
+       subtitle = "Our Dataset") +
+  theme(plot.title = element_markdown(size = 24, face = "bold", family = "arial"),
+        plot.subtitle = element_markdown(size = 22, face = "italic", family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title.y = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 22, face = "bold"),
+        strip.text = element_text(face = "bold", size = 22))
+
+fig2.AmnioSC.ILC3_expr
+
+saveRDS(fig2.AmnioSC.ILC3_expr,
+        here("output", "main_figures", "fig2.AmnioSC.ILC3_expr.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+# fig2.umap_early_late <- readRDS(here("output", "main_figures", "fig2.umap_early_late.rds"))
+# fig2.prop_cluster07 <- readRDS(here("output", "main_figures", "fig2.prop_cluster07.rds"))
+# fig2.prop_cluster10 <- readRDS(here("output", "main_figures", "fig2.prop_cluster10.rds"))
+# fig2.prop_cluster12 <- readRDS(here("output", "main_figures", "fig2.prop_cluster12.rds"))
+# fig2.lung_pseudotime <- readRDS(here("output", "main_figures", "fig2.lung_pseudotime"))
+# fig2.AmnioSC.surfactant_expr <- readRDS(here("output", "main_figures", "fig2.AmnioSC.surfactant_expr.rds"))
+```
+
+```{r, fig.width=22, fig.height=16}
+layout = "
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+"
+
+wrap_elements(fig2.prop_cluster07 + fig2.prop_cluster10 + 
+                fig2.prop_cluster12 + theme(plot.margin = unit(rep(0,4), "cm")))  +
+  wrap_elements(fig2.umap_early_late + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(fig2.AmnioSC.surfactant_expr + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(fig2.lung_pseudotime + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = list(c("A","B", "C", "D"))) &
+  theme(
+    plot.tag = element_text(size = 24, face = "bold", family = "arial"),
+    plot.title = element_text(size = 10, face = "bold", family = "arial"),
+    axis.title = element_text(size = 20),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 14)) -> fig2
+
+fig2
+
+ggsave(plot = fig2, filename = here("output", "figures_png", "fig2.png"), height = 16, width = 22)
+```
+
+# Figure 3
+
+## Generate the plots
+
+The `fit.AmnioSC` and `contr.AmnioSC` objects were generated on [this page](AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html).
+
+```{r}
+fit.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.fit.rds"))
+contr.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.contr.rds"))
+```
+
+```{r, fig.height=8, fig.width=8}
+pal <- c(paletteer::paletteer_d("RColorBrewer::Set1")[2:1], "grey")
+
+# DGE results summary
+cutoff <- 0.05
+
+# set index for current contrast
+i = 1
+
+dt.AmnioSC <- lapply(1:ncol(contr.AmnioSC), function(i){
+  decideTests(glmLRT(fit.AmnioSC, contrast = contr.AmnioSC[,i]),
+                            p.value = cutoff)
+})
+
+lrt.AmnioSC <- glmLRT(fit.AmnioSC, contrast = contr.AmnioSC[,i])
+topTags(lrt.AmnioSC, n = Inf) %>% data.frame -> top.AmnioSC
+
+top_genes_to_label <- top.AmnioSC %>% filter(FDR < cutoff,
+                                     abs(logFC) > 5 | PValue < 0.000000001)
+
+top.AmnioSC$label_this <- rownames(top.AmnioSC) %in% rownames(top_genes_to_label)
+table(top.AmnioSC$label_this)
+
+top.AmnioSC %>%
+  mutate(sig = ifelse(FDR <= cutoff, glue::glue("<= {cutoff}"),
+                      glue::glue("> {cutoff}"))) %>%
+  rownames_to_column(var = "SYMBOL") %>%
+  left_join(dt.AmnioSC[[i]][,1] %>%
+              data.frame %>%
+              rownames_to_column(var = "SYMBOL") %>%
+              dplyr::rename(status = 2)) %>%
+  mutate(status = ifelse(status == 1, "Up",
+                         ifelse(status == -1, "Down",
+                                "NotSig"))) %>%
+  mutate(status = as.factor(status)) %>%
+  mutate(status = fct_relevel(status, "NotSig", after = Inf)) %>%
+  ggplot(aes(x = logFC, y = -log10(PValue), color = status)) +
+  geom_point(alpha = 0.75) +
+  ggrepel::geom_text_repel(data = function(x) subset(x, label_this == TRUE),
+                           aes(x = logFC, y = -log10(PValue),
+                               label = SYMBOL),
+                           size = 4, colour = "black", max.overlaps = 50) +
+  scale_colour_manual(values = pal) +
+  theme_linedraw() +
+  labs(title = "DEGs in Keratinocytes",
+       subtitle = "Early vs Late Gestational Age Groups",
+       x = "log<sub>2</sub>(Fold Change)",
+       y = "-log<sub>10</sub>(P-value)",
+       colour = glue::glue("FDR < {cutoff}")) +
+  theme(legend.position = "bottom") +
+  theme(plot.title = element_text(face = "bold", size = 18, hjust = 0.5, family = "arial"),
+        plot.subtitle = element_text(face = "italic", size = 14, hjust = 0.5, family = "arial"),
+    axis.title.x = element_markdown(size = 16, face = "bold", family = "arial"),
+    axis.title.y = element_markdown(size = 16, face = "bold", family = "arial"),
+    axis.text = element_text(size = 14, family = "arial"),
+    legend.title = element_text(size = 14, family = "arial", face = "bold.italic"),
+    legend.text = element_text(size = 14, family = "arial")) -> fig3.volcano_plot
+
+fig3.volcano_plot
+
+saveRDS(fig3.volcano_plot, here("output", "main_figures", "fig3.volcano_plot.rds"))
+```
+
+The `c5.cam.AmnioSC` and `c2.cam.AmnioSC` objects were generates on [this page](AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html).
+
+```{r}
+c5.cam.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.c5.cam.RDS"))
+c2.cam.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC.dge_early_vs_late.c2.cam.RDS"))
+```
+
+```{r, fig.height = 12, fig.width = 10}
+pal <- c(paletteer::paletteer_d("RColorBrewer::Set1")[2:1], "grey")
+
+c5.cam.AmnioSC %>%
+  dplyr::slice(1:10) %>%
+  rownames_to_column(var = "Set") %>%
+  mutate(Type = "GO",
+         Rank = 1:10) %>%
+  bind_rows(c2.cam.AmnioSC %>%
+              dplyr::slice(1:8) %>%
+              rownames_to_column(var = "Set") %>%
+              mutate(Type = "REACTOME",
+                     Rank = 1:8)) %>%
+  mutate(Set = str_wrap(str_replace_all(Set, "_", " "), width = 32),# was 75
+         Set = str_remove_all(Set, "GO |REACTOME |HALLMARK ")) %>%
+  ggplot(aes(x = -log10(FDR), y = fct_reorder(Set, -Rank),
+             colour = Direction)) +
+  geom_point(aes(size = NGenes)) +
+  facet_wrap(~Type, ncol = 1, scales = "free_y") +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dashed")  +
+  scale_colour_manual(values = pal) +
+  labs(y = "Gene Set", x = "-log<sub>10</sub>(FDR)") +
+  theme_linedraw(12) +
+  theme(legend.title = element_text(size = 14, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 14, family = "arial"),
+        axis.title.y = element_text(size = 16, family = "arial", face = "bold"),
+        axis.text = element_text(size = 14, family = "arial"),
+        axis.title.x = element_markdown(family = "arial", size = 16, face = "bold"),
+        strip.text = element_text(face = "bold", size = 14),
+        legend.box = "vertical") +
+  bottom_legend -> fig3.gsea
+fig3.gsea
+
+saveRDS(fig3.gsea, here("output", "main_figures", "fig3.gsea.rds"))
+```
+
+The `lrt.Gerli` and `fit.Gerli` objects were generated on [this page](Gerli_et_al_2024.dge_ruvseq.cluster_0.html).
+
+```{r}
+lrt.Gerli <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.lrt.rds"))
+fit.Gerli <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.dge_early_vs_late.fit.rds"))
+```
+
+```{r}
+dge_early_vs_late.up <- top.AmnioSC %>% filter(FDR < 0.05, logFC > 0)
+dim(dge_early_vs_late.up)
+
+dge_early_vs_late.down <- top.AmnioSC %>% filter(FDR < 0.05, logFC < 0)
+dim(dge_early_vs_late.down)
+
+# translate gene SYMBOLS to entrez gene IDs
+dge_early_vs_late.up.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(dge_early_vs_late.up),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+dge_early_vs_late.down.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(dge_early_vs_late.down),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+
+fit.gns <- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(fit.Gerli),
+                             column = c("ENTREZID"),
+                             keytype = "SYMBOL",
+                             multiVals = "first")
+```
+
+```{r}
+# run camera competitive gene set test
+# use signed likelihood ratio test statistic as recommended by GS here: https://support.bioconductor.org/p/112937/
+
+# fix floating point representation issue
+lrt.Gerli$table$LR <- pmax(lrt.Gerli$table$LR, 0) # Converts all negative values to 0
+
+statistic.Gerli <- sign(lrt.Gerli$table$logFC) * sqrt(lrt.Gerli$table$LR)
+
+# get gene indices for all gene set genes
+dge_early_vs_late.up.id <- ids2indices(dge_early_vs_late.up.gns,
+                                       unname(fit.gns[rownames(lrt.Gerli)]))
+dge_early_vs_late.up.cam <- cameraPR(statistic.Gerli, dge_early_vs_late.up.id)
+dge_early_vs_late.up.cam
+
+dge_early_vs_late.down.id <- ids2indices(dge_early_vs_late.down.gns,
+                                         unname(fit.gns[rownames(lrt.Gerli)]))
+dge_early_vs_late.down.cam <- cameraPR(statistic.Gerli, dge_early_vs_late.down.id)
+dge_early_vs_late.down.cam
+```
+
+```{r, fig.width=10, fig.height=6.5}
+fig3.barcode_plot <- as.ggplot(~barcodeplot.custom(statistic.Gerli,
+                     index = dge_early_vs_late.up.id$Set1,
+                     index2 = dge_early_vs_late.down.id$Set1,
+                     main = "Ranking of significant DEGs from our dataset\nin Gerli et al. (2024) dataset",
+                     cex.main = 1.6))
+
+fig3.barcode_plot <- fig3.barcode_plot + geom_richtext(
+    data = data.frame(x = 0.53, y = 0.85, 
+                      label = "***Up:** P-value = 2.1981 x 10<sup>-10</sup><br>**Down:** P-value = 1.3857 × 10<sup>−17</sup>*"),
+    aes(x, y, label = label), hjust = 0.5, fill = NA, label.color = NA, size = 5, family = "arial")
+
+# fig3.barcode_plot <- fig3.barcode_plot + labs(subtitle = paste0("Up: P-value = ",
+#                                                                 format(dge_early_vs_late.up.cam$PValue,
+#                                                                        scientific = FALSE), 
+#                                                                 "\nDown: P-value = ",
+#                                                                 format(dge_early_vs_late.down.cam$PValue,
+#                                                                        scientific = FALSE))) + 
+#   theme(plot.subtitle = element_text(face = "italic",hjust = 0.5, vjust = -30, size = 14, family = "arial",
+#                                      margin = margin(t = 0, b = 10)))
+
+fig3.barcode_plot # Statistic label needs to look off center here to look ok in the main figure
+
+saveRDS(fig3.barcode_plot, here("output", "main_figures", "fig3.barcode_plot.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+# fig3.volcano_plot <- readRDS(here("output", "main_figures", "fig3.volcano_plot.rds"))
+# fig3.gsea <- readRDS(here("output", "main_figures", "fig3.gsea.rds"))
+# fig3.barcode_plot <- readRDS(here("output", "main_figures", "fig3.barcode_plot.rds"))
+```
+
+```{r, fig.width=20, fig.height=15}
+layout = "
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+"
+
+wrap_elements(fig3.volcano_plot + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(fig3.gsea + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(fig3.barcode_plot + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = list(c("A", "B", "C"))) &
+  theme(
+    plot.tag = element_text(size = 24, face = "bold", family = "arial"),
+    plot.title = element_text(size = 10, face = "bold", family = "arial"),
+    axis.title = element_text(size = 20),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 14)) -> fig3
+
+fig3
+
+ggsave(plot = fig3, filename = here("output", "figures_png", "fig3.png"), height = 15, width = 20)
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

@@ -1,0 +1,3686 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Calandra Grima" />
+
+<meta name="date" content="2026-10-13" />
+
+<title>Cluster marker gene and Gene Ontology analysis - Optimised Reference</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">AmnioSC Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Cluster marker gene and Gene Ontology
+analysis - Optimised Reference</h1>
+<h4 class="author">Calandra Grima</h4>
+<h4 class="date">2026-10-13</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-10-13
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>amniosinglecell/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220125code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220125)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220125code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220125)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreefe381290635aa7ba126ac8f7b562aebfeced6f85targetblankfe38129a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/fe381290635aa7ba126ac8f7b562aebfeced6f85" target="_blank">fe38129</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreefe381290635aa7ba126ac8f7b562aebfeced6f85targetblankfe38129a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/fe381290635aa7ba126ac8f7b562aebfeced6f85" target="_blank">fe38129</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/generate_site.R
+    Ignored:    analysis/knit_docs.R
+    Ignored:    analysis/run_as_job.R
+    Ignored:    analysis/sccomp_draws_files/
+    Ignored:    celltypist/.DS_Store
+    Ignored:    data/
+    Ignored:    excluded_analysis/
+    Ignored:    output/
+    Ignored:    renv/.DS_Store
+    Ignored:    renv/library/
+    Ignored:    renv/staging/
+    Ignored:    sccomp_draws_files/
+
+Untracked files:
+    Untracked:  AmnioSC_Manuscript_Claude/
+    Untracked:  claude_log/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd</code>)
+and HTML
+(<code>docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html</code>)
+files. If you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fe381290635aa7ba126ac8f7b562aebfeced6f85/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">fe38129</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c705f9bf5f437ade9a7b964de42aa4dd083548ce/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">c705f9b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ab67e6b4e7e750c1be873d2272f8fc19e27f35b0/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">ab67e6b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-24
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a82f90cac5c6ec13138a917880175ae9ae54c0de/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">a82f90c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5aeed7cd7d64f91b4b85489116e5d78288b2c74f/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">5aeed7c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/14362ffcd67fdaf9b279cc801614b88e923ec117/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">14362ff</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c2d4d2adf489d92a6f7672fa32c718bfb99d3185/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">c2d4d2a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4f81c3f0928d16319a86d68ba0932ce2aa2f8f86/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">4f81c3f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c7ba1c7a7ae28ee41a5d6611c4d6b5a765c7a393/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">c7ba1c7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c5c97cd42f5d6b6959d6e20d5539925500671984/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">c5c97cd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7a7b471d9798261e0263015b00ea519321860b56/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">7a7b471</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f7fb8709aa9773dfc3d82c1a80019cf51d885a63/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">f7fb870</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1471266b15754d13cc5dbb346e12c52a54a2affd/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">1471266</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f912871115d54cd6afb1223cfcf220ca72c3b3a7/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">f912871</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e740625e9f7bd86cd01e60a97a4a5281adaa8507/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">e740625</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-04-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/11bf2c795a4ac1ed865713dead8620c46a45ec84/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">11bf2c7</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-04-29
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c69abd6259a5111eece0888ff76fe40901dee05a/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">c69abd6</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f394355b340ee8d445894dbba63cba7ee5f22b7b/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">f394355</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ead02546a3c7bf03715ec7550e02970364192770/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">ead0254</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7cfb45a3d6696e4ab0f6e7d6575f7e2e4abedae1/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">7cfb45a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+Commit files for migration to local
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/13ed75cf3057db00381b636e167fdad46f0d905b/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">13ed75c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/028e2dd70c1446f22c63494e1fa7c1b82cc55fe7/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">028e2dd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+<td>
+Update analysis workflow to use new clustering approach
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/aea88e843525163faf1461cf80839557defed1ce/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">aea88e8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/53c740736bcd5e82d435eac3b1f878e958261427/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">53c7407</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/26c55dddd9d88f37e7126521add7e2f236baba08/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">26c55dd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/767cc7894995853c7bd3fec572ea54a4d72828f5/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">767cc78</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-02
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8411a2fe8784c6a42ef65ba000d8857582442696/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">8411a2f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fc04588dbf3cd69c6a0028bfa9639e47d2635401/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">fc04588</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65b9c8fdded474b45c445804219fbec5aa719330/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">65b9c8f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a534cd5f5d6a9088c6f96544d12ed95be69f25c4/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">a534cd5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-02-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bbf50a7d3c6efc595d928abeda4853afb5bcb86b/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">bbf50a7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-02-05
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a81bd7a5ae3ae0a50fd1c93d6bc0273ca9a52761/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">a81bd7a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/158f1e842a1614e2f0af337592d65bc50b8a05fe/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">158f1e8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/13b7dbe36799ad9393ba794d877b9a53dd1c061d/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">13b7dbe</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a5788799613f3859b60b117d1fa3f4ffdfcb426a/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">a578879</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/40a27d419cb724f7d0c11bf75dc4a537b8931ce8/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">40a27d4</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/32b16f84db899a47df01db8cadc331fb540df152/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">32b16f8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Change rerun flag back to FALSE
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/49abc7839d03129cb5c3fbc1fce83e1716eee753/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">49abc78</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-05-29
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/98cf8c8b5e229c776cc53852c385279719a9c4d5/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">98cf8c8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/eb6abb5f6da160c17f5a625e4e449b645dc973b2/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">eb6abb5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a2fc3f24fd4828b5ef83163e94883688634bdf8b/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">a2fc3f2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e86a657ada5528cbe36308daec9fbd432df3b093/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">e86a657</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d315ad34f84566ef488d8f313293d73c09b893cd/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">d315ad3</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7630c39c7cd8521ad697b4a9fc83cd3ddb501269/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">7630c39</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/42f421ef0c6f3a8b1e2eda2a692c363a2c27d188/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">42f421e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00205b24e34b152698e4e6a8401bc505e2bb622c/analysis/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd" target="_blank">00205b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Update file naming scheme for optimised reference analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00205b24e34b152698e4e6a8401bc505e2bb622c/docs/AmnioSC_workflow_optref_cluster_marker_gene_analysis.html" target="_blank">00205b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Update file naming scheme for optimised reference analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="load-libraries" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Load libraries</h1>
+<pre class="r"><code>library(Seurat)
+library(SeuratObject)
+library(limma)
+library(edgeR)
+library(org.Hs.eg.db)
+library(GO.db)
+library(pheatmap)
+library(ggplot2)
+library(ggbeeswarm)
+library(viridis)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(rmarkdown)
+library(tidyr)
+library(workflowr)
+library(here)
+library(tidyverse)
+
+source(here(&quot;code&quot;, &quot;helper_functions.R&quot;))
+source(here(&quot;code&quot;, &quot;load_colour_schemes.R&quot;))
+
+RERUN_ALL &lt;- FALSE</code></pre>
+</div>
+<div id="refined-cluster-marker-gene-analysis-for-all-cells"
+class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Refined cluster marker
+gene analysis for all cells</h1>
+<div id="load-in-the-integrated-dataset-with-refined-cluster-labels"
+class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Load in the
+integrated dataset with refined cluster labels</h2>
+<pre class="r"><code>seu_int &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds&quot;))</code></pre>
+<pre class="r"><code>DimPlot(seu_int, reduction = &#39;umap&#39;, label = TRUE, label.size = 5, 
+        group.by = &quot;cluster_names&quot;) +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  guides(color=guide_legend(ncol = 3, override.aes = list(size=2))) +
+  bottom_legend +
+  ggtitle(&quot;Integrated dataset (clusters)&quot;)</code></pre>
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette(&quot;ggplot2-in-packages&quot;)` for more information.
+ℹ The deprecated feature was likely used in the Seurat package.
+  Please report the issue at &lt;https://github.com/satijalab/seurat/issues&gt;.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8411a2fe8784c6a42ef65ba000d8857582442696/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">8411a2f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-2-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="plot-qc-metrics" class="section level3" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Plot QC
+metrics</h3>
+<pre class="r"><code>seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = cluster_names)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  no_legend + rotate_x_labels + 
+  ggtitle(&quot;QC metrics by cluster&quot;) -&gt; p1
+
+seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = cluster_names)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels + 
+  scale_colour_manual(values = CLUSTER_NAME_COLOURS) +
+  no_legend -&gt; p2
+
+p3 &lt;- seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             fill = cluster_names)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels + no_legend +
+  scale_fill_manual(values = CLUSTER_NAME_COLOURS) +
+  ggtitle(&quot;Number of cells per cluster&quot;)
+
+p1 | p2 | p3</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f394355b340ee8d445894dbba63cba7ee5f22b7b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">f394355</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8411a2fe8784c6a42ef65ba000d8857582442696/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">8411a2f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-3-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="plot-cell-type-composition-of-each-cluster"
+class="section level3" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Plot cell type
+composition of each cluster</h3>
+<pre class="r"><code>p1 &lt;- seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  ggtitle(&quot;Number of cells per cluster&quot;)
+
+p2 &lt;- seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle(&quot;Proportion of cell types per cluster&quot;)
+
+p1 | p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7a7b471d9798261e0263015b00ea519321860b56/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">7a7b471</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1471266b15754d13cc5dbb346e12c52a54a2affd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">1471266</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f394355b340ee8d445894dbba63cba7ee5f22b7b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">f394355</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8411a2fe8784c6a42ef65ba000d8857582442696/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">8411a2f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-4-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  ggtitle(&quot;Number of cells per cluster&quot;)
+
+p2 &lt;- seu_int@meta.data %&gt;%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_cowplot(12) +
+  ylab(&quot;Proportion&quot;) + rotate_x_labels +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle(&quot;Proportion of cell types per cluster&quot;)
+
+p1 | p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7a7b471d9798261e0263015b00ea519321860b56/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">7a7b471</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f394355b340ee8d445894dbba63cba7ee5f22b7b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">f394355</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8411a2fe8784c6a42ef65ba000d8857582442696/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">8411a2f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-5-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="identify-marker-genes-using-limma" class="section level2"
+number="2.2">
+<h2><span class="header-section-number">2.2</span> Identify marker genes
+using <em>limma</em></h2>
+<pre class="r"><code>counts &lt;- as.matrix(seu_int[[&quot;RNA&quot;]]@counts)</code></pre>
+<pre><code>Warning in asMethod(object): sparse-&gt;dense coercion: allocating vector of size
+3.1 GiB</code></pre>
+<pre class="r"><code>sample &lt;- seu_int$Sample
+
+clusters &lt;- seu_int$refined_clusters
+# clustgrp &lt;- paste0(&quot;cluster_&quot;, clusters)
+clustgrp &lt;- factor(clusters, levels = levels(seu_int$refined_clusters))
+
+fit.cont &lt;- findMarkerGenes(counts, clustgrp, sample)
+
+summary(decideTests(fit.cont))</code></pre>
+<pre><code>       Cluster_01 Cluster_02 Cluster_03 Cluster_04 Cluster_05 Cluster_06
+Down        11859       8029       2791       2016        611       7136
+NotSig      18845      25934      27475      28292      33438      22473
+Up           5566       2307       6004       5962       2221       6661
+       Cluster_07 Cluster_08 Cluster_09 Cluster_10 Cluster_11 Cluster_12
+Down         7469       4939      10626      11322       5707       5810
+NotSig      22797      24221      23836      22713      27029      27501
+Up           6004       7110       1808       2235       3534       2959
+       Cluster_13 Cluster_14 Cluster_15 Cluster_16 Cluster_17
+Down        10812       2953        983        697        554
+NotSig      17537      29996      31888      33222      30946
+Up           7921       3321       3399       2351       4770</code></pre>
+<pre class="r"><code># picks genes above given logFC threshold
+treat.all &lt;- treat(fit.cont,lfc=0.5)
+
+dt &lt;- decideTests(treat.all)
+summary(dt)</code></pre>
+<pre><code>       Cluster_01 Cluster_02 Cluster_03 Cluster_04 Cluster_05 Cluster_06
+Down          352        299         71         44         31        129
+NotSig      35146      35854      35818      35676      35872      35228
+Up            772        117        381        550        367        913
+       Cluster_07 Cluster_08 Cluster_09 Cluster_10 Cluster_11 Cluster_12
+Down          183        105        610        818        238        323
+NotSig      35295      35369      35552      35287      35622      35586
+Up            792        796        108        165        410        361
+       Cluster_13 Cluster_14 Cluster_15 Cluster_16 Cluster_17
+Down         1055        138         38         16          7
+NotSig      35091      35578      35660      35802      35370
+Up            124        554        572        452        893</code></pre>
+<div id="extract-marker-genes" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Extract marker
+genes</h3>
+<pre class="r"><code>clusters_names &lt;- levels(clusters)
+
+cluster_markers_top10 &lt;- extractMarkerGenes(treat.all, clusters_names)
+cluster_markers_top20 &lt;- extractMarkerGenes(treat.all, clusters_names, 
+                                            n_markers=20)
+cluster_markers_top50 &lt;- extractMarkerGenes(treat.all, clusters_names, 
+                                            n_markers=50)
+
+saveRDS(cluster_markers_top10, 
+        here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.cluster_markers_top10.rds&quot;))
+
+write.csv(cluster_markers_top10, 
+          file = here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.cluster_markers_top10.csv&quot;),
+          quote = FALSE)
+
+write.csv(cluster_markers_top20, 
+          file = here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.cluster_markers_top20.csv&quot;),
+          quote = FALSE)
+
+CLUSTER_NAMES &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;CLUSTER_NAMES.rds&quot;))
+cluster_markers_top20.named &lt;- cluster_markers_top20
+names(cluster_markers_top20.named) &lt;- unname(CLUSTER_NAMES[names(cluster_markers_top20.named)])
+write.csv(cluster_markers_top20.named, 
+          file = here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.cluster_markers_top20.named.csv&quot;),
+          quote = FALSE)
+write.csv(cluster_markers_top20.named, 
+          file = here(&quot;output&quot;, &quot;supp_tables&quot;, &quot;AmnioSC.cluster_markers_top20.named.csv&quot;),
+          quote = FALSE)
+
+cluster_markers_top10.named &lt;- cluster_markers_top10
+names(cluster_markers_top10.named) &lt;- unname(CLUSTER_NAMES[names(cluster_markers_top10.named)])
+paged_table(as.data.frame(cluster_markers_top10.named))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Keratinocytes"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Erythroid"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Kidney.epithelium"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Dendritic.cells"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Fibroblasts...mesenchyme"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Macrophages"],"name":[6],"type":["chr"],"align":["left"]},{"label":["ILC3"],"name":[7],"type":["chr"],"align":["left"]},{"label":["T.cells"],"name":[8],"type":["chr"],"align":["left"]},{"label":["Unknown"],"name":[9],"type":["chr"],"align":["left"]},{"label":["Lung.epithelium..low.confidence."],"name":[10],"type":["chr"],"align":["left"]},{"label":["Neural.crest.like"],"name":[11],"type":["chr"],"align":["left"]},{"label":["Lung.epithelium"],"name":[12],"type":["chr"],"align":["left"]},{"label":["Neuronal.like"],"name":[13],"type":["chr"],"align":["left"]},{"label":["Ciliated"],"name":[14],"type":["chr"],"align":["left"]},{"label":["Mast.cells"],"name":[15],"type":["chr"],"align":["left"]},{"label":["NK.cells...cytotoxic.lymphocytes"],"name":[16],"type":["chr"],"align":["left"]},{"label":["Proliferating.T.cells"],"name":[17],"type":["chr"],"align":["left"]}],"data":[{"1":"LGALS3","2":"HBG2","3":"MMP7","4":"HLA-DQA1","5":"COL3A1","6":"SPP1","7":"CD96","8":"LTB","9":"PLCG2","10":"ADAMTSL1","11":"MEG3","12":"GPC5","13":"RBFOX1","14":"HYDIN","15":"TPSB2","16":"CD96","17":"TYMS"},{"1":"PPDPF","2":"HBG1","3":"WFDC2","4":"HLA-DPB1","5":"DCN","6":"RNASE1","7":"CAMK4","8":"CAMK4","9":"CROCC","10":"GPC5","11":"POU3F1","12":"PLCG2","13":"CNTNAP2","14":"DTHD1","15":"CPA3","16":"CCL5","17":"CDCA7"},{"1":"HOPX","2":"AHSP","3":"UGT2B7","4":"HLA-DRA","5":"LUM","6":"AC131944.1","7":"KIT","8":"SKAP1","9":"FP236383.3","10":"HES1","11":"MEG8","12":"RASD1","13":"CDH13","14":"LRRIQ1","15":"TPSAB1","16":"SAMD3","17":"CAMK4"},{"1":"H19","2":"HBA1","3":"CLDN3","4":"HLA-DPA1","5":"COL1A2","6":"NRP1","7":"IL23R","8":"BCL11B","9":"HES1","10":"KHDRBS2","11":"CDON","12":"CSRNP2","13":"CSMD1","14":"TMEM190","15":"LINC02197","16":"GZMA","17":"CD96"},{"1":"TJP1","2":"HBA2","3":"PAX8","4":"HLA-DQB1","5":"COL1A1","6":"DAB2","7":"KLRB1","8":"LEF1","9":"NEBL","10":"AC107223.1","11":"TCIM","12":"KHDRBS2","13":"SGCZ","14":"ERICH3","15":"CTSG","16":"GZMK","17":"HELLS"},{"1":"RAB11FIP1","2":"HEMGN","3":"KRT18","4":"HLA-DRB1","5":"DPT","6":"SPRED1","7":"IL7R","8":"CD52","9":"ERRFI1","10":"CROCC","11":"PCDH9","12":"ADAMTSL1","13":"CALN1","14":"STK33","15":"MS4A2","16":"SKAP1","17":"FAM111B"},{"1":"KRT78","2":"GYPA","3":"TNFRSF11B","4":"HLA-DRB5","5":"MGP","6":"TYROBP","7":"SKAP1","8":"IL32","9":"CCDC200","10":"ST6GALNAC5","11":"AL139106.1","12":"SFTPB","13":"LRRC4C","14":"RP1","15":"ADCYAP1","16":"KLRC1","17":"LEF1"},{"1":"SPRR3","2":"HBM","3":"MAL2","4":"CD74","5":"BGN","6":"CTSB","7":"LTB","8":"CD96","9":"ID4","10":"SFTA3","11":"AC079298.3","12":"SELENBP1","13":"GRID2","14":"CDHR3","15":"SLC18A2","16":"KLRC2","17":"CENPK"},{"1":"PERP","2":"SLC4A1","3":"EPCAM","4":"CIITA","5":"SPARC","6":"LGALS1","7":"CA10","8":"RIPOR2","9":"AL139106.1","10":"MECOM","11":"LINC01033","12":"ID1","13":"CDH18","14":"CFAP47","15":"HDC","16":"AOAH","17":"CD52"},{"1":"SCEL","2":"ALAS2","3":"C12orf75","4":"S100B","5":"DLK1","6":"DOCK4","7":"CD52","8":"CD247","9":"PLK2","10":"ID2","11":"SERPINE1","12":"BAMBI","13":"ZFPM2","14":"ARMC3","15":"IL1RL1","16":"GNLY","17":"PCLAF"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="plot-heatmap" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Plot heatmap</h3>
+<pre class="r"><code>annotation_df &lt;- data.frame(clusters = seu_int$cluster_names,
+                            cell = colnames(seu_int),
+                            Sample = seu_int$Sample)
+annotation_df &lt;- annotation_df[order(annotation_df$clusters),]
+
+annotation_colours &lt;- list(clusters = CLUSTER_NAME_COLOURS)
+
+cluster_markers_seu &lt;- seu_int[unique(unname(unlist(cluster_markers_top10))), annotation_df$cell]</code></pre>
+<pre class="r"><code>pheatmap(GetAssayData(cluster_markers_seu, &quot;data&quot;), show_colnames = FALSE,
+         color = viridis(14), annotation_col = annotation_df[, &quot;clusters&quot;, drop=FALSE],
+         annotation_colors = annotation_colours[&quot;clusters&quot;],
+         cluster_cols = FALSE, cluster_rows = TRUE, 
+         gaps_col = cumsum(table(cluster_markers_seu$cluster_names)))</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-10-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>DotPlot(object = seu_int, features = unique(unlist(cluster_markers_top10)), 
+        group.by = &quot;cluster_names&quot;) +
+  rotate_x_labels +
+  ggtitle(&quot;Expression of cluster marker genes&quot;)</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" alt="" width="2880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dcfc95f77598bacb95bbdc0ce9adcfed8bdfa276/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">dcfc95f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f394355b340ee8d445894dbba63cba7ee5f22b7b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">f394355</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e5539055fcb5db138ef49be42b1f7fa5498103/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">e1e5539</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d4f2bf908f8b843b49fd453551e7b4e78ca9346c/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">d4f2bf9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-11-12
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/488e4dff7e6ac9d2ac4de0399cf26fe82406a911/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">488e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-11
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fc04588dbf3cd69c6a0028bfa9639e47d2635401/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">fc04588</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-28
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9471746d3b75b8b0041efe49a46cb133c43a20e6/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">9471746</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-27
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4bbafb174c0bfe970d13f0fc8b76d6a53f19575a/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">4bbafb1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-11-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="perform-gene-ontology-analysis-by-cluster"
+class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Perform gene ontology
+analysis by cluster</h2>
+<pre class="r"><code>cluster_go &lt;- performGO(cluster_markers_top50, clusters_names) </code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns
+&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<pre class="r"><code>cluster_go &lt;- as.data.frame(cluster_go)
+
+write.table(cluster_go, sep = &quot;\t&quot;, row.names = F,
+            file = here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_optref.cluster_refined_go_top_10.tsv&quot;),
+            quote = FALSE)
+
+cluster_go.named &lt;- cluster_go
+names(cluster_go.named) &lt;- unname(CLUSTER_NAMES[names(cluster_go.named)])
+write.table(cluster_go.named, sep = &quot;\t&quot;, row.names = F,
+            file = here(&quot;data&quot;, &quot;workflow&quot;,
+                        &quot;AmnioSC_optref.cluster_refined_go_top_10.named.tsv&quot;),
+            quote = FALSE)
+write.table(cluster_go.named, sep = &quot;\t&quot;, row.names = F,
+            file = here(&quot;output&quot;, &quot;supp_tables&quot;,
+                        &quot;AmnioSC_optref.cluster_refined_go_top_10.named.tsv&quot;),
+            quote = FALSE)</code></pre>
+<pre class="r"><code>paged_table(cluster_go.named)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Keratinocytes"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Erythroid"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Kidney epithelium"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Dendritic cells"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Fibroblasts / mesenchyme"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Macrophages"],"name":[6],"type":["chr"],"align":["left"]},{"label":["ILC3"],"name":[7],"type":["chr"],"align":["left"]},{"label":["T cells"],"name":[8],"type":["chr"],"align":["left"]},{"label":["Unknown"],"name":[9],"type":["chr"],"align":["left"]},{"label":["Lung epithelium (low confidence)"],"name":[10],"type":["chr"],"align":["left"]},{"label":["Neural crest-like"],"name":[11],"type":["chr"],"align":["left"]},{"label":["Lung epithelium"],"name":[12],"type":["chr"],"align":["left"]},{"label":["Neuronal-like"],"name":[13],"type":["chr"],"align":["left"]},{"label":["Ciliated"],"name":[14],"type":["chr"],"align":["left"]},{"label":["Mast cells"],"name":[15],"type":["chr"],"align":["left"]},{"label":["NK cells / cytotoxic lymphocytes"],"name":[16],"type":["chr"],"align":["left"]},{"label":["Proliferating T cells"],"name":[17],"type":["chr"],"align":["left"]}],"data":[{"1":"intermediate filament cytoskeleton organization","2":"erythrocyte differentiation","3":"regulation of smooth muscle cell migration","4":"antigen processing and presentation of exogenous antigen","5":"collagen fibril organization","6":"phagocytosis, engulfment","7":"positive T cell selection","8":"T cell receptor signaling pathway","9":"DNA damage response, signal transduction by p53 class mediator","10":"ascending aorta morphogenesis","11":"regulation of protein kinase C activity","12":"lung vasculature development","13":"startle response","14":"microtubule bundle formation","15":"mast cell activation involved in immune response","16":"natural killer cell activation","17":"cell cycle checkpoint signaling"},{"1":"intermediate filament-based process","2":"erythrocyte homeostasis","3":"smooth muscle cell migration","4":"MHC class II protein complex assembly","5":"cellular response to amino acid stimulus","6":"positive regulation of myeloid leukocyte mediated immunity","7":"T cell selection","8":"gamma-delta T cell activation","9":"signal transduction by p53 class mediator","10":"ascending aorta development","11":"positive regulation of protein kinase C activity","12":"negative regulation of oligodendrocyte differentiation","13":"presynapse assembly","14":"axoneme assembly","15":"mast cell activation","16":"leukocyte mediated cytotoxicity","17":"T cell receptor signaling pathway"},{"1":"keratinocyte differentiation","2":"erythrocyte development","3":"regulation of response to wounding","4":"peptide antigen assembly with MHC class II protein complex","5":"cellular response to acid chemical","6":"plasma membrane invagination","7":"T cell differentiation in thymus","8":"T cell differentiation in thymus","9":"establishment of endothelial intestinal barrier","10":"ventricular septum morphogenesis","11":"myoblast fate commitment","12":"nitric oxide mediated signal transduction","13":"prepulse inhibition","14":"epithelial cilium movement involved in extracellular fluid movement","15":"myeloid cell activation involved in immune response","16":"regulation of cell killing","17":"positive T cell selection"},{"1":"intermediate filament organization","2":"myeloid cell development","3":"muscle cell migration","4":"antigen processing and presentation of exogenous peptide antigen","5":"extracellular matrix assembly","6":"neutrophil activation involved in immune response","7":"T cell receptor signaling pathway","8":"positive T cell selection","9":"positive regulation of extrinsic apoptotic signaling pathway via death domain receptors","10":"negative regulation of oligodendrocyte differentiation","11":"transforming growth factor beta production","12":"artery morphogenesis","13":"presynapse organization","14":"extracellular transport","15":"myeloid leukocyte mediated immunity","16":"natural killer cell mediated immunity","17":"T cell selection"},{"1":"keratinization","2":"heme B biosynthetic process","3":"regulation of wound healing","4":"antigen processing and presentation","5":"endodermal cell differentiation","6":"melanocyte differentiation","7":"positive thymic T cell selection","8":"T cell selection","9":"positive regulation of cell-cell adhesion mediated by cadherin","10":"ventricular septum development","11":"negative regulation of smooth muscle cell migration","12":"ascending aorta morphogenesis","13":"homophilic cell adhesion via plasma membrane adhesion molecules","14":"motile cilium assembly","15":"mast cell degranulation","16":"regulation of natural killer cell mediated immunity","17":"DNA integrity checkpoint signaling"},{"1":"granulocyte chemotaxis","2":"heme B metabolic process","3":"positive regulation of response to wounding","4":"antigen processing and presentation of exogenous peptide antigen via MHC class II","5":"biomineral tissue development","6":"osteoclast differentiation","7":"thymic T cell selection","8":"regulation of T cell differentiation","9":"negative regulation of oligodendrocyte differentiation","10":"cardiac septum morphogenesis","11":"limb joint morphogenesis","12":"negative regulation of glial cell differentiation","13":"postsynaptic density assembly","14":"sperm flagellum assembly","15":"mast cell mediated immunity","16":"regulation of leukocyte mediated cytotoxicity","17":"gamma-delta T cell activation"},{"1":"establishment of endothelial intestinal barrier","2":"protoporphyrinogen IX metabolic process","3":"tumor necrosis factor-mediated signaling pathway","4":"antigen processing and presentation of peptide antigen via MHC class II","5":"collagen metabolic process","6":"antigen processing and presentation","7":"gamma-delta T cell activation","8":"regulation of gamma-delta T cell differentiation","9":"signal transduction in response to DNA damage","10":"negative regulation of glial cell differentiation","11":"negative regulation of plasminogen activation","12":"blood vessel endothelial cell migration","13":"neuromuscular process","14":"mucociliary clearance","15":"serotonin production involved in inflammatory response","16":"positive regulation of cell killing","17":"T cell differentiation in thymus"},{"1":"positive regulation of cell-cell adhesion mediated by cadherin","2":"gas transport","3":"positive regulation of wound healing","4":"antigen processing and presentation of peptide or polysaccharide antigen via MHC class II","5":"endoderm formation","6":"membrane invagination","7":"alpha-beta T cell differentiation","8":"positive regulation of T cell differentiation","9":"regulation of cell-cell adhesion mediated by cadherin","10":"astrocyte differentiation","11":"negative regulation of fibrinolysis","12":"regulation of neural precursor cell proliferation","13":"postsynaptic specialization assembly","14":"axonemal dynein complex assembly","15":"serotonin secretion involved in inflammatory response","16":"natural killer cell mediated cytotoxicity","17":"negative T cell selection"},{"1":"granulocyte migration","2":"porphyrin-containing compound metabolic process","3":"calcium-independent cell-cell adhesion via plasma membrane cell-adhesion molecules","4":"MHC protein complex assembly","5":"tissue remodeling","6":"antigen processing and presentation of peptide antigen","7":"hematopoietic or lymphoid organ development","8":"regulation of gamma-delta T cell activation","9":"columnar/cuboidal epithelial cell differentiation","10":"regulation of astrocyte differentiation","11":"negative regulation of G protein-coupled receptor signaling pathway","12":"regulation of astrocyte differentiation","13":"ERBB4-ERBB4 signaling pathway","14":"sperm axoneme assembly","15":"leukocyte degranulation","16":"regulation of natural killer cell mediated cytotoxicity","17":"positive thymic T cell selection"},{"1":"desmosome organization","2":"carbon dioxide transport","3":"regulation of transepithelial transport","4":"peptide antigen assembly with MHC protein complex","5":"bone mineralization","6":"pigment cell differentiation","7":"regulation of T cell differentiation","8":"positive regulation of lymphocyte differentiation","9":"cellular response to dexamethasone stimulus","10":"atrial septum primum morphogenesis","11":"transforming growth factor beta1 production","12":"kidney morphogenesis","13":"positive regulation of cardiac muscle tissue growth","14":"respiratory system process","15":"lysosome localization","16":"positive regulation of leukocyte mediated cytotoxicity","17":"deoxyribonucleotide biosynthetic process"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div id="plot-canonical-markers-for-each-cluster" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Plot canonical markers
+for each cluster</h1>
+<p>Known canonical markers for each cluster in the literature have been
+selected from the top 20 marker genes found above and also from our
+biological knowledge to be used in a dot plot. For Clusters 16 and 17,
+which were found via subclustering the T cells, marker genes from that
+analysis have also been considered as that analysis is more focused
+towards these immune subtypes.</p>
+<pre class="r"><code>AmnioSC.canonical_markers.all &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.canonical_markers.all.rds&quot;))
+AmnioSC.canonical_markers.all &lt;- AmnioSC.canonical_markers.all[levels(seu_int$cluster_names)]
+
+canonical_markers.all &lt;- unique(unlist(AmnioSC.canonical_markers.all, use.names = FALSE))
+canonical_markers.all &lt;- filterPresentGenes(canonical_markers.all, seu_int)</code></pre>
+<pre class="r"><code>DotPlot(object = seu_int, features = canonical_markers.all, assay = &quot;SCT&quot;,
+        group.by = &quot;cluster_names&quot;, col.max = 5) +
+  ggtitle(&quot;Canonical markers (all)&quot;) + 
+  theme_linedraw() + rotate_x_labels +
+  scale_color_viridis(option = &quot;viridis&quot;, direction = 1) +
+  theme(panel.grid = element_blank())</code></pre>
+<pre><code>Warning: Could not find IL22 in the default search locations, found in RNA
+assay instead</code></pre>
+<pre><code>Warning: Could not find FOXD3 in the default search locations, found in RNA
+assay instead</code></pre>
+<pre><code>Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-15-1.png" alt="" width="2880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-15-1">
+Past versions of unnamed-chunk-15-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-15-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-15-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>AmnioSC.canonical_markers.reduced &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.canonical_markers.reduced.rds&quot;))
+AmnioSC.canonical_markers.reduced &lt;- AmnioSC.canonical_markers.reduced[levels(seu_int$cluster_names)]
+
+canonical_markers.reduced &lt;- unique(unlist(AmnioSC.canonical_markers.reduced, use.names = FALSE))
+canonical_markers.reduced &lt;- filterPresentGenes(canonical_markers.reduced, seu_int)</code></pre>
+<pre class="r"><code>DotPlot(object = seu_int, features = canonical_markers.reduced, assay = &quot;SCT&quot;,
+        group.by = &quot;cluster_names&quot;, col.max = 5) +
+  ggtitle(&quot;Canonical markers (reduced)&quot;) + 
+  theme_linedraw() + rotate_x_labels +
+  scale_color_viridis(option = &quot;viridis&quot;, direction = 1) +
+  theme(panel.grid = element_blank())</code></pre>
+<pre><code>Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" alt="" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c705f9bf5f437ade9a7b964de42aa4dd083548ce/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">c705f9b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5efb11be2016ef0139eb6477538cc3b6678af78b/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">5efb11b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f44f9a7fa2db780bf4e60fbef2cbe6b8208bbef/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">7f44f9a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-25
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7abff0fb9a12dff9bcb268bdd98586545c50857/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">a7abff0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/158f1e842a1614e2f0af337592d65bc50b8a05fe/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">158f1e8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8a4ae40c9e728f12c51112b2bb3bca93b22b65fd/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">8a4ae40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0c442771ad52ee2df90c80dfb15707bea4b37c22/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">0c44277</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69ec0da69a225c3a5ad1f23402cf1aa651fc5206/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">69ec0da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-02-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1caf914840a09e1058438b7c8d21368d24b0db2e/docs/figure/AmnioSC_workflow_optref_cluster_marker_gene_analysis.Rmd/unnamed-chunk-17-1.png" target="_blank">1caf914</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="confirm-identity-of-lung-clusters" class="section level1"
+number="4">
+<h1><span class="header-section-number">4</span> Confirm identity of
+lung clusters</h1>
+<pre class="r"><code># Prepare the MSigDB C8 (cell type signature) gene sets, if not already saved
+if (!file.exists(here(&quot;data&quot;, &quot;workflow&quot;, &quot;GSEA&quot;, &quot;Hs.c8.all.v2026.1.entrez.rds&quot;))) {
+  # Downloaded from here: https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2026.1.Hs/c8.all.v2026.1.Hs.entrez.gmt
+  c8.all.v2026.1.Hs.entrez &lt;- qusage::read.gmt(here(&quot;data&quot;, &quot;workflow&quot;, &quot;GSEA&quot;, &quot;c8.all.v2026.1.Hs.entrez.gmt&quot;))
+  saveRDS(c8.all.v2026.1.Hs.entrez, here(&quot;data&quot;, &quot;workflow&quot;, &quot;GSEA&quot;, &quot;Hs.c8.all.v2026.1.entrez.rds&quot;))
+}</code></pre>
+<pre class="r"><code>Hs.c8.all &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;GSEA&quot;, &quot;Hs.c8.all.v2026.1.entrez.rds&quot;))</code></pre>
+<pre class="r"><code>c8.all_clusters &lt;- data.frame()
+for (i in c(10, 12)) {
+  cluster &lt;- colnames(fit.cont$t)[i]
+  # translate gene SYMBOLS to entrez gene IDs
+  gns &lt;- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                               keys = rownames(fit.cont$t),
+                               column = c(&quot;ENTREZID&quot;),
+                               keytype = &quot;SYMBOL&quot;,
+                               multiVals = &quot;first&quot;)
+
+  gene_sets.id &lt;- ids2indices(Hs.c8.all, 
+                              unname(gns[rownames(fit.cont$t)]))
+
+  # docs suggest this: https://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/camera.html
+  statistic &lt;- fit.cont$t[,i]
+  cam &lt;- cameraPR(statistic, gene_sets.id)
+  cam$cluster &lt;- cluster
+  cam &lt;- cam %&gt;% rownames_to_column(&quot;c8&quot;)
+
+  c8.all_clusters &lt;- rbind(c8.all_clusters, cam)
+}</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>c8.all_clusters %&gt;% filter(FDR &lt; 0.05, Direction == &quot;Up&quot;) %&gt;% 
+  group_by(cluster) %&gt;% 
+  slice_min(order_by = FDR, n = 5)</code></pre>
+<pre><code># A tibble: 10 × 6
+# Groups:   cluster [2]
+   c8                                 NGenes Direction   PValue      FDR cluster
+   &lt;chr&gt;                               &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;  
+ 1 DESCARTES_MAIN_FETAL_BRONCHIOLAR_…     42 Up        5.88e-58 3.92e-56 Cluste…
+ 2 DESCARTES_FETAL_LUNG_BRONCHIOLAR_…     58 Up        3.01e-40 9.29e-39 Cluste…
+ 3 HE_LIM_SUN_FETAL_LUNG_C1_LATE_STA…      7 Up        4.40e-29 8.29e-28 Cluste…
+ 4 HE_LIM_SUN_FETAL_LUNG_C1_AT1_CELL      42 Up        4.81e-19 5.21e-18 Cluste…
+ 5 TRAVAGLINI_LUNG_SIGNALING_ALVEOLA…     69 Up        3.81e-16 3.27e-15 Cluste…
+ 6 DESCARTES_MAIN_FETAL_BRONCHIOLAR_…     42 Up        2.62e-83 2.27e-80 Cluste…
+ 7 DESCARTES_FETAL_LUNG_BRONCHIOLAR_…     58 Up        1.07e-52 4.62e-50 Cluste…
+ 8 TRAVAGLINI_LUNG_SIGNALING_ALVEOLA…     69 Up        3.59e-31 2.22e-29 Cluste…
+ 9 CUI_DEVELOPING_HEART_C5_VALVAR_CE…    201 Up        5.50e-30 2.65e-28 Cluste…
+10 HE_LIM_SUN_FETAL_LUNG_C1_AT1_CELL      42 Up        5.94e-22 1.84e-20 Cluste…</code></pre>
+<p>This supports Clusters 10 and 12 being lung cell clusters (Cluster 10
+is the low confidence lung cluster).</p>
+</div>
+<div id="session-info" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Session info</h1>
+<summary>
+This analysis was performed using the following software (click triangle
+to expand)
+</summary>
+<details>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.0 (2025-04-11)
+ os       macOS 26.7.1
+ system   aarch64, darwin20
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Australia/Melbourne
+ date     2026-10-13
+ pandoc   3.10 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown)
+ quarto   1.10.18 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ ! package              * version  date (UTC) lib source
+ P abind                  1.4-8    2024-09-12 [?] RSPM
+ P AnnotationDbi        * 1.72.0   2025-10-29 [?] Bioconduc~
+ P beachmat               2.26.0   2025-10-29 [?] Bioconduc~
+ P beeswarm               0.4.0    2021-06-01 [?] RSPM
+ P Biobase              * 2.70.0   2025-10-29 [?] Bioconduc~
+ P BiocGenerics         * 0.56.0   2025-10-29 [?] Bioconduc~
+ P BiocManager            1.30.27  2025-11-14 [?] RSPM
+ P BiocNeighbors          2.4.0    2025-10-29 [?] Bioconduc~
+ P BiocParallel           1.44.0   2025-10-29 [?] Bioconduc~
+ P BiocSingular           1.26.1   2025-11-17 [?] Bioconduc~
+ P Biostrings             2.78.0   2025-10-29 [?] Bioconduc~
+ P bit                    4.6.0    2025-03-06 [?] RSPM
+ P bit64                  4.6.0-1  2025-01-16 [?] RSPM
+ P blob                   1.3.0    2026-01-14 [?] RSPM
+ P bluster                1.20.0   2025-10-29 [?] Bioconduc~
+ P bslib                  0.10.0   2026-01-26 [?] RSPM
+ P cachem                 1.1.0    2024-05-16 [?] RSPM
+ P callr                  3.7.6    2024-03-25 [?] CRAN (R 4.5.0)
+ P cli                    3.6.6    2026-04-09 [?] RSPM
+ P cluster                2.1.8.1  2025-03-12 [?] CRAN (R 4.5.0)
+ P codetools              0.2-20   2024-03-31 [?] CRAN (R 4.5.0)
+   colorspace             2.1-2    2025-09-22 [1] RSPM (R 4.5.0)
+ P cowplot              * 1.2.0    2025-07-07 [?] RSPM
+ P crayon                 1.5.3    2024-06-20 [?] RSPM
+ P data.table             1.18.2.1 2026-01-27 [?] RSPM
+ P DBI                    1.2.3    2024-06-02 [?] RSPM
+   DelayedArray           0.36.1   2026-03-31 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P deldir                 2.0-4    2024-02-28 [?] RSPM
+ P digest                 0.6.39   2025-11-19 [?] RSPM
+   dplyr                * 1.2.0    2026-02-03 [1] RSPM (R 4.5.0)
+ P dqrng                  0.4.1    2024-05-28 [?] CRAN (R 4.5.0)
+ P edgeR                * 4.8.2    2025-12-23 [?] https://bioc-release.r-universe.dev (R 4.5.2)
+ P egg                  * 0.4.5    2019-07-13 [?] RSPM
+ P evaluate               1.0.5    2025-08-27 [?] RSPM
+ P farver                 2.1.2    2024-05-13 [?] RSPM
+ P fastmap                1.2.0    2024-05-15 [?] RSPM
+ P fitdistrplus           1.2-6    2026-01-24 [?] RSPM
+ P forcats              * 1.0.1    2025-09-25 [?] RSPM
+ P fs                     2.1.0    2026-04-18 [?] RSPM
+ P future                 1.69.0   2026-01-16 [?] RSPM
+ P future.apply           1.20.1   2025-12-09 [?] RSPM
+ P generics             * 0.1.4    2025-05-09 [?] CRAN (R 4.5.0)
+ P GenomicRanges        * 1.62.1   2025-12-08 [?] Bioconduc~
+ P getPass                0.2-4    2023-12-10 [?] CRAN (R 4.5.0)
+ P ggalluvial           * 0.12.5   2023-02-22 [?] RSPM
+ P ggbeeswarm           * 0.7.3    2025-11-29 [?] RSPM
+ P ggplot2              * 4.0.2    2026-02-03 [?] RSPM
+ P ggrepel                0.9.6    2024-09-07 [?] CRAN (R 4.5.0)
+ P ggridges               0.5.7    2025-08-27 [?] RSPM
+ P git2r                  0.36.2   2025-03-29 [?] CRAN (R 4.5.0)
+ P globals                0.19.0   2026-02-02 [?] RSPM
+ P glue                   1.8.0    2024-09-30 [?] RSPM
+ P GO.db                * 3.22.0   2026-02-03 [?] Bioconductor
+ P goftest                1.2-3    2021-10-07 [?] CRAN (R 4.5.0)
+ P gridExtra            * 2.3      2017-09-09 [?] RSPM
+ P gtable                 0.3.6    2024-10-25 [?] RSPM
+ P here                 * 1.0.2    2025-09-15 [?] RSPM
+ P hms                    1.1.4    2025-10-17 [?] RSPM
+ P htmltools              0.5.9    2025-12-04 [?] RSPM
+ P htmlwidgets            1.6.4    2023-12-06 [?] RSPM
+ P httpuv                 1.6.16   2025-04-16 [?] CRAN (R 4.5.0)
+ P httr                   1.4.7    2023-08-15 [?] RSPM
+ P ica                    1.0-3    2022-07-08 [?] CRAN (R 4.5.0)
+ P igraph                 2.2.1    2025-10-27 [?] RSPM
+ P IRanges              * 2.44.0   2025-10-29 [?] Bioconduc~
+ P irlba                  2.3.7    2026-01-30 [?] RSPM
+ P jquerylib              0.1.4    2021-04-26 [?] RSPM
+ P jsonlite               2.0.0    2025-03-27 [?] RSPM
+ P KEGGREST               1.50.0   2025-10-29 [?] Bioconduc~
+ P KernSmooth             2.23-26  2025-01-01 [?] CRAN (R 4.5.0)
+ P knitr                  1.51     2025-12-20 [?] RSPM
+ P labeling               0.4.3    2023-08-29 [?] RSPM
+ P later                  1.4.5    2026-01-08 [?] RSPM
+ P lattice                0.22-7   2025-04-02 [?] RSPM
+ P lazyeval               0.2.2    2019-03-15 [?] RSPM
+   leiden                 0.4.3.1  2023-11-17 [1] RSPM (R 4.5.0)
+ P lifecycle              1.0.5    2026-01-08 [?] RSPM
+ P limma                * 3.66.0   2025-10-29 [?] Bioconduc~
+ P listenv                0.10.0   2025-11-02 [?] RSPM
+ P lmtest                 0.9-40   2022-03-21 [?] CRAN (R 4.5.0)
+ P locfit                 1.5-9.12 2025-03-05 [?] RSPM
+ P lubridate            * 1.9.4    2024-12-08 [?] RSPM
+ P magrittr               2.0.4    2025-09-12 [?] RSPM
+ P MASS                   7.3-65   2025-02-28 [?] CRAN (R 4.5.0)
+ P Matrix                 1.7-4    2025-08-28 [?] RSPM
+ P MatrixGenerics       * 1.22.0   2025-10-29 [?] Bioconduc~
+ P matrixStats          * 1.5.0    2025-01-07 [?] RSPM
+ P memoise                2.0.1    2021-11-26 [?] RSPM
+ P metapod                1.18.0   2025-10-29 [?] Bioconduc~
+ P mime                   0.13     2025-03-17 [?] RSPM
+ P miniUI                 0.1.2    2025-04-17 [?] CRAN (R 4.5.0)
+ P nlme                   3.1-168  2025-03-31 [?] CRAN (R 4.5.0)
+ P org.Hs.eg.db         * 3.22.0   2026-02-03 [?] Bioconductor
+ P otel                   0.2.0    2025-08-29 [?] RSPM
+ P parallelly             1.46.1   2026-01-08 [?] RSPM
+ P patchwork            * 1.3.2    2025-08-25 [?] RSPM
+ P pbapply                1.7-4    2025-07-20 [?] RSPM
+ P pheatmap             * 1.0.13   2025-06-05 [?] RSPM
+ P pillar                 1.11.1   2025-09-17 [?] RSPM
+ P pkgconfig              2.0.3    2019-09-22 [?] RSPM
+ P plotly                 4.12.0   2026-01-24 [?] RSPM
+ P plyr                   1.8.9    2023-10-02 [?] RSPM
+ P png                    0.1-8    2022-11-29 [?] RSPM
+ P Polychrome           * 1.5.4    2025-04-06 [?] RSPM
+ P polyclip               1.10-7   2024-07-23 [?] CRAN (R 4.5.0)
+ P processx               3.8.6    2025-02-21 [?] CRAN (R 4.5.0)
+ P progressr              0.18.0   2025-11-06 [?] RSPM
+ P promises               1.5.0    2025-11-01 [?] RSPM
+ P ps                     1.9.1    2025-04-12 [?] CRAN (R 4.5.0)
+ P purrr                * 1.2.1    2026-01-09 [?] RSPM
+ P R6                     2.6.1    2025-02-15 [?] RSPM
+ P RANN                   2.6.2    2024-08-25 [?] CRAN (R 4.5.0)
+ P RColorBrewer           1.1-3    2022-04-03 [?] RSPM
+ P Rcpp                   1.1.1    2026-01-10 [?] RSPM
+ P RcppAnnoy              0.0.23   2026-01-12 [?] RSPM
+ P readr                * 2.1.6    2025-11-14 [?] RSPM
+ P renv                   1.1.7    2026-01-27 [?] RSPM
+ P reshape2             * 1.4.5    2025-11-12 [?] RSPM
+ P reticulate             1.44.1   2025-11-14 [?] RSPM
+ P rlang                  1.2.0    2026-04-06 [?] RSPM
+ P rmarkdown            * 2.30     2025-09-28 [?] RSPM
+ P ROCR                   1.0-12   2026-01-23 [?] RSPM
+ P rprojroot              2.1.1    2025-08-26 [?] RSPM
+ P RSQLite                2.4.5    2025-11-30 [?] RSPM
+ P rstudioapi             0.18.0   2026-01-16 [?] RSPM
+ P rsvd                   1.0.5    2021-04-16 [?] RSPM
+ P Rtsne                  0.17     2023-12-07 [?] CRAN (R 4.5.0)
+ P S4Arrays               1.10.1   2025-12-08 [?] Bioconduc~
+   S4Vectors            * 0.48.1   2026-04-04 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P S7                     0.2.1    2025-11-14 [?] RSPM
+ P sass                   0.4.10   2025-04-11 [?] RSPM
+ P ScaledMatrix           1.18.0   2025-10-29 [?] Bioconduc~
+ P scales                 1.4.0    2025-04-24 [?] RSPM
+ P scattermore            1.2      2023-06-12 [?] CRAN (R 4.5.0)
+ P scatterplot3d          0.3-44   2023-05-05 [?] RSPM
+ P scran                * 1.38.0   2025-10-29 [?] Bioconduc~
+ P sctransform            0.4.3    2026-01-10 [?] RSPM
+ P scuttle              * 1.20.0   2025-10-29 [?] Bioconduc~
+ P Seqinfo              * 1.0.0    2025-10-29 [?] Bioconduc~
+ P sessioninfo            1.2.3    2025-02-05 [?] RSPM
+   Seurat               * 4.4.0    2024-01-10 [1] https://satijalab.r-universe.dev (R 4.5.0)
+   SeuratObject         * 4.1.4    2023-09-27 [1] https://satijalab.r-universe.dev (R 4.5.0)
+ P shiny                  1.12.1   2025-12-09 [?] RSPM
+ P SingleCellExperiment * 1.32.0   2025-10-29 [?] Bioconduc~
+ P sp                     2.2-0    2025-02-01 [?] CRAN (R 4.5.0)
+ P SparseArray            1.10.8   2025-12-18 [?] Bioconduc~
+ P spatstat.data          3.1-9    2025-10-18 [?] RSPM
+ P spatstat.explore       3.7-0    2026-01-22 [?] RSPM
+ P spatstat.geom          3.7-0    2026-01-20 [?] RSPM
+ P spatstat.random        3.4-4    2026-01-21 [?] RSPM
+ P spatstat.sparse        3.1-0    2024-06-21 [?] CRAN (R 4.5.0)
+ P spatstat.univar        3.1-6    2026-01-17 [?] RSPM
+ P spatstat.utils         3.2-1    2026-01-10 [?] RSPM
+ P statmod                1.5.1    2025-10-09 [?] RSPM
+ P stringi                1.8.7    2025-03-27 [?] RSPM
+ P stringr              * 1.6.0    2025-11-04 [?] RSPM
+ P SummarizedExperiment * 1.40.0   2025-10-29 [?] Bioconduc~
+ P survival               3.8-6    2026-01-16 [?] RSPM
+ P tensor                 1.5.1    2025-06-17 [?] RSPM
+ P tibble               * 3.3.1    2026-01-11 [?] RSPM
+ P tidyr                * 1.3.2    2025-12-19 [?] RSPM
+ P tidyselect             1.2.1    2024-03-11 [?] RSPM
+ P tidyverse            * 2.0.0    2023-02-22 [?] RSPM
+ P timechange             0.4.0    2026-01-29 [?] RSPM
+ P tzdb                   0.5.0    2025-03-15 [?] RSPM
+ P utf8                   1.2.6    2025-06-08 [?] RSPM
+ P uwot                   0.2.4    2025-11-10 [?] RSPM
+ P vctrs                  0.7.1    2026-01-23 [?] RSPM
+ P vipor                  0.4.7    2023-12-18 [?] RSPM
+ P viridis              * 0.6.5    2024-01-29 [?] RSPM
+ P viridisLite          * 0.4.2    2023-05-02 [?] RSPM
+ P whisker                0.4.1    2022-12-05 [?] CRAN (R 4.5.0)
+ P withr                  3.0.2    2024-10-28 [?] RSPM
+ P workflowr            * 1.7.2    2025-08-18 [?] RSPM
+ P xfun                   0.56     2026-01-18 [?] RSPM
+ P xtable                 1.8-4    2019-04-21 [?] RSPM
+ P XVector                0.50.0   2025-10-29 [?] Bioconduc~
+ P yaml                   2.3.12   2025-12-10 [?] RSPM
+ P zoo                    1.8-15   2025-12-15 [?] RSPM
+
+ [1] &lt;project&gt;/renv/library/macos/R-4.5/aarch64-apple-darwin20
+ [2] &lt;renv-cache&gt;/sandbox/macos/R-4.5/aarch64-apple-darwin20/4cd76b74
+
+ * ── Packages attached to the search path.
+ P ── Loaded and on-disk path mismatch.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</details>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS 26.7.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Australia/Melbourne
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices datasets  utils     methods  
+[8] base     
+
+other attached packages:
+ [1] scran_1.38.0                scuttle_1.20.0             
+ [3] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
+ [5] GenomicRanges_1.62.1        Seqinfo_1.0.0              
+ [7] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+ [9] Polychrome_1.5.4            reshape2_1.4.5             
+[11] ggalluvial_0.12.5           lubridate_1.9.4            
+[13] forcats_1.0.1               stringr_1.6.0              
+[15] dplyr_1.2.0                 purrr_1.2.1                
+[17] readr_2.1.6                 tibble_3.3.1               
+[19] tidyverse_2.0.0             here_1.0.2                 
+[21] tidyr_1.3.2                 rmarkdown_2.30             
+[23] egg_0.4.5                   gridExtra_2.3              
+[25] patchwork_1.3.2             cowplot_1.2.0              
+[27] viridis_0.6.5               viridisLite_0.4.2          
+[29] ggbeeswarm_0.7.3            ggplot2_4.0.2              
+[31] pheatmap_1.0.13             GO.db_3.22.0               
+[33] org.Hs.eg.db_3.22.0         AnnotationDbi_1.72.0       
+[35] IRanges_2.44.0              S4Vectors_0.48.1           
+[37] Biobase_2.70.0              BiocGenerics_0.56.0        
+[39] generics_0.1.4              edgeR_4.8.2                
+[41] limma_3.66.0                SeuratObject_4.1.4         
+[43] Seurat_4.4.0                workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.23       splines_4.5.0          later_1.4.5           
+  [4] polyclip_1.10-7        lifecycle_1.0.5        rprojroot_2.1.1       
+  [7] globals_0.19.0         processx_3.8.6         lattice_0.22-7        
+ [10] MASS_7.3-65            magrittr_2.0.4         plotly_4.12.0         
+ [13] sass_0.4.10            jquerylib_0.1.4        yaml_2.3.12           
+ [16] metapod_1.18.0         httpuv_1.6.16          otel_0.2.0            
+ [19] sctransform_0.4.3      sessioninfo_1.2.3      sp_2.2-0              
+ [22] spatstat.sparse_3.1-0  reticulate_1.44.1      pbapply_1.7-4         
+ [25] DBI_1.2.3              RColorBrewer_1.1-3     abind_1.4-8           
+ [28] Rtsne_0.17             git2r_0.36.2           ggrepel_0.9.6         
+ [31] irlba_2.3.7            listenv_0.10.0         spatstat.utils_3.2-1  
+ [34] goftest_1.2-3          dqrng_0.4.1            spatstat.random_3.4-4 
+ [37] fitdistrplus_1.2-6     parallelly_1.46.1      DelayedArray_0.36.1   
+ [40] leiden_0.4.3.1         codetools_0.2-20       tidyselect_1.2.1      
+ [43] farver_2.1.2           ScaledMatrix_1.18.0    spatstat.explore_3.7-0
+ [46] jsonlite_2.0.0         BiocNeighbors_2.4.0    progressr_0.18.0      
+ [49] ggridges_0.5.7         survival_3.8-6         tools_4.5.0           
+ [52] ica_1.0-3              Rcpp_1.1.1             glue_1.8.0            
+ [55] SparseArray_1.10.8     xfun_0.56              withr_3.0.2           
+ [58] BiocManager_1.30.27    fastmap_1.2.0          bluster_1.20.0        
+ [61] rsvd_1.0.5             callr_3.7.6            digest_0.6.39         
+ [64] timechange_0.4.0       R6_2.6.1               mime_0.13             
+ [67] colorspace_2.1-2       scattermore_1.2        tensor_1.5.1          
+ [70] spatstat.data_3.1-9    RSQLite_2.4.5          utf8_1.2.6            
+ [73] renv_1.1.7             data.table_1.18.2.1    S4Arrays_1.10.1       
+ [76] httr_1.4.7             htmlwidgets_1.6.4      scatterplot3d_0.3-44  
+ [79] whisker_0.4.1          uwot_0.2.4             pkgconfig_2.0.3       
+ [82] gtable_0.3.6           blob_1.3.0             lmtest_0.9-40         
+ [85] S7_0.2.1               XVector_0.50.0         htmltools_0.5.9       
+ [88] scales_1.4.0           png_0.1-8              spatstat.univar_3.1-6 
+ [91] knitr_1.51             rstudioapi_0.18.0      tzdb_0.5.0            
+ [94] nlme_3.1-168           cachem_1.1.0           zoo_1.8-15            
+ [97] KernSmooth_2.23-26     parallel_4.5.0         miniUI_0.1.2          
+[100] vipor_0.4.7            pillar_1.11.1          grid_4.5.0            
+[103] vctrs_0.7.1            RANN_2.6.2             promises_1.5.0        
+[106] BiocSingular_1.26.1    beachmat_2.26.0        xtable_1.8-4          
+[109] cluster_2.1.8.1        beeswarm_0.4.0         evaluate_1.0.5        
+[112] cli_3.6.6              locfit_1.5-9.12        compiler_4.5.0        
+[115] rlang_1.2.0            crayon_1.5.3           future.apply_1.20.1   
+[118] labeling_0.4.3         ps_1.9.1               getPass_0.2-4         
+[121] plyr_1.8.9             fs_2.1.0               stringi_1.8.7         
+[124] BiocParallel_1.44.0    deldir_2.0-4           Biostrings_2.78.0     
+[127] lazyeval_0.2.2         spatstat.geom_3.7-0    Matrix_1.7-4          
+[130] hms_1.1.4              bit64_4.6.0-1          future_1.69.0         
+[133] KEGGREST_1.50.0        statmod_1.5.1          shiny_1.12.1          
+[136] ROCR_1.0-12            igraph_2.2.1           memoise_2.0.1         
+[139] bslib_0.10.0           bit_4.6.0             </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

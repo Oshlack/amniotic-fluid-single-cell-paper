@@ -1,0 +1,4621 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Calandra Grima" />
+
+<meta name="date" content="2026-08-05" />
+
+<title>Comparing usual and optimised reference</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">AmnioSC Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Comparing usual and optimised
+reference</h1>
+<h4 class="author">Calandra Grima</h4>
+<h4 class="date">2026-08-05</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-08-05
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>amniosinglecell/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220125code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220125)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220125code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220125)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreed73f1a391695b4e9ed92d9e5e20c4c63b2633782targetblankd73f1a3a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/d73f1a391695b4e9ed92d9e5e20c4c63b2633782" target="_blank">d73f1a3</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreed73f1a391695b4e9ed92d9e5e20c4c63b2633782targetblankd73f1a3a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/d73f1a391695b4e9ed92d9e5e20c4c63b2633782" target="_blank">d73f1a3</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/generate_site.R
+    Ignored:    analysis/knit_docs.R
+    Ignored:    analysis/run_as_job.R
+    Ignored:    analysis/sccomp_draws_files/
+    Ignored:    celltypist/output_Gerli_et_al_2024_fetal_organ/
+    Ignored:    celltypist/output_Gerli_et_al_2024_pan_fetal/
+    Ignored:    data/
+    Ignored:    excluded_analysis/
+    Ignored:    output/
+    Ignored:    renv/.DS_Store
+    Ignored:    renv/library/
+    Ignored:    renv/staging/
+    Ignored:    sccomp_draws_files/
+
+Untracked files:
+    Untracked:  Paper Draft - Claude - Single-cell RNA-seq of amniotic fluid - gaining unique insight into foetal development.docx
+    Untracked:  claude_log/
+
+Unstaged changes:
+    Modified:   analysis/AmnioSC_additional_paper_figures.Rmd
+    Modified:   analysis/AmnioSC_additional_supp_figures.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/AmnioSC_workflow_optref_comparison.Rmd</code>) and HTML
+(<code>docs/AmnioSC_workflow_optref_comparison.html</code>) files. If
+you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b688a9cffe4f9839ab4c5f614ba7029d4cc6ca9b/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">b688a9c</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d74a635881773111928e19f846917511233ca99c/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">d74a635</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-10
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e1e2c36eab8600eed5eabe4df9ce571bd885c8c8/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">e1e2c36</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7cfb45a3d6696e4ab0f6e7d6575f7e2e4abedae1/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">7cfb45a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+Commit files for migration to local
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f87417992a7cfb55f3cb9f5c1f7799e7d15e4192/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">f874179</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/808691771e72b82abad5fd4ff546da2a99f3619d/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">8086917</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fe2f47cc1236c29fe4b6331f7e421250870f754f/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">fe2f47c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/19e070b8d8d4c55271a817d7e76368e47ebc6f94/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">19e070b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc08ee739b3e7f379e916be1050253e64b719ca5/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">dc08ee7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/16798abf0c27b0805c883c29f42d58553e64a095/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">16798ab</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/76414688e4b42cb5901071c75f61e0e83260bca3/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">7641468</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_optref_comparison.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00205b24e34b152698e4e6a8401bc505e2bb622c/analysis/AmnioSC_workflow_optref_comparison.Rmd" target="_blank">00205b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Update file naming scheme for optimised reference analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00205b24e34b152698e4e6a8401bc505e2bb622c/docs/AmnioSC_workflow_optref_comparison.html" target="_blank">00205b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Update file naming scheme for optimised reference analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="load-libraries" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Load libraries</h1>
+<pre class="r"><code>library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggrepel)
+library(ggbeeswarm)
+library(ggridges)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(dplyr)
+
+source(here(&quot;code&quot;, &quot;helper_functions.R&quot;))
+source(here(&quot;code&quot;, &quot;load_colour_schemes.R&quot;))
+
+RERUN_ALL &lt;- FALSE</code></pre>
+</div>
+<div id="load-in-datasets-after-empty-droplet-removal"
+class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Load in datasets after
+empty droplet removal</h1>
+<p>Samples labelled as “optref” were processed using Cell Ranger 7.2.0
+using the optimised reference transcriptome described by Pool et
+al. (2023). Non-“optref” samples were processed using Cell Ranger 6.0.2
+using human transcriptome reference version GRCh38 3.0.0 provided by
+Cell Ranger.</p>
+<p>Empty droplet removal was performed using <code>emptyDrops()</code>
+from the <em>DropletUtils</em> package for all samples.</p>
+<pre class="r"><code>object &lt;- here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref_comparison.emptyDrops_merged.Seurat.rds&quot;)
+
+if (!file.exists(object) | RERUN_ALL) {
+  # load in datasets
+  sce_data1 &lt;-  readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_01.emptyDrops.SCE.rds&quot;))
+  sce_data1_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_01_optimised_ref.emptyDrops.SCE.rds&quot;))
+  
+  sce_data3 &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_03.emptyDrops.SCE.rds&quot;))
+  sce_data3_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_03_optimised_ref.emptyDrops.SCE.rds&quot;))
+
+  sce_data4 &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_04.emptyDrops.SCE.rds&quot;))
+  sce_data4_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_04_optimised_ref.emptyDrops.SCE.rds&quot;))
+  
+  sce_data1_optimised_ref$Sample &lt;- paste0(sce_data1_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data1_optimised_ref$Barcode &lt;- paste0(sce_data1_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  sce_data3_optimised_ref$Sample &lt;- paste0(sce_data3_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data3_optimised_ref$Barcode &lt;- paste0(sce_data3_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  sce_data4_optimised_ref$Sample &lt;- paste0(sce_data4_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data4_optimised_ref$Barcode &lt;- paste0(sce_data4_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  # add in batch information
+  sce_data1$Dataset &lt;- &quot;dataset_01&quot;
+  sce_data1_optimised_ref$Dataset &lt;- &quot;dataset_01_optref&quot;
+  
+  sce_data3$Dataset &lt;- &quot;dataset_03&quot;
+  sce_data3_optimised_ref$Dataset &lt;- &quot;dataset_03_optref&quot;
+  
+  sce_data4$Dataset &lt;- &quot;dataset_04&quot;
+  sce_data4_optimised_ref$Dataset &lt;- &quot;dataset_04_optref&quot;
+
+  # distinguish between the cell names of each dataset (prevents duplicate names)
+  colnames(sce_data1) &lt;- paste0(&quot;01_&quot;, colnames(sce_data1))
+  colnames(sce_data1_optimised_ref) &lt;- paste0(&quot;01_optref_&quot;, colnames(sce_data1_optimised_ref))
+  
+  colnames(sce_data3) &lt;- paste0(&quot;03_&quot;, colnames(sce_data3))
+  colnames(sce_data3_optimised_ref) &lt;- paste0(&quot;03_optref_&quot;, colnames(sce_data3_optimised_ref))
+  
+  colnames(sce_data4) &lt;- paste0(&quot;04_&quot;, colnames(sce_data4))
+  colnames(sce_data4_optimised_ref) &lt;- paste0(&quot;04_optref_&quot;, colnames(sce_data4_optimised_ref))
+  
+  # identify genes in common between the datasets
+  common_genes &lt;- Reduce(intersect, list(rownames(sce_data1),
+                                         rownames(sce_data1_optimised_ref),
+                                         rownames(sce_data3),
+                                         rownames(sce_data3_optimised_ref),
+                                         rownames(sce_data4),
+                                         rownames(sce_data4_optimised_ref)))
+  sce_data1 &lt;- sce_data1[common_genes,]
+  sce_data1_optimised_ref &lt;- sce_data1_optimised_ref[common_genes,]
+  
+  sce_data3 &lt;- sce_data3[common_genes,]
+  sce_data3_optimised_ref &lt;- sce_data3_optimised_ref[common_genes,]
+  
+  sce_data4 &lt;- sce_data4[common_genes,]
+  sce_data4_optimised_ref &lt;- sce_data4_optimised_ref[common_genes,]
+  
+  sce &lt;- SingleCellExperiment(list(counts = cbind(counts(sce_data1),
+                                                  counts(sce_data1_optimised_ref),
+                                                  counts(sce_data3),
+                                                  counts(sce_data3_optimised_ref),
+                                                  counts(sce_data4),
+                                                  counts(sce_data4_optimised_ref))),
+                              colData = data.frame(
+                                Sample = c(sce_data1$Sample,
+                                           sce_data1_optimised_ref$Sample,
+                                           sce_data3$Sample,
+                                           sce_data3_optimised_ref$Sample,
+                                           sce_data4$Sample,
+                                           sce_data4_optimised_ref$Sample),
+                                Dataset = c(sce_data1$Dataset,
+                                            sce_data1_optimised_ref$Dataset,
+                                            sce_data3$Dataset,
+                                            sce_data3_optimised_ref$Dataset,
+                                            sce_data4$Dataset,
+                                            sce_data4_optimised_ref$Dataset),
+                                Barcode = c(sce_data1$Barcode,
+                                            sce_data1_optimised_ref$Barcode,
+                                            sce_data3$Barcode,
+                                            sce_data3_optimised_ref$Barcode,
+                                            sce_data4$Barcode,
+                                            sce_data4_optimised_ref$Barcode)))
+  
+  # create Seurat object
+  seu &lt;- CreateSeuratObject(counts = counts(sce),
+                                     meta.data = data.frame(Sample = sce$Sample,
+                                                            Dataset = sce$Dataset,
+                                                            Barcode = sce$Barcode,
+                                                            row.names = colnames(sce)))
+  
+  seu$Donor &lt;- ifelse(seu$Sample %in% c(&quot;1AFa&quot;, &quot;1AFb&quot;), &quot;1AF&quot;, seu$Sample)
+  seu$Donor &lt;- ifelse(seu$Sample %in% c(&quot;1AFa_optref&quot;, &quot;1AFb_optref&quot;), &quot;1AF_optref&quot;, seu$Donor)
+  
+  saveRDS(seu, object)
+} else {
+  seu &lt;- readRDS(object)
+}</code></pre>
+<pre class="r"><code>ALL_SAMPLES_COLOURS &lt;- ALL_SAMPLES_COLOURS[-4]
+ALL_SAMPLES_COLOURS &lt;- ALL_SAMPLES_COLOURS[1:6]
+ALL_DONORS_COLOURS &lt;- ALL_DONORS_COLOURS[-3]
+ALL_DONORS_COLOURS &lt;- ALL_DONORS_COLOURS[1:5]
+
+SAMPLE.PAPER &lt;- c(&quot;AF_1a&quot;, &quot;AF_1b&quot;, &quot;AF_2&quot;, &quot;AF_3&quot;, &quot;AF_4&quot;, &quot;AF_5&quot;, &quot;AF_6&quot;, &quot;AF_7&quot;, 
+                  &quot;AF_1a.optref&quot;, &quot;AF_1b.optref&quot;, &quot;AF_2.optref&quot;, &quot;AF_3.optref&quot;, &quot;AF_4.optref&quot;, &quot;AF_5.optref&quot;)
+names(SAMPLE.PAPER) &lt;- c(&quot;1AFa&quot;, &quot;1AFb&quot;, &quot;2AF&quot;, &quot;4AF&quot;, &quot;5AF&quot;, &quot;6AF&quot;, &quot;7AF&quot;, &quot;8AF&quot;,
+                         &quot;1AFa_optref&quot;, &quot;1AFb_optref&quot;, &quot;2AF_optref&quot;, &quot;4AF_optref&quot;, &quot;5AF_optref&quot;, &quot;6AF_optref&quot;)
+DONOR.PAPER &lt;- c(&quot;AF_1&quot;, &quot;AF_2&quot;, &quot;AF_3&quot;, &quot;AF_4&quot;, &quot;AF_5&quot;, &quot;AF_6&quot;, &quot;AF_7&quot;, 
+                 &quot;AF_1.optref&quot;, &quot;AF_2.optref&quot;, &quot;AF_3.optref&quot;, &quot;AF_4.optref&quot;, &quot;AF_5.optref&quot;)
+names(DONOR.PAPER) &lt;- c(&quot;1AF&quot;, &quot;2AF&quot;, &quot;4AF&quot;, &quot;5AF&quot;, &quot;6AF&quot;, &quot;7AF&quot;, &quot;8AF&quot;, 
+                        &quot;1AF_optref&quot;, &quot;2AF_optref&quot;, &quot;4AF_optref&quot;, &quot;5AF_optref&quot;, &quot;6AF_optref&quot;)
+
+names(ALL_SAMPLES_COLOURS) &lt;- SAMPLE.PAPER[names(ALL_SAMPLES_COLOURS)]
+names(ALL_DONORS_COLOURS) &lt;- DONOR.PAPER[names(ALL_DONORS_COLOURS)]
+
+ALL_DONORS_COLOURS &lt;- c(ALL_DONORS_COLOURS[1:5], 
+                        &quot;darkorange3&quot;, &quot;mediumpurple&quot;, 
+                        &quot;darkgreen&quot;, &quot;deeppink2&quot;, &quot;dodgerblue&quot;)
+names(ALL_DONORS_COLOURS) &lt;- c(names(ALL_DONORS_COLOURS)[1:5], 
+                               &quot;AF_1.optref&quot;, &quot;AF_2.optref&quot;, 
+                               &quot;AF_3.optref&quot;, &quot;AF_4.optref&quot;, &quot;AF_5.optref&quot;)
+
+ALL_SAMPLES_COLOURS &lt;- c(ALL_SAMPLES_COLOURS[1:6], 
+                         &quot;darkgoldenrod1&quot;, &quot;firebrick&quot;, &quot;mediumpurple&quot;, 
+                         &quot;darkgreen&quot;, &quot;deeppink2&quot;, &quot;dodgerblue&quot;)
+names(ALL_SAMPLES_COLOURS) &lt;- c(names(ALL_SAMPLES_COLOURS)[1:6], 
+                                &quot;AF_1a.optref&quot;, &quot;AF_1b.optref&quot;, &quot;AF_2.optref&quot;, 
+                               &quot;AF_3.optref&quot;, &quot;AF_4.optref&quot;, &quot;AF_5.optref&quot;)</code></pre>
+<pre class="r"><code>seu$Sample &lt;- unname(SAMPLE.PAPER[seu$Sample])
+seu$Donor &lt;- unname(DONOR.PAPER[seu$Donor])</code></pre>
+<div id="plot-qc-metrics-for-all-datasets" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Plot QC metrics for
+all datasets</h2>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Sample)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;QC metrics for all datasets&quot;) -&gt; p1
+
+seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Sample)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  rotate_x_labels +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;QC metrics by donor&quot;) +
+  ylab(&quot;Library size&quot;) -&gt; p3
+
+seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ylab(&quot;Number of detected genes&quot;) -&gt; p4
+
+p3 | p4</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
+Past versions of unnamed-chunk-4-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-4-2.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             fill = Sample)) +
+  geom_bar() +
+  geom_text(stat=&quot;count&quot;, aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;Number of cells per sample for all datasets&quot;) -&gt; p5
+
+p5</code></pre>
+<pre><code>Warning: The dot-dot notation (`..count..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(count)` instead.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             fill = Donor)) +
+  geom_bar() +
+  geom_text(stat=&quot;count&quot;, aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  ggtitle(&quot;Number of cells per donor&quot;) +
+  rotate_x_labels +
+  ylab(&quot;Count&quot;) -&gt; p6
+
+p6</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
+Past versions of unnamed-chunk-5-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-2.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-5-2.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p6 | p3 | p4</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-6-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-6-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-6-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-6-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-6-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>cellDifference &lt;- function(n_cells) {
+  n_cells.names &lt;- names(n_cells)
+  n_cells.counts &lt;- unname(n_cells)
+  for (i in seq(2, 10, by = 2)) {
+    cat(&quot;Sample name:&quot;, n_cells.names[i-1], &quot;\n&quot;)
+    cat(&quot;Difference in cell number:&quot;, n_cells.counts[i] - n_cells.counts[i-1], &quot;\n&quot;)
+    cat(&quot;Percentage difference:&quot;, (n_cells.counts[i] - n_cells.counts[i-1]) / n_cells.counts[i-1] * 100, &quot;%\n&quot;)
+    cat(&quot;\n&quot;)
+  }
+}
+
+n_cells &lt;- table(seu$Donor)
+cellDifference(n_cells)</code></pre>
+<pre><code>Sample name: AF_1 
+Difference in cell number: 329 
+Percentage difference: 26.4257 %
+
+Sample name: AF_2 
+Difference in cell number: 1870 
+Percentage difference: 191.7949 %
+
+Sample name: AF_3 
+Difference in cell number: 228 
+Percentage difference: 11.90601 %
+
+Sample name: AF_4 
+Difference in cell number: 5333 
+Percentage difference: 133.4251 %
+
+Sample name: AF_5 
+Difference in cell number: 1705 
+Percentage difference: 382.287 %</code></pre>
+</div>
+</div>
+<div id="load-in-datasets-after-performing-quality-control"
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Load in datasets after
+performing quality control</h1>
+<p>Following on from above, standard quality control processes such as
+filtering of cells with high mitochondrial proportion, low library size
+and few detected genes were performed on all samples. Non-“optref”
+samples were also filtered using the <em>DropletQC</em> package to
+remove damaged cells and provided additional empty droplet filtering.
+For details, please see Supplementary Analysis pages 1b to 1d linked on
+<a href="index.html">this page</a>.</p>
+<pre class="r"><code>object &lt;- here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref_comparison.Preprocessed_merged.Seurat.rds&quot;)
+
+if (!file.exists(object) | RERUN_ALL) {
+  # load in datasets
+  sce_data1 &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_01.Preprocess.SCE.rds&quot;))
+  sce_data1_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_01_optimised_ref.Preprocess.SCE.rds&quot;))
+  
+  sce_data3 &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_03.Preprocess.SCE.rds&quot;))
+  sce_data3_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_03_optimised_ref.Preprocess.SCE.rds&quot;))
+  
+  sce_data4 &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_04.Preprocess.SCE.rds&quot;))
+  sce_data4_optimised_ref &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;,
+                                          &quot;AmnioSC_04_optimised_ref.Preprocess.SCE.rds&quot;))
+  
+  sce_data1_optimised_ref$Sample &lt;- paste0(sce_data1_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data1_optimised_ref$Barcode &lt;- paste0(sce_data1_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  sce_data3_optimised_ref$Sample &lt;- paste0(sce_data3_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data3_optimised_ref$Barcode &lt;- paste0(sce_data3_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  sce_data4_optimised_ref$Sample &lt;- paste0(sce_data4_optimised_ref$Sample, &quot;_optref&quot;)
+  sce_data4_optimised_ref$Barcode &lt;- paste0(sce_data4_optimised_ref$Barcode, &quot;_optref&quot;)
+  
+  # add in batch information
+  sce_data1$Dataset &lt;- &quot;dataset_01&quot;
+  sce_data1_optimised_ref$Dataset &lt;- &quot;dataset_01_optref&quot;
+  
+  sce_data3$Dataset &lt;- &quot;dataset_03&quot;
+  sce_data3_optimised_ref$Dataset &lt;- &quot;dataset_03_optref&quot;
+  
+  sce_data4$Dataset &lt;- &quot;dataset_04&quot;
+  sce_data4_optimised_ref$Dataset &lt;- &quot;dataset_04_optref&quot;
+
+  # distinguish between the cell names of each dataset (prevents duplicate names)
+  colnames(sce_data1) &lt;- paste0(&quot;01_&quot;, colnames(sce_data1))
+  colnames(sce_data1_optimised_ref) &lt;- paste0(&quot;01_optref_&quot;, colnames(sce_data1_optimised_ref))
+  
+  colnames(sce_data3) &lt;- paste0(&quot;03_&quot;, colnames(sce_data3))
+  colnames(sce_data3_optimised_ref) &lt;- paste0(&quot;03_optref_&quot;, colnames(sce_data3_optimised_ref))
+  
+  colnames(sce_data4) &lt;- paste0(&quot;04_&quot;, colnames(sce_data4))
+  colnames(sce_data4_optimised_ref) &lt;- paste0(&quot;04_optref_&quot;, colnames(sce_data4_optimised_ref))
+  
+  # identify genes in common between the datasets
+  common_genes &lt;- Reduce(intersect, list(rownames(sce_data1),
+                                         rownames(sce_data1_optimised_ref),
+                                         rownames(sce_data3),
+                                         rownames(sce_data3_optimised_ref),
+                                         rownames(sce_data4),
+                                         rownames(sce_data4_optimised_ref)))
+  sce_data1 &lt;- sce_data1[common_genes,]
+  sce_data1_optimised_ref &lt;- sce_data1_optimised_ref[common_genes,]
+  
+  sce_data3 &lt;- sce_data3[common_genes,]
+  sce_data3_optimised_ref &lt;- sce_data3_optimised_ref[common_genes,]
+  
+  sce_data4 &lt;- sce_data4[common_genes,]
+  sce_data4_optimised_ref &lt;- sce_data4_optimised_ref[common_genes,]
+  
+  sce &lt;- SingleCellExperiment(list(counts = cbind(counts(sce_data1),
+                                                  counts(sce_data1_optimised_ref),
+                                                  counts(sce_data3),
+                                                  counts(sce_data3_optimised_ref),
+                                                  counts(sce_data4),
+                                                  counts(sce_data4_optimised_ref))),
+                              colData = data.frame(
+                                Sample = c(sce_data1$Sample,
+                                           sce_data1_optimised_ref$Sample,
+                                           sce_data3$Sample,
+                                           sce_data3_optimised_ref$Sample,
+                                           sce_data4$Sample,
+                                           sce_data4_optimised_ref$Sample),
+                                Dataset = c(sce_data1$Dataset,
+                                            sce_data1_optimised_ref$Dataset,
+                                            sce_data3$Dataset,
+                                            sce_data3_optimised_ref$Dataset,
+                                            sce_data4$Dataset,
+                                            sce_data4_optimised_ref$Dataset),
+                                Barcode = c(sce_data1$Barcode,
+                                            sce_data1_optimised_ref$Barcode,
+                                            sce_data3$Barcode,
+                                            sce_data3_optimised_ref$Barcode,
+                                            sce_data4$Barcode,
+                                            sce_data4_optimised_ref$Barcode)))
+  
+  # create Seurat object
+  seu &lt;- CreateSeuratObject(counts = counts(sce),
+                                     meta.data = data.frame(Sample = sce$Sample,
+                                                            Dataset = sce$Dataset,
+                                                            Barcode = sce$Barcode,
+                                                            row.names = colnames(sce)))
+  
+  seu$Donor &lt;- ifelse(seu$Sample %in% c(&quot;1AFa&quot;, &quot;1AFb&quot;), &quot;1AF&quot;, seu$Sample)
+  seu$Donor &lt;- ifelse(seu$Sample %in% c(&quot;1AFa_optref&quot;, &quot;1AFb_optref&quot;), &quot;1AF_optref&quot;, seu$Donor)
+  
+  saveRDS(seu, object)
+} else {
+  seu &lt;- readRDS(object)
+}</code></pre>
+<pre class="r"><code>seu$Sample &lt;- unname(SAMPLE.PAPER[seu$Sample])
+seu$Donor &lt;- unname(DONOR.PAPER[seu$Donor])</code></pre>
+<div id="plot-qc-metrics-for-all-datasets-1" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> Plot QC metrics for
+all datasets</h2>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Sample)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;QC metrics for all datasets&quot;) -&gt; p1
+
+seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Sample)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  rotate_x_labels +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() -&gt; p2
+
+p1 | p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = nCount_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;QC metrics by donor&quot;) +
+  ylab(&quot;Library size&quot;) -&gt; p3
+
+seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = nFeature_RNA)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ylab(&quot;Number of detected genes&quot;) -&gt; p4
+
+p3 | p4</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-2.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-2">
+Past versions of unnamed-chunk-10-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-2.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-10-2.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Sample,
+             fill = Sample)) +
+  geom_bar() +
+  geom_text(stat=&quot;count&quot;, aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_SAMPLES_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;Number of cells per sample for all datasets&quot;) -&gt; p5
+
+p5</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             fill = Donor)) +
+  geom_bar() +
+  geom_text(stat=&quot;count&quot;, aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  ggtitle(&quot;Number of cells per donor&quot;) +
+  rotate_x_labels +
+  ylab(&quot;Count&quot;) -&gt; p6
+
+p6</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-2">
+Past versions of unnamed-chunk-11-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-11-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p6 | p3 | p4</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-12-1.png" alt="" width="1536" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-12-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-12-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-12-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-12-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>n_cells &lt;- table(seu$Donor)
+cellDifference(n_cells)</code></pre>
+<pre><code>Sample name: AF_1 
+Difference in cell number: 74 
+Percentage difference: 9.511568 %
+
+Sample name: AF_2 
+Difference in cell number: 362 
+Percentage difference: 53.39233 %
+
+Sample name: AF_3 
+Difference in cell number: 155 
+Percentage difference: 11.94145 %
+
+Sample name: AF_4 
+Difference in cell number: 1044 
+Percentage difference: 56.73913 %
+
+Sample name: AF_5 
+Difference in cell number: 124 
+Percentage difference: 98.4127 %</code></pre>
+</div>
+</div>
+<div id="celltypist-annotation" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> <em>Celltypist</em>
+annotation</h1>
+<p><em>Celltypist</em> uses a logistic regression classifier to transfer
+cell type labels based on an in-built pan-foetal reference dataset that
+contains cells from a variety of tissues, including foetal skin.</p>
+<p><em>Celltypist</em> was run via command line using the
+<code>Pan_Fetal_Human</code> reference model and majority voting
+options.</p>
+<div id="prepare-dataset-for-annotation-with-celltypist"
+class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Prepare dataset for
+annotation with <em>Celltypist</em></h2>
+<pre class="r"><code># extract counts matrix from Seurat object
+object &lt;- here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref_comparison.Preprocessed_merged.Counts.csv&quot;)
+if (!file.exists(object) | RERUN_ALL) {
+  seu_counts &lt;- GetAssayData(seu[[&quot;RNA&quot;]], &quot;counts&quot;)
+  write.csv(seu_counts, object)
+}</code></pre>
+</div>
+<div id="load-in-results-from-celltypist" class="section level2"
+number="4.2">
+<h2><span class="header-section-number">4.2</span> Load in results from
+<em>Celltypist</em></h2>
+<pre class="r"><code>object &lt;- here(&quot;data&quot;, &quot;workflow&quot;,
+               &quot;AmnioSC_ALL_optimised_ref_comparison.Celltypist_annotated.Seurat.rds&quot;)
+if (!file.exists(object) | RERUN_ALL) {
+  predicted_labels &lt;- read.csv(here(&quot;celltypist&quot;, 
+                                    &quot;output_ALL_optimised_ref_comparison_pan_fetal&quot;, 
+                                    &quot;predicted_labels.csv&quot;))
+  probability_matrix &lt;- read.csv(here(&quot;celltypist&quot;, 
+                                      &quot;output_ALL_optimised_ref_comparison_pan_fetal&quot;, 
+                                      &quot;probability_matrix.csv&quot;))
+  decision_matrix &lt;- read.csv(here(&quot;celltypist&quot;, 
+                                   &quot;output_ALL_optimised_ref_comparison_pan_fetal&quot;, 
+                                   &quot;decision_matrix.csv&quot;))
+  
+  predicted_labels &lt;- createCelltypistResultsDF(predicted_labels, 
+                                                probability_matrix, 
+                                                decision_matrix, 
+                                                &quot;pan_fetal&quot;)
+  
+  # reorder to ensure names match Seurat object
+  predicted_labels &lt;- predicted_labels[colnames(seu),]
+  
+  seu &lt;- AddMetaData(seu, predicted_labels)
+  
+  seu$pan_fetal.predicted_labels &lt;- sortedFactor(seu$pan_fetal.predicted_labels)
+  seu$pan_fetal.majority_voting &lt;- sortedFactor(seu$pan_fetal.majority_voting)
+  
+  saveRDS(seu, object)
+} else {
+  seu &lt;- readRDS(object)
+}</code></pre>
+</div>
+<div id="examine-predicted-labels" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Examine predicted
+labels</h2>
+<p>These are the cell type labels prior to majority voting.</p>
+<pre class="r"><code># labels after initial prediction
+table(seu$pan_fetal.predicted_labels)</code></pre>
+<pre><code>
+                   KERATINOCYTE           MACROPHAGE_LYVE1_HIGH 
+                           4591                            1527 
+             CYCLING_EPITHELIUM                            ILC3 
+                           1446                             556 
+                        MID_ERY                      FIBROBLAST 
+                            315                             202 
+                TYPE_3_INNATE_T                           CD4.T 
+                            189                             184 
+                     EPITHELIUM                        LATE_ERY 
+                            182                             175 
+                         YS_ERY                           CD8.T 
+                            156                             119 
+                      MAST_CELL                       HIGH_MITO 
+                            110                              97 
+                       MATURE_B                              NK 
+                             95                              91 
+LOW_QUALITY_MID_ERY_.HIGH_RIBO.        MACROPHAGE_PROLIFERATING 
+                             82                              82 
+          MACROPHAGE_MHCII_HIGH                MONOCYTE_I_CXCR4 
+                             71                              65 
+                TYPE_1_INNATE_T     DOUBLET_LYMPHOID_MACROPHAGE 
+                             54                              52 
+                           TREG                              B1 
+                             38                              36 
+                            DC2                             DC1 
+                             36                              33 
+                      CYCLING_T                     LOW_QUALITY 
+                             32                              27 
+                    ENDOTHELIUM                       MYELOCYTE 
+                             25                              23 
+             DEVELOPING_NEPHRON             EOSINOPHIL_BASOPHIL 
+                             22                              22 
+                        LATE_MK                       EARLY_ERY 
+                             22                              21 
+                  VSMC_PERICYTE                      HEPATOCYTE 
+                             21                              19 
+                        HSC_MPP                MONOCYTE_II_CCR2 
+                             18                              18 
+               LANGERHANS_CELLS                            ILC2 
+                             16                              15 
+                     CYCLING_NK                    PROMYELOCYTE 
+                             14                              13 
+                     OSTEOCLAST                 ENTEROENDOCRINE 
+                             11                              10 
+                    LARGE_PRE_B          LOW_QUALITY_MACROPHAGE 
+                             10                              10 
+                    MESOTHELIUM                             MOP 
+                              9                               9 
+                  MYOFIBROBLAST                      CYCLING_DC 
+                              9                               8 
+                    CYCLING_ILC                  CYCLING_YS_ERY 
+                              8                               8 
+                     LATE_PRO_B               MONOCYTE_III_IL1B 
+                              8                               8 
+                    PROMONOCYTE              CYCLING_FIBROBLAST 
+                              8                               7 
+                 MACROPHAGE_ERY         MACROPHAGE_KUPFFER_LIKE 
+                              7                               6 
+               MACROPHAGE_TREM2                    MIGRATORY_DC 
+                              6                               6 
+                       PLASMA_B                 SKELETAL_MUSCLE 
+                              6                               6 
+                    SMALL_PRE_B                             CMP 
+                              6                               5 
+                    CYCLING_MPP                     CYCLING_PDC 
+                              5                               5 
+                       EARLY_MK                       CYCLING_B 
+                              5                               4 
+                    DN.early._T                         DN.Q._T 
+                              4                               4 
+                            PDC                   DC_PROGENITOR 
+                              4                               3 
+                          GLIAL                             GMP 
+                              3                               3 
+      MACROPHAGE_IRON_RECYCLING                 MACROPHAGE_PERI 
+                              3                               3 
+                         NEURON                   SMOOTH_MUSCLE 
+                              3                               3 
+                          CD8AA              DOUBLETS_FIBRO_ERY 
+                              2                               2 
+             LOW_Q_INCONSISTENT                            MEMP 
+                              2                               2 
+                            MEP                      OSTEOBLAST 
+                              2                               2 
+         PLACENTAL_CONTAMINANTS                           PRO_B 
+                              2                               2 
+                   CYCLING_MEMP                         DOUBLET 
+                              1                               1 
+DOUBLET_ENDOTHELIUM_ERYTHROCYTE                         DP.P._T 
+                              1                               1 
+                        DP.Q._T                 HEPATOCYTE.LIKE 
+                              1                               1 
+                     IMMATURE_B                        LMPP_MLP 
+                              1                               1 
+                     MELANOCYTE                      NEUTROPHIL 
+                              1                               1 
+                      PRE_PRO_B 
+                              1 </code></pre>
+<pre class="r"><code>seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab(&quot;Count&quot;) +
+        ggtitle(&quot;Number of cells by cell type&quot;)</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" alt="" width="2400" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-17-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.predicted_labels,
+             y = pan_fetal.prob_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;Celltypist labels confidence scores (predicted labels)&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.predicted_labels,
+             y = pan_fetal.decision_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" alt="" width="2880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-1">
+Past versions of unnamed-chunk-18-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-18-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-18-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+       ggplot(aes(x = pan_fetal.predicted_labels, y = nCount_RNA)) +
+       geom_violin(scale = &quot;area&quot;) +
+       geom_quasirandom(aes(colour = pan_fetal.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle(&quot;QC metrics by cell type&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+       ggplot(aes(x = pan_fetal.predicted_labels, y = nFeature_RNA)) +
+       geom_violin(scale = &quot;area&quot;) +
+       geom_quasirandom(aes(colour = pan_fetal.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2</code></pre>
+<pre><code>Warning: Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.
+Groups with fewer than two datapoints have been dropped.
+ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" alt="" width="2880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
+Past versions of unnamed-chunk-19-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-19-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab(&quot;Count&quot;) +
+        ylim(0, max(table(seu$pan_fetal.predicted_labels))+500) + 
+        coord_flip() +
+        ggtitle(&quot;Number of cells by cell type&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = Sample)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab(&quot;Proportion&quot;) +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS) +
+        ggtitle(&quot;Cell type proportions by sample&quot;)
+
+p3 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = Donor)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab(&quot;Proportion&quot;) +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS[seu$Donor]) +
+        ggtitle(&quot;Cell type proportions by donor&quot;)
+
+p1 + p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" alt="" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-20-1">
+Past versions of unnamed-chunk-20-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-20-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 + p3</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-2.png" alt="" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-20-2">
+Past versions of unnamed-chunk-20-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-20-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-2.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-20-2.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.predicted_labels)])  +
+        no_legend +
+        ggtitle(&quot;Number of cells per cell type by donor&quot;) +
+        rotate_x_labels_45
+
+p2 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = pan_fetal.predicted_labels)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.predicted_labels)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle(&quot;Propotion of cell types by donor&quot;) +
+        rotate_x_labels_45
+
+p1 + p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" alt="" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-21-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="examine-labels-after-majority-voting" class="section level2"
+number="4.4">
+<h2><span class="header-section-number">4.4</span> Examine labels after
+majority voting</h2>
+<p>Majority voting involves overclustering the dataset and assigning the
+same cell type label within these clsuters based on highest vote.</p>
+<pre class="r"><code># labels after majority voting
+table(seu$pan_fetal.majority_voting)</code></pre>
+<pre><code>
+         KERATINOCYTE MACROPHAGE_LYVE1_HIGH    CYCLING_EPITHELIUM 
+                 5902                  1989                  1169 
+                 ILC3               MID_ERY       TYPE_3_INNATE_T 
+                  597                   367                   355 
+             LATE_ERY                 CD8.T             MAST_CELL 
+                  286                   204                   105 
+                   B1             CYCLING_T   EOSINOPHIL_BASOPHIL 
+                   66                    39                    29 
+                CD4.T            FIBROBLAST      MONOCYTE_I_CXCR4 
+                   22                    19                    13 </code></pre>
+<pre class="r"><code>seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab(&quot;Count&quot;) +
+        ggtitle(&quot;Number of cells by cell type&quot;)</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-23-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-23-1">
+Past versions of unnamed-chunk-23-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-23-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-23-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-23-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-23-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-23-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             y = pan_fetal.prob_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;Celltypist labels confidence scores (majority voting)&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             y = pan_fetal.decision_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-24-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
+Past versions of unnamed-chunk-24-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-24-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-24-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-24-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-24-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = pan_fetal.prob_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle(&quot;Celltypist labels confidence scores within donors (majority voting)&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+  ggplot(aes(x = Donor,
+             y = pan_fetal.decision_vote)) +
+  geom_violin(scale = &quot;area&quot;) +
+  geom_quasirandom(aes(color = Donor)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing non-finite outside the scale range
+(`stat_ydensity()`).</code></pre>
+<pre><code>Warning: Removed 37 rows containing missing values or values outside the scale range
+(`position_quasirandom()`).</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-1">
+Past versions of unnamed-chunk-25-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e83b91104702f2585a4c1e90804a1bbcd663be10/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-25-1.png" target="_blank">e83b911</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+       ggplot(aes(x = pan_fetal.majority_voting, y = nCount_RNA)) +
+       geom_violin(scale = &quot;area&quot;) +
+       geom_quasirandom(aes(colour = pan_fetal.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle(&quot;QC metrics by cell type&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+       ggplot(aes(x = pan_fetal.majority_voting, y = nFeature_RNA)) +
+       geom_violin(scale = &quot;area&quot;) +
+       geom_quasirandom(aes(colour = pan_fetal.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-26-1.png" alt="" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
+Past versions of unnamed-chunk-26-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-26-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-26-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-26-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-26-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-26-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>alluvial_df &lt;- createAlluvialLongDF(colnames(seu), seu$pan_fetal.predicted_labels, seu$pan_fetal.majority_voting)</code></pre>
+<pre><code>Warning: attributes are not identical across measure variables; they will be
+dropped</code></pre>
+<pre class="r"><code>ggplot(alluvial_df,
+       aes(x = label, alluvium = names, stratum = label_type, fill = label_type, 
+           label = label_type)) +
+  geom_flow(stat = &quot;alluvium&quot;, lode.guidance = &quot;backward&quot;, alpha = 0.5, 
+            segments = 100) +
+  geom_stratum(alpha = 0.5) + 
+  theme_cowplot(12) +
+  theme(legend.position = &quot;none&quot;) +
+  scale_fill_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  scale_color_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  ggtitle(&quot;Flow between each stage of Celltypist labels&quot;) +
+  geom_text(stat = &quot;stratum&quot;, size = 2, check_overlap = TRUE) +
+  scale_x_discrete(labels = c(&quot;pan_fetal.predicted_labels&quot;, &quot;pan_fetal.majority_voting&quot;)) +
+  ylab(&quot;Number of cells&quot;)</code></pre>
+<pre><code>Warning: No shared levels found between `names(values)` of the manual scale and the
+data&#39;s colour values.</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values or values outside the scale range
+(`geom_text()`).</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-27-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-27-1">
+Past versions of unnamed-chunk-27-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-27-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-27-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-27-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-27-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-27-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat=&#39;count&#39;, aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab(&quot;Count&quot;) +
+        ylim(0, unname(max(table(seu$pan_fetal.majority_voting)))) + 
+        coord_flip() +
+        ggtitle(&quot;Number of cells by cell type&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = Sample)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab(&quot;Proportion&quot;) +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS) +
+        ggtitle(&quot;Cell type proportions by sample&quot;)
+
+p3 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = Donor)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab(&quot;Proportion&quot;) +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS[seu$Donor]) +
+        ggtitle(&quot;Cell type proportions by donor&quot;)
+
+p1 + p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-1.png" alt="" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-1">
+Past versions of unnamed-chunk-28-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-28-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 + p3</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-2.png" alt="" width="1440" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-2">
+Past versions of unnamed-chunk-28-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-28-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-28-2.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>p1 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)])  +
+        no_legend +
+        rotate_x_labels_45 +
+        ggtitle(&quot;Number of cells per cell type by donor&quot;)
+
+p2 &lt;- seu@meta.data %&gt;%
+        ggplot(aes(x = Donor, fill = pan_fetal.majority_voting)) +
+        geom_bar(position = &quot;fill&quot;) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        rotate_x_labels_45 +
+        ggtitle(&quot;Propotion of cell types by donor&quot;)
+
+p1 + p2</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-29-1.png" alt="" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
+Past versions of unnamed-chunk-29-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-29-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-29-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-29-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3238b24286d5eeb5043756b831543eb17d8c72a/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-29-1.png" target="_blank">e3238b2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-14
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a732c7248840373cac6e9120043e64f43bda723f/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-29-1.png" target="_blank">a732c72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div
+id="comparing-performance-of-celltypist-labels-on-usual-and-optimised-references"
+class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Comparing performance
+of <em>Celltypist</em> labels on usual and optimised references</h1>
+<pre class="r"><code>seu@meta.data %&gt;% ggplot(aes(x = log10(nCount_RNA), y = Donor, fill = Donor)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = &quot;none&quot;) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS)</code></pre>
+<pre><code>Picking joint bandwidth of 0.129</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-30-1">
+Past versions of unnamed-chunk-30-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-30-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu@meta.data %&gt;% ggplot(aes(x = log10(nFeature_RNA), y = Donor, fill = Donor)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = &quot;none&quot;) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS)</code></pre>
+<pre><code>Picking joint bandwidth of 0.0884</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-2.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-30-2">
+Past versions of unnamed-chunk-30-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-30-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-30-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>seu_comparison &lt;- seu
+
+dim(seu_comparison)</code></pre>
+<pre><code>[1] 31669 11199</code></pre>
+<pre class="r"><code># remove any cells with an NA value for the prob.vote metric of interest
+summary(seu_comparison$pan_fetal.prob_vote)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+0.00000 0.09102 0.88829 0.61891 0.99883 1.00000      37 </code></pre>
+<pre class="r"><code>seu_comparison &lt;- seu_comparison[,!is.na(seu_comparison$pan_fetal.prob_vote)]
+
+dim(seu_comparison)</code></pre>
+<pre><code>[1] 31669 11162</code></pre>
+<pre class="r"><code>seu_comparison$original_colname &lt;- colnames(seu_comparison)
+seu_comparison$cellname &lt;- gsub(&quot;_optref&quot;, &quot;&quot;, colnames(seu_comparison))
+
+seu_comparison$is_optref &lt;- !(seu_comparison$Dataset %in% c(&quot;dataset_01&quot;, &quot;dataset_03&quot;, &quot;dataset_04&quot;))
+
+filtered &lt;- seu_comparison@meta.data %&gt;% group_by(cellname) %&gt;% filter(n() &gt; 1)
+seu_comparison &lt;- seu_comparison[,filtered$original_colname]</code></pre>
+<pre class="r"><code>optref_meta &lt;- seu_comparison@meta.data %&gt;% subset(is_optref == TRUE)
+colnames(optref_meta) &lt;- paste0(colnames(optref_meta), &quot;_optref&quot;)
+rownames(optref_meta) &lt;- optref_meta$cellname_optref
+
+usual_meta &lt;- seu_comparison@meta.data %&gt;% subset(is_optref == FALSE)
+rownames(usual_meta) &lt;- usual_meta$cellname
+
+comp_meta &lt;- cbind(usual_meta, optref_meta)</code></pre>
+<pre class="r"><code>plotPerformanceAlluvial &lt;- function(var_to_use) {
+  alluvial_df &lt;- createAlluvialLongDF(rownames(comp_meta), 
+                                      comp_meta[,var_to_use], 
+                                      comp_meta[,paste0(var_to_use, &quot;_optref&quot;)])
+  
+  alluvial_df$donor_name &lt;- comp_meta[alluvial_df$names,]$Donor
+  
+  vals &lt;- as.numeric(levels(alluvial_df$label_type))[alluvial_df$label_type]
+  
+  if (var_to_use == &quot;pan_fetal.prob_vote&quot; | var_to_use == &quot;pan_fetal.prob_pred&quot;) {
+    breaks &lt;- seq(0, 1, by = 0.1)
+  } else if (var_to_use == &quot;pan_fetal.decision_vote&quot; | var_to_use == &quot;pan_fetal.decision_pred&quot;) {
+    breaks &lt;- seq(-20, 40, by = 5)
+  } else {
+    breaks &lt;- seq(floor(min(vals)), ceiling(max(vals)), by = 10)
+  }
+  
+  alluvial_df$label_group &lt;- cut(vals, breaks=breaks, dig.lab=10)
+  
+  for (curr_name in unique(alluvial_df$donor_name)) {
+    p3 &lt;- ggplot(alluvial_df[alluvial_df$donor_name == curr_name,],
+           aes(x = label, alluvium = names, stratum = label_group, fill = label_group, 
+               label = label_group)) +
+      geom_flow(stat = &quot;alluvium&quot;, lode.guidance = &quot;backward&quot;, alpha = 0.5, 
+                segments = 100) +
+      geom_stratum(alpha = 0.5) + 
+      theme_cowplot(12) +
+      theme(legend.position = &quot;none&quot;) +
+      ggtitle(curr_name) +
+      geom_text(stat = &quot;stratum&quot;, size = 4) +
+      scale_x_discrete(labels = c(&quot;Standard&quot;, &quot;Optimised&quot;)) +
+      ylab(&quot;Number of cells&quot;) + xlab(&quot;Reference Used&quot;)
+      rotate_x_labels_45
+    
+    print(p3)
+  }
+}
+
+plotPerformanceAlluvial(&quot;pan_fetal.prob_vote&quot;)</code></pre>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-1.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-1">
+Past versions of unnamed-chunk-33-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-1.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-1.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-2.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-2">
+Past versions of unnamed-chunk-33-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-2.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b688a9cffe4f9839ab4c5f614ba7029d4cc6ca9b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-2.png" target="_blank">b688a9c</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-10
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-2.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-3.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-3">
+Past versions of unnamed-chunk-33-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-3.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-3.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-4.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-4">
+Past versions of unnamed-chunk-33-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-4.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-4.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-5.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-5">
+Past versions of unnamed-chunk-33-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df98660b782bfa84c7547fcccc652f2a840dc6a2/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-5.png" target="_blank">df98660</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/86a1fb425a123e41db6ef61e204487b675be360b/docs/figure/AmnioSC_workflow_optref_comparison.Rmd/unnamed-chunk-33-5.png" target="_blank">86a1fb4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="session-info" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Session info</h1>
+<summary>
+This analysis was performed using the following software (click triangle
+to expand)
+</summary>
+<details>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.0 (2025-04-11)
+ os       macOS 26.6
+ system   aarch64, darwin20
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Australia/Melbourne
+ date     2026-08-05
+ pandoc   3.8.3 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown)
+ quarto   1.9.38 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ ! package              * version  date (UTC) lib source
+ P abind                  1.4-8    2024-09-12 [?] RSPM
+ P beachmat               2.26.0   2025-10-29 [?] Bioconduc~
+ P beeswarm               0.4.0    2021-06-01 [?] RSPM
+ P Biobase              * 2.70.0   2025-10-29 [?] Bioconduc~
+ P BiocGenerics         * 0.56.0   2025-10-29 [?] Bioconduc~
+ P BiocManager            1.30.27  2025-11-14 [?] RSPM
+ P BiocNeighbors          2.4.0    2025-10-29 [?] Bioconduc~
+ P BiocParallel           1.44.0   2025-10-29 [?] Bioconduc~
+ P BiocSingular           1.26.1   2025-11-17 [?] Bioconduc~
+ P bluster                1.20.0   2025-10-29 [?] Bioconduc~
+ P bslib                  0.10.0   2026-01-26 [?] RSPM
+ P cachem                 1.1.0    2024-05-16 [?] RSPM
+ P callr                  3.7.6    2024-03-25 [?] CRAN (R 4.5.0)
+ P cli                    3.6.6    2026-04-09 [?] RSPM
+ P cluster                2.1.8.1  2025-03-12 [?] CRAN (R 4.5.0)
+ P clustree             * 0.5.1    2023-11-05 [?] RSPM
+ P codetools              0.2-20   2024-03-31 [?] CRAN (R 4.5.0)
+   colorspace             2.1-2    2025-09-22 [1] RSPM (R 4.5.0)
+ P cowplot              * 1.2.0    2025-07-07 [?] RSPM
+ P data.table             1.18.2.1 2026-01-27 [?] RSPM
+   DelayedArray           0.36.1   2026-03-31 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P deldir                 2.0-4    2024-02-28 [?] RSPM
+ P digest                 0.6.39   2025-11-19 [?] RSPM
+   dplyr                * 1.2.0    2026-02-03 [1] RSPM (R 4.5.0)
+ P dqrng                  0.4.1    2024-05-28 [?] CRAN (R 4.5.0)
+ P edgeR                  4.8.2    2025-12-23 [?] https://bioc-release.r-universe.dev (R 4.5.2)
+ P egg                  * 0.4.5    2019-07-13 [?] RSPM
+ P evaluate               1.0.5    2025-08-27 [?] RSPM
+ P farver                 2.1.2    2024-05-13 [?] RSPM
+ P fastmap                1.2.0    2024-05-15 [?] RSPM
+ P fitdistrplus           1.2-6    2026-01-24 [?] RSPM
+ P fs                     2.1.0    2026-04-18 [?] RSPM
+ P future                 1.69.0   2026-01-16 [?] RSPM
+ P future.apply           1.20.1   2025-12-09 [?] RSPM
+ P generics             * 0.1.4    2025-05-09 [?] CRAN (R 4.5.0)
+ P GenomicRanges        * 1.62.1   2025-12-08 [?] Bioconduc~
+ P getPass                0.2-4    2023-12-10 [?] CRAN (R 4.5.0)
+ P ggalluvial           * 0.12.5   2023-02-22 [?] RSPM
+ P ggbeeswarm           * 0.7.3    2025-11-29 [?] RSPM
+ P ggforce                0.5.0    2025-06-18 [?] RSPM
+ P ggplot2              * 4.0.2    2026-02-03 [?] RSPM
+ P ggraph               * 2.2.2    2025-08-24 [?] RSPM
+ P ggrepel              * 0.9.6    2024-09-07 [?] CRAN (R 4.5.0)
+ P ggridges             * 0.5.7    2025-08-27 [?] RSPM
+ P git2r                  0.36.2   2025-03-29 [?] CRAN (R 4.5.0)
+ P globals                0.19.0   2026-02-02 [?] RSPM
+ P glue                   1.8.0    2024-09-30 [?] RSPM
+ P goftest                1.2-3    2021-10-07 [?] CRAN (R 4.5.0)
+ P graphlayouts           1.2.2    2025-01-23 [?] RSPM
+ P gridExtra            * 2.3      2017-09-09 [?] RSPM
+ P gtable                 0.3.6    2024-10-25 [?] RSPM
+ P here                 * 1.0.2    2025-09-15 [?] RSPM
+ P htmltools              0.5.9    2025-12-04 [?] RSPM
+ P htmlwidgets            1.6.4    2023-12-06 [?] RSPM
+ P httpuv                 1.6.16   2025-04-16 [?] CRAN (R 4.5.0)
+ P httr                   1.4.7    2023-08-15 [?] RSPM
+ P ica                    1.0-3    2022-07-08 [?] CRAN (R 4.5.0)
+ P igraph                 2.2.1    2025-10-27 [?] RSPM
+ P IRanges              * 2.44.0   2025-10-29 [?] Bioconduc~
+ P irlba                  2.3.7    2026-01-30 [?] RSPM
+ P jquerylib              0.1.4    2021-04-26 [?] RSPM
+ P jsonlite               2.0.0    2025-03-27 [?] RSPM
+ P KernSmooth             2.23-26  2025-01-01 [?] CRAN (R 4.5.0)
+ P knitr                  1.51     2025-12-20 [?] RSPM
+ P labeling               0.4.3    2023-08-29 [?] RSPM
+ P later                  1.4.5    2026-01-08 [?] RSPM
+ P lattice                0.22-7   2025-04-02 [?] RSPM
+ P lazyeval               0.2.2    2019-03-15 [?] RSPM
+   leiden                 0.4.3.1  2023-11-17 [1] RSPM (R 4.5.0)
+ P lifecycle              1.0.5    2026-01-08 [?] RSPM
+ P limma                  3.66.0   2025-10-29 [?] Bioconduc~
+ P listenv                0.10.0   2025-11-02 [?] RSPM
+ P lmtest                 0.9-40   2022-03-21 [?] CRAN (R 4.5.0)
+ P locfit                 1.5-9.12 2025-03-05 [?] RSPM
+ P magrittr               2.0.4    2025-09-12 [?] RSPM
+ P MASS                   7.3-65   2025-02-28 [?] CRAN (R 4.5.0)
+ P Matrix                 1.7-4    2025-08-28 [?] RSPM
+ P MatrixGenerics       * 1.22.0   2025-10-29 [?] Bioconduc~
+ P matrixStats          * 1.5.0    2025-01-07 [?] RSPM
+ P memoise                2.0.1    2021-11-26 [?] RSPM
+ P metapod                1.18.0   2025-10-29 [?] Bioconduc~
+ P mime                   0.13     2025-03-17 [?] RSPM
+ P miniUI                 0.1.2    2025-04-17 [?] CRAN (R 4.5.0)
+ P nlme                   3.1-168  2025-03-31 [?] CRAN (R 4.5.0)
+ P otel                   0.2.0    2025-08-29 [?] RSPM
+ P parallelly             1.46.1   2026-01-08 [?] RSPM
+ P patchwork            * 1.3.2    2025-08-25 [?] RSPM
+ P pbapply                1.7-4    2025-07-20 [?] RSPM
+ P pillar                 1.11.1   2025-09-17 [?] RSPM
+ P pkgconfig              2.0.3    2019-09-22 [?] RSPM
+ P plotly                 4.12.0   2026-01-24 [?] RSPM
+ P plyr                   1.8.9    2023-10-02 [?] RSPM
+ P png                    0.1-8    2022-11-29 [?] RSPM
+ P Polychrome           * 1.5.4    2025-04-06 [?] RSPM
+ P polyclip               1.10-7   2024-07-23 [?] CRAN (R 4.5.0)
+ P processx               3.8.6    2025-02-21 [?] CRAN (R 4.5.0)
+ P progressr              0.18.0   2025-11-06 [?] RSPM
+ P promises               1.5.0    2025-11-01 [?] RSPM
+ P ps                     1.9.1    2025-04-12 [?] CRAN (R 4.5.0)
+ P purrr                  1.2.1    2026-01-09 [?] RSPM
+ P R6                     2.6.1    2025-02-15 [?] RSPM
+ P RANN                   2.6.2    2024-08-25 [?] CRAN (R 4.5.0)
+ P RColorBrewer           1.1-3    2022-04-03 [?] RSPM
+ P Rcpp                   1.1.1    2026-01-10 [?] RSPM
+ P RcppAnnoy              0.0.23   2026-01-12 [?] RSPM
+ P renv                   1.1.7    2026-01-27 [?] RSPM
+ P reshape2             * 1.4.5    2025-11-12 [?] RSPM
+ P reticulate             1.44.1   2025-11-14 [?] RSPM
+ P rlang                  1.2.0    2026-04-06 [?] RSPM
+ P rmarkdown              2.30     2025-09-28 [?] RSPM
+ P ROCR                   1.0-12   2026-01-23 [?] RSPM
+ P rprojroot              2.1.1    2025-08-26 [?] RSPM
+ P rstudioapi             0.18.0   2026-01-16 [?] RSPM
+ P rsvd                   1.0.5    2021-04-16 [?] RSPM
+ P Rtsne                  0.17     2023-12-07 [?] CRAN (R 4.5.0)
+ P S4Arrays               1.10.1   2025-12-08 [?] Bioconduc~
+   S4Vectors            * 0.48.1   2026-04-04 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P S7                     0.2.1    2025-11-14 [?] RSPM
+ P sass                   0.4.10   2025-04-11 [?] RSPM
+ P ScaledMatrix           1.18.0   2025-10-29 [?] Bioconduc~
+ P scales                 1.4.0    2025-04-24 [?] RSPM
+ P scater               * 1.38.0   2025-10-29 [?] Bioconduc~
+ P scattermore            1.2      2023-06-12 [?] CRAN (R 4.5.0)
+ P scatterplot3d          0.3-44   2023-05-05 [?] RSPM
+ P scran                * 1.38.0   2025-10-29 [?] Bioconduc~
+ P sctransform            0.4.3    2026-01-10 [?] RSPM
+ P scuttle              * 1.20.0   2025-10-29 [?] Bioconduc~
+ P Seqinfo              * 1.0.0    2025-10-29 [?] Bioconduc~
+ P sessioninfo          * 1.2.3    2025-02-05 [?] RSPM
+   Seurat               * 4.4.0    2024-01-10 [1] https://satijalab.r-universe.dev (R 4.5.0)
+   SeuratObject         * 4.1.4    2023-09-27 [1] https://satijalab.r-universe.dev (R 4.5.0)
+ P shiny                  1.12.1   2025-12-09 [?] RSPM
+ P SingleCellExperiment * 1.32.0   2025-10-29 [?] Bioconduc~
+ P sp                     2.2-0    2025-02-01 [?] CRAN (R 4.5.0)
+ P SparseArray            1.10.8   2025-12-18 [?] Bioconduc~
+ P spatstat.data          3.1-9    2025-10-18 [?] RSPM
+ P spatstat.explore       3.7-0    2026-01-22 [?] RSPM
+ P spatstat.geom          3.7-0    2026-01-20 [?] RSPM
+ P spatstat.random        3.4-4    2026-01-21 [?] RSPM
+ P spatstat.sparse        3.1-0    2024-06-21 [?] CRAN (R 4.5.0)
+ P spatstat.univar        3.1-6    2026-01-17 [?] RSPM
+ P spatstat.utils         3.2-1    2026-01-10 [?] RSPM
+ P statmod                1.5.1    2025-10-09 [?] RSPM
+ P stringi                1.8.7    2025-03-27 [?] RSPM
+ P stringr              * 1.6.0    2025-11-04 [?] RSPM
+ P SummarizedExperiment * 1.40.0   2025-10-29 [?] Bioconduc~
+ P survival               3.8-6    2026-01-16 [?] RSPM
+ P tensor                 1.5.1    2025-06-17 [?] RSPM
+ P tibble                 3.3.1    2026-01-11 [?] RSPM
+ P tidygraph              1.3.1    2024-01-30 [?] RSPM
+ P tidyr                  1.3.2    2025-12-19 [?] RSPM
+ P tidyselect             1.2.1    2024-03-11 [?] RSPM
+ P tweenr                 2.0.3    2024-02-26 [?] RSPM
+ P uwot                   0.2.4    2025-11-10 [?] RSPM
+ P vctrs                  0.7.1    2026-01-23 [?] RSPM
+ P vipor                  0.4.7    2023-12-18 [?] RSPM
+ P viridis              * 0.6.5    2024-01-29 [?] RSPM
+ P viridisLite          * 0.4.2    2023-05-02 [?] RSPM
+ P whisker                0.4.1    2022-12-05 [?] CRAN (R 4.5.0)
+ P withr                  3.0.2    2024-10-28 [?] RSPM
+ P workflowr            * 1.7.2    2025-08-18 [?] RSPM
+ P xfun                   0.56     2026-01-18 [?] RSPM
+ P xtable                 1.8-4    2019-04-21 [?] RSPM
+ P XVector                0.50.0   2025-10-29 [?] Bioconduc~
+ P yaml                   2.3.12   2025-12-10 [?] RSPM
+ P zoo                    1.8-15   2025-12-15 [?] RSPM
+
+ [1] &lt;project&gt;/renv/library/macos/R-4.5/aarch64-apple-darwin20
+ [2] &lt;renv-cache&gt;/sandbox/macos/R-4.5/aarch64-apple-darwin20/4cd76b74
+
+ * ── Packages attached to the search path.
+ P ── Loaded and on-disk path mismatch.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</details>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS 26.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Australia/Melbourne
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices datasets  utils     methods  
+[8] base     
+
+other attached packages:
+ [1] scran_1.38.0                Polychrome_1.5.4           
+ [3] viridis_0.6.5               viridisLite_0.4.2          
+ [5] reshape2_1.4.5              ggalluvial_0.12.5          
+ [7] dplyr_1.2.0                 sessioninfo_1.2.3          
+ [9] here_1.0.2                  egg_0.4.5                  
+[11] gridExtra_2.3               patchwork_1.3.2            
+[13] cowplot_1.2.0               ggridges_0.5.7             
+[15] ggbeeswarm_0.7.3            ggrepel_0.9.6              
+[17] stringr_1.6.0               scater_1.38.0              
+[19] scuttle_1.20.0              SingleCellExperiment_1.32.0
+[21] SummarizedExperiment_1.40.0 Biobase_2.70.0             
+[23] GenomicRanges_1.62.1        Seqinfo_1.0.0              
+[25] IRanges_2.44.0              S4Vectors_0.48.1           
+[27] BiocGenerics_0.56.0         generics_0.1.4             
+[29] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+[31] clustree_0.5.1              ggraph_2.2.2               
+[33] ggplot2_4.0.2               SeuratObject_4.1.4         
+[35] Seurat_4.4.0                workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.23       splines_4.5.0          later_1.4.5           
+  [4] tibble_3.3.1           polyclip_1.10-7        lifecycle_1.0.5       
+  [7] edgeR_4.8.2            rprojroot_2.1.1        globals_0.19.0        
+ [10] processx_3.8.6         lattice_0.22-7         MASS_7.3-65           
+ [13] magrittr_2.0.4         limma_3.66.0           plotly_4.12.0         
+ [16] sass_0.4.10            rmarkdown_2.30         jquerylib_0.1.4       
+ [19] yaml_2.3.12            metapod_1.18.0         httpuv_1.6.16         
+ [22] otel_0.2.0             sctransform_0.4.3      sp_2.2-0              
+ [25] spatstat.sparse_3.1-0  reticulate_1.44.1      pbapply_1.7-4         
+ [28] RColorBrewer_1.1-3     abind_1.4-8            Rtsne_0.17            
+ [31] purrr_1.2.1            tweenr_2.0.3           git2r_0.36.2          
+ [34] irlba_2.3.7            listenv_0.10.0         spatstat.utils_3.2-1  
+ [37] goftest_1.2-3          dqrng_0.4.1            spatstat.random_3.4-4 
+ [40] fitdistrplus_1.2-6     parallelly_1.46.1      leiden_0.4.3.1        
+ [43] codetools_0.2-20       DelayedArray_0.36.1    ggforce_0.5.0         
+ [46] tidyselect_1.2.1       farver_2.1.2           ScaledMatrix_1.18.0   
+ [49] spatstat.explore_3.7-0 jsonlite_2.0.0         BiocNeighbors_2.4.0   
+ [52] tidygraph_1.3.1        progressr_0.18.0       survival_3.8-6        
+ [55] tools_4.5.0            ica_1.0-3              Rcpp_1.1.1            
+ [58] glue_1.8.0             SparseArray_1.10.8     xfun_0.56             
+ [61] withr_3.0.2            BiocManager_1.30.27    fastmap_1.2.0         
+ [64] bluster_1.20.0         callr_3.7.6            digest_0.6.39         
+ [67] rsvd_1.0.5             R6_2.6.1               mime_0.13             
+ [70] colorspace_2.1-2       scattermore_1.2        tensor_1.5.1          
+ [73] spatstat.data_3.1-9    tidyr_1.3.2            renv_1.1.7            
+ [76] data.table_1.18.2.1    graphlayouts_1.2.2     httr_1.4.7            
+ [79] htmlwidgets_1.6.4      S4Arrays_1.10.1        scatterplot3d_0.3-44  
+ [82] whisker_0.4.1          uwot_0.2.4             pkgconfig_2.0.3       
+ [85] gtable_0.3.6           lmtest_0.9-40          S7_0.2.1              
+ [88] XVector_0.50.0         htmltools_0.5.9        scales_1.4.0          
+ [91] png_0.1-8              spatstat.univar_3.1-6  knitr_1.51            
+ [94] rstudioapi_0.18.0      nlme_3.1-168           cachem_1.1.0          
+ [97] zoo_1.8-15             KernSmooth_2.23-26     parallel_4.5.0        
+[100] miniUI_0.1.2           vipor_0.4.7            pillar_1.11.1         
+[103] grid_4.5.0             vctrs_0.7.1            RANN_2.6.2            
+[106] promises_1.5.0         BiocSingular_1.26.1    beachmat_2.26.0       
+[109] xtable_1.8-4           cluster_2.1.8.1        beeswarm_0.4.0        
+[112] evaluate_1.0.5         locfit_1.5-9.12        cli_3.6.6             
+[115] compiler_4.5.0         rlang_1.2.0            future.apply_1.20.1   
+[118] labeling_0.4.3         ps_1.9.1               getPass_0.2-4         
+[121] plyr_1.8.9             fs_2.1.0               stringi_1.8.7         
+[124] deldir_2.0-4           BiocParallel_1.44.0    lazyeval_0.2.2        
+[127] spatstat.geom_3.7-0    Matrix_1.7-4           future_1.69.0         
+[130] statmod_1.5.1          shiny_1.12.1           ROCR_1.0-12           
+[133] igraph_2.2.1           memoise_2.0.1          bslib_0.10.0          </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

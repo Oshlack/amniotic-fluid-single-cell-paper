@@ -1,0 +1,250 @@
+---
+title: "Gerli et al. (2024) - Preprocessing and Celltypist Annotation"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(Polychrome)
+library(clustree)
+library(dplyr)
+library(tidyverse)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "load_colour_schemes.R"))
+source(here("code", "helper_functions.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load the dataset
+
+```{r}
+# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE220994
+# https://www.nature.com/articles/s41591-024-02807-z
+
+metadata <- read.csv(here("data", "Gerli_et_al_2024", "GSE220994_AF_scRNAseq_metadata.csv"))
+rownames(metadata) <- metadata$Barcode
+
+seu <- readRDS(here("data", "Gerli_et_al_2024", "GSE220994_AF_scRNAseq_seurat_object.rds"))
+seu@meta.data <- cbind(seu@meta.data, 
+                       metadata[rownames(seu@meta.data),
+                                c("orig_sample", "gender", "PCW", "Trimester")])
+rmarkdown::paged_table(seu@meta.data)
+```
+
+```{r}
+# change the assay to RNA
+DefaultAssay(seu) <- "RNA"
+
+seu$Dataset_Source <- "Gerli_et_al_2024"
+seu$cmv_status <- "negative"
+seu$karyotype <- "normal"
+seu$num_captures <- NA
+seu$sample_type <- NA
+seu$sc_sn_performed <- NA
+seu$sample_cleaning <- NA
+
+seu$Barcode <- colnames(seu)
+
+dim(seu)
+```
+
+```{r}
+# relabel metadata to match our datasets
+
+# Donor and Sample
+seu$Donor <- seu$orig_sample
+seu$Sample <- seu$orig_sample
+seu$orig_sample <- NULL
+
+# Gestational Age
+seu$gest_age_weeks <- seu$PCW + 2 # gestational age =  PCW + 2 
+# https://neonataltherapists.com/using-correct-terminology-in-the-nicu/
+
+# Foetal Sex
+seu$foetal_sex <- seu$gender
+seu$gender <- NULL
+
+seu$Donor.gest_age <- factor(seu$Donor)
+seu$early_late_gestation <- ifelse(seu$gest_age_weeks <= 19, "Early",
+                              ifelse(seu$gest_age_weeks >= 23, "Late", 
+                                     "Mid"))
+```
+
+```{r}
+table(seu$Donor, seu$early_late_gestation)
+table(seu$Donor, seu$gest_age_weeks)
+```
+
+# Quality Control Metrics
+
+```{r, fig.width=15, fig.height=5}
+seu@meta.data %>%
+  ggplot(aes(x = Donor,
+             fill = Donor)) +
+  geom_bar() +
+  geom_text(stat="count", aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  NoLegend() +
+  ggtitle("Number of cells per sample") +
+  rotate_x_labels +
+  ylab("Count") -> p1
+
+seu@meta.data %>%
+  ggplot(aes(x = Donor,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle("QC metrics for all datasets") -> p2
+
+seu@meta.data %>%
+  ggplot(aes(x = Donor,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  rotate_x_labels +
+  NoLegend() -> p3
+
+p1 | p2 | p3
+```
+
+# Foetal Sex
+
+```{r}
+# Some samples are missing foetal sex metadata
+table(seu$Donor, seu$foetal_sex)
+```
+
+```{r}
+VlnPlot(seu, features = c("XIST", "TSIX"), group.by = "Donor", assay = "RNA")
+VlnPlot(seu, features = c("SRY", "ZFY"), group.by = "Donor", assay = "RNA")
+```
+
+```{r}
+# update missing sex values with predicted foetal sex based on gene expression
+seu$foetal_sex <- ifelse(seu$Donor %in% c("14PCW_713", "17PCW_719"), "Female", seu$foetal_sex)
+seu$foetal_sex <- ifelse(seu$Donor == "19PCW_725", "Male", seu$foetal_sex)
+
+table(seu$Donor, seu$foetal_sex)
+```
+
+# Perform cell type annotation using *Celltypist*
+
+```{r}
+# extract counts matrix from Seurat object
+object <- here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.Counts.csv")
+if (!file.exists(object) | RERUN_ALL) {
+  seu_counts <- GetAssayData(seu[["RNA"]], "counts")
+  write.csv(seu_counts, object)
+}
+```
+
+```{r}
+# Load in the Celltypist results
+object <- here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.Celltypist_annotated.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  # Add the pan_fetal reference results
+  predicted_labels <- read.csv(here("celltypist", "output_Gerli_et_al_2024_pan_fetal", "predicted_labels.csv"))
+  probability_matrix <- read.csv(here("celltypist", "output_Gerli_et_al_2024_pan_fetal", "probability_matrix.csv"))
+  decision_matrix <- read.csv(here("celltypist", "output_Gerli_et_al_2024_pan_fetal", "decision_matrix.csv"))
+  
+  predicted_labels <- createCelltypistResultsDF(predicted_labels, probability_matrix, decision_matrix, 
+                                                ref_name = "pan_fetal")
+  predicted_labels <- predicted_labels[colnames(seu),] # reorder to ensure names match Seurat object
+  seu <- AddMetaData(seu, predicted_labels)
+  
+  predicted_labels <- read.csv(here("celltypist", "output_Gerli_et_al_2024_fetal_organ", "predicted_labels.csv"))
+  probability_matrix <- read.csv(here("celltypist", "output_Gerli_et_al_2024_fetal_organ", "probability_matrix.csv"))
+  decision_matrix <- read.csv(here("celltypist", "output_Gerli_et_al_2024_fetal_organ", "decision_matrix.csv"))
+    
+  predicted_labels <- createCelltypistResultsDF(predicted_labels, probability_matrix, decision_matrix, 
+                                                ref_name = "fetal_organ")
+    
+  predicted_labels <- predicted_labels[colnames(seu),] # reorder to ensure names match Seurat object
+  seu <- AddMetaData(seu, predicted_labels)
+  
+  seu$pan_fetal.predicted_labels <- sortedFactor(seu$pan_fetal.predicted_labels)
+  seu$pan_fetal.majority_voting <- sortedFactor(seu$pan_fetal.majority_voting)
+  seu$fetal_organ.predicted_labels <- sortedFactor(seu$fetal_organ.predicted_labels)
+  seu$fetal_organ.majority_voting <- sortedFactor(seu$fetal_organ.majority_voting)
+  
+  # Add batch information into the object (from R script used in paper)
+  combined_metadata <- read.csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+  rownames(combined_metadata) <- combined_metadata$Sample
+  seu$Dataset <- combined_metadata[seu$Sample,]$dataset_batch
+  
+  saveRDS(seu, object)
+} else {
+  seu <- readRDS(object)
+}
+```
+
+```{r}
+# labels after majority voting
+table(seu$pan_fetal.majority_voting)
+```
+
+```{r,fig.width=15, fig.height=8}
+seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Count") +
+        ggtitle("Number of cells by cell type")
+```
+
+```{r}
+# labels after majority voting
+table(seu$fetal_organ.majority_voting)
+```
+
+```{r,fig.width=10, fig.height=8}
+seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Count") +
+        ggtitle("Number of cells by cell type")
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

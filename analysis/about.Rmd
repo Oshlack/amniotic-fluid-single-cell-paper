@@ -1,0 +1,11 @@
+---
+title: "About"
+output:
+  workflowr::wflow_html:
+    toc: false
+    number_sections: false
+editor_options:
+  chunk_output_type: console
+---
+
+This `workflowr` site contains the analysis that accompanies our manuscript: Single-cell RNA-seq of amniotic fluid: gaining unique insight into fetal development

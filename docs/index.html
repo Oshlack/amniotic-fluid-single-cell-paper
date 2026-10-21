@@ -1,0 +1,4904 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Single-cell RNA-seq analysis of amniotic fluid</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">AmnioSC Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Single-cell RNA-seq analysis of amniotic
+fluid</h1>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-10-21
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>amniosinglecell/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220125code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220125)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220125code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220125)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree65ab701ff6c894dcd13390e56a7c82cafc7fb314targetblank65ab701a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/65ab701ff6c894dcd13390e56a7c82cafc7fb314" target="_blank">65ab701</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree65ab701ff6c894dcd13390e56a7c82cafc7fb314targetblank65ab701a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/65ab701ff6c894dcd13390e56a7c82cafc7fb314" target="_blank">65ab701</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/generate_site.R
+    Ignored:    analysis/knit_docs.R
+    Ignored:    analysis/run_as_job.R
+    Ignored:    analysis/sccomp_draws_files/
+    Ignored:    celltypist/.DS_Store
+    Ignored:    data/
+    Ignored:    excluded_analysis/
+    Ignored:    output/
+    Ignored:    renv/.DS_Store
+    Ignored:    renv/library/
+    Ignored:    renv/staging/
+    Ignored:    sccomp_draws_files/
+
+Untracked files:
+    Untracked:  AmnioSC_Manuscript_Claude/
+    Untracked:  claude_log/
+
+Unstaged changes:
+    Modified:   analysis/AmnioSC_additional_supp_figures_2.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
+(<code>docs/index.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65ab701ff6c894dcd13390e56a7c82cafc7fb314/analysis/index.Rmd" target="_blank">65ab701</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-21
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/cfb84ba736d486825b6d64111fbe20f1f45c75f8/docs/index.html" target="_blank">cfb84ba</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/cf784db57c357fb7394c30b0a73762bca5542896/analysis/index.Rmd" target="_blank">cf784db</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9fb36ab616769ab970acb8bfe9e8cd867c0aef8d/docs/index.html" target="_blank">9fb36ab</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/104f6f69a3f06adeeefaf6cb134bb8568e2bbcee/analysis/index.Rmd" target="_blank">104f6f6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-30
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/df23872f1ffb6f544e51d0fea902fe94164280c8/docs/index.html" target="_blank">df23872</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/979cd5c25e43e86dddd71d02819f8bdbf738ebb5/docs/index.html" target="_blank">979cd5c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a342a2888474eeebf05e0b0de79fc679b4d03f13/analysis/index.Rmd" target="_blank">a342a28</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b8eea3c1a80f67cd084059a68abe8ada452c9c7/docs/index.html" target="_blank">6b8eea3</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/55b0192502f5cc3dcf15f1633cab99c6e8640d90/analysis/index.Rmd" target="_blank">55b0192</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/52cf02d09b8d2cf48760c9d09a35bd831e72ac3a/docs/index.html" target="_blank">52cf02d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9a0924e86eb08f5ce2669d7b8539b0cf5dbf529e/analysis/index.Rmd" target="_blank">9a0924e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ab1bedd53a8a73ac0cada78391f4f3b05dfd144b/docs/index.html" target="_blank">ab1bedd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e96b85351db49855e380c4c3c978eea2e29f19ec/analysis/index.Rmd" target="_blank">e96b853</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-05
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b338338bb395a71612d95b463bc021a262d8f9a3/docs/index.html" target="_blank">b338338</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69f5b31fcb02de24f7ba323a4180a9ee2c9b0435/analysis/index.Rmd" target="_blank">69f5b31</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7b9ad7607d62cca841f7ea305fb82caeb6e36e98/docs/index.html" target="_blank">7b9ad76</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c72c592de9b1e00274ef817383358810f8148590/analysis/index.Rmd" target="_blank">c72c592</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8efef58a069edf3d8e91d2552fbf6c0341518722/docs/index.html" target="_blank">8efef58</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/97697427eb9ab0473917ffe666df8f8f8b1afe91/analysis/index.Rmd" target="_blank">9769742</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-08-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7921fc5a9262cbf163296b0d2422dc433139feda/docs/index.html" target="_blank">7921fc5</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-07-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/10ca55268f96fcf4853e602387802fc1d1d2d906/analysis/index.Rmd" target="_blank">10ca552</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-07-09
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5d27ff47de4b79f9d19f7d5cdd2960371cf734a9/docs/index.html" target="_blank">5d27ff4</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-04-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/61501473772178ef657fd990a0f3bb28dfc50f8a/analysis/index.Rmd" target="_blank">6150147</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-04-29
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c0226145a8f82406bf65be025064a2104784bf59/docs/index.html" target="_blank">c022614</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5b98c2d44a94b8289b2dc315adf631ddae6730b6/docs/index.html" target="_blank">5b98c2d</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3524efded62ab4c0625185e02b0a3084cb5d544d/analysis/index.Rmd" target="_blank">3524efd</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-03-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/68deb71b3b0d747534d2c719b2bfccd9c04d5742/docs/index.html" target="_blank">68deb71</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4254410a243366beb322f6685c61a8dd56dfa5f3/analysis/index.Rmd" target="_blank">4254410</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7f19b1208f5a9ffb207c9fe6fcfb9e704c3626ae/docs/index.html" target="_blank">7f19b12</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/205976658d1291528b1e0cea8d7c0c182f8b4b9d/analysis/index.Rmd" target="_blank">2059766</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5cd8236aaeeaa3462ea3d937f8e0290f565b0c53/docs/index.html" target="_blank">5cd8236</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/23b2fc0e4b2882b9b396101cd1762ef5b25530a4/docs/index.html" target="_blank">23b2fc0</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fc5775791fb9f989982f48c5f93e743f14421d8f/analysis/index.Rmd" target="_blank">fc57757</a>
+</td>
+<td>
+calandra.grima
+</td>
+<td>
+2026-02-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e70787f09510010e535205b3ab08e3ec7e7f637e/docs/index.html" target="_blank">e70787f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-08-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/af404d5c9b146ee7d9f644fb5c3d06b4d91072be/docs/index.html" target="_blank">af404d5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-08-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6196b32594eaf855596bcb284aaa1f074cdc7283/docs/index.html" target="_blank">6196b32</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/72e090325261f83c98775353d0de56f1dc71fda3/analysis/index.Rmd" target="_blank">72e0903</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0866f3a42cfec0f9e7aa122ee122342d23f253a5/docs/index.html" target="_blank">0866f3a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e852479053a64fd93de3ddeb953ac05c8d350084/docs/index.html" target="_blank">e852479</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/58cde1622aa9e342a42802c079376dcc9babc841/analysis/index.Rmd" target="_blank">58cde16</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+Clean up files and remove excluded files from git
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1da828f741f30ac681580e2c3dbc637c0e13f197/docs/index.html" target="_blank">1da828f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7d0d40615a012fb21c61ccd5a2fb1e2cd500289/analysis/index.Rmd" target="_blank">a7d0d40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-04-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/03f0cbd938033ac4879577d6072d0cdd1cee1e60/docs/index.html" target="_blank">03f0cbd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/aa1ef773469d823ea0d9e0aef5e92444bcdc24fa/docs/index.html" target="_blank">aa1ef77</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/79f366c8758722c62b561c704aa5116fd808f179/analysis/index.Rmd" target="_blank">79f366c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1b9a8b9395ef79338a19a70a0548c2b1fb1bd3d0/docs/index.html" target="_blank">1b9a8b9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/822f09b2a01a962720c097a2c0d1bf16a8848a9b/docs/index.html" target="_blank">822f09b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bb73ebf063d14bf46238cdee018a7ab4d8705e14/analysis/index.Rmd" target="_blank">bb73ebf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/470fc65cfb59547597a51e9ef6ee5d4fdf56da23/docs/index.html" target="_blank">470fc65</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8597b5c05a02e65fd181282fe3603453cfb9be94/analysis/index.Rmd" target="_blank">8597b5c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b559c8268131e3abb356f7d16f7fc23efa0b4601/docs/index.html" target="_blank">b559c82</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f4996ced2ce89dc15d3c28153f53f8318b07f0ff/analysis/index.Rmd" target="_blank">f4996ce</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e34f67bdd747096d6504d3a6181128aaa564f55c/docs/index.html" target="_blank">e34f67b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7e70f5d630f38f669490b28380f24554c5c297f5/analysis/index.Rmd" target="_blank">7e70f5d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-19
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bdde8300db96131d9dc29c01b9ef7c6765d3d538/docs/index.html" target="_blank">bdde830</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c69259b831ed5a994423c2cc9a5b6a20795efe60/docs/index.html" target="_blank">c69259b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4a6707763b97312d48c00e6be167747c6fdcf97d/analysis/index.Rmd" target="_blank">4a67077</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-03-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bba6e47917f9bf84cf25ea4fa12f880ccf1c1cb1/docs/index.html" target="_blank">bba6e47</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00faa633455c278bc9487eaf05b6ed8eaf227277/analysis/index.Rmd" target="_blank">00faa63</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-29
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/538a1fdac94eb7381099ee0af722ef76f5cfb165/docs/index.html" target="_blank">538a1fd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/690645357196eda7aa15e35eb4688f0d94899eb5/analysis/index.Rmd" target="_blank">6906453</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/341018e0009cfe3a5d321041ebb3c0ed92d5c2db/docs/index.html" target="_blank">341018e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e66907b2486053f6825e207bf8d6f05dd6a8fba8/analysis/index.Rmd" target="_blank">e66907b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac9b6037130f8aa5d103e4ca2d3384cd77ec71d/docs/index.html" target="_blank">bac9b60</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/77754b1a8e5be4bca2e8ca5f9f1443cc0af9db4e/analysis/index.Rmd" target="_blank">77754b1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-17
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/feffad5fae9f53c5da29f122ccd6ba41d77ec2b4/docs/index.html" target="_blank">feffad5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/65785a55383aebd83d970bdf4fa0a2aac0ee601c/analysis/index.Rmd" target="_blank">65785a5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/84350114c25857f7cc75fb5ae7ccfae7ee3b0d88/docs/index.html" target="_blank">8435011</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/154c26ae04fc94dc631e1a6f1e4c2c9ef12d83b7/analysis/index.Rmd" target="_blank">154c26a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a4b7dc10a85d4201f3e436dc8bca5574ac0280e2/docs/index.html" target="_blank">a4b7dc1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0f883bb23691f0fcebffc2420b709eae6f6e9a4f/analysis/index.Rmd" target="_blank">0f883bb</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/49f5aebd38da6a6bc75d3642f3413c828ba9c388/docs/index.html" target="_blank">49f5aeb</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/09a68253dd74aa3993d2186c418423191159c13c/analysis/index.Rmd" target="_blank">09a6825</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7b657869a8c20e2b780a4536b31f48a043947ef2/docs/index.html" target="_blank">7b65786</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a75eb4c3d92244e70f741aeb6683fbbedf726ecf/analysis/index.Rmd" target="_blank">a75eb4c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1f7a53dd71a13dae5b0c69cd8041a5478d12fc20/docs/index.html" target="_blank">1f7a53d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5d33320239361fe4d0a7c6ac66fcb121b87d74ed/analysis/index.Rmd" target="_blank">5d33320</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/325abdf349ac9657f96740331af79d7b41418df8/docs/index.html" target="_blank">325abdf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dd2ad59148aa8dbc9b432fd41d1ee14661762f5a/analysis/index.Rmd" target="_blank">dd2ad59</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-12-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/edfa4632f84027b0b20e7ae75b55e9e2a3490de3/docs/index.html" target="_blank">edfa463</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-11-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/efe1620a0b9a6f3806693e89fc1f6f2f38a2f374/analysis/index.Rmd" target="_blank">efe1620</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-11-27
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bde2e1ade6bcc0bdeb27316c870b73ce4a203ab1/docs/index.html" target="_blank">bde2e1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-11-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bb75187de2c2e4f502fc435bb62e0c5ac6d6b507/analysis/index.Rmd" target="_blank">bb75187</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-11-27
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c26670b2bac233663280fd9b2da67888a0a84471/docs/index.html" target="_blank">c26670b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7087ed8bb1402a1146476b9de24befc924ce62be/analysis/index.Rmd" target="_blank">7087ed8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5b7404efa883ab0a5652395b3b89175459afc4ad/docs/index.html" target="_blank">5b7404e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3fda2adc40378b538c837f50457274390712fb50/analysis/index.Rmd" target="_blank">3fda2ad</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-11
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/2edeadd3bf11dd22b1ce1fba12531f2880901f09/docs/index.html" target="_blank">2edeadd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3a662157be4d2df26ec014bbcb5bb76c524e6c75/analysis/index.Rmd" target="_blank">3a66215</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-09-04
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/80453bd906d783d84c87b1c652d07fc99e32d618/docs/index.html" target="_blank">80453bd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-08-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ac3538e2f4af20c8f928ccb7af791d3176795fc2/analysis/index.Rmd" target="_blank">ac3538e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-08-09
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e53328bef7dd7f4ef9d02194d22c15df35d32dae/docs/index.html" target="_blank">e53328b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-08-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/2d2c481ad263dde5bb3c03224fa6b3b714afbf20/analysis/index.Rmd" target="_blank">2d2c481</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-08-09
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b89f230c2f1fbc31e159836138f08a1516a5e43c/docs/index.html" target="_blank">b89f230</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1b19300906a4e07756973c2c5779a22c416f6e7f/analysis/index.Rmd" target="_blank">1b19300</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-31
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1e750712a317f50a823c4fec867ff93916f68faf/docs/index.html" target="_blank">1e75071</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d2c09a4d6241e9636ed57a849846273044a23d0f/analysis/index.Rmd" target="_blank">d2c09a4</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-24
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f12034ce740ea634e1e1250623351e5bf199b6ca/docs/index.html" target="_blank">f12034c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5e82b91a749a206ef32308730113ad7e8ebc7d86/analysis/index.Rmd" target="_blank">5e82b91</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/999f100f20cebb85397f2839286859c06f71e4cc/docs/index.html" target="_blank">999f100</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a7df0784f16b26160ee72d50dcb5a543ffba641c/analysis/index.Rmd" target="_blank">a7df078</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-17
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c0ea03ec34d37b8da1dc855e1219173c8fd575ca/docs/index.html" target="_blank">c0ea03e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4aa6b6d68e3c9c7a7521bc64fbb880b1f8b8c93a/analysis/index.Rmd" target="_blank">4aa6b6d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-07-10
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f97875a2063a5bccf1f41849425f5f771c5e00e9/docs/index.html" target="_blank">f97875a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/050b2ef8963fa080a6854ab6cbdefee3804534c2/docs/index.html" target="_blank">050b2ef</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/377ad9472b87147b183e6bf756ca64755bf3e518/analysis/index.Rmd" target="_blank">377ad94</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-20
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bceccdd2b101f40e35c36f7be44a936a7baf6cd6/docs/index.html" target="_blank">bceccdd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/10c14710852232ac37b32d5fbe9317ccbbe45671/analysis/index.Rmd" target="_blank">10c1471</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/99d633d6d61534f753eea84b55f98ffc34c9ec7b/docs/index.html" target="_blank">99d633d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-05-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e3713e740c556da948b2c7f8c1b07e8e3fa096b4/analysis/index.Rmd" target="_blank">e3713e7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-05-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/66f5e762bd5a9e0e431ada358bd3d0764f9e08bc/docs/index.html" target="_blank">66f5e76</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-05-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3d25e73430bdd40c9aa51de7e8621c9b07785269/analysis/index.Rmd" target="_blank">3d25e73</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-05-08
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/00e05f2dc1805b88af1340878e53b6dd48875cee/docs/index.html" target="_blank">00e05f2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6322b8a32f46e4a437f04e40b5649a3e76385593/analysis/index.Rmd" target="_blank">6322b8a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-31
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/31131f14ac71b22da82d7c2b89fd4c19a49e3523/docs/index.html" target="_blank">31131f1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a9f8e602ec711330821401888c3c559e11a768e5/analysis/index.Rmd" target="_blank">a9f8e60</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ff86799b06a2d8c1fb6c622cf59b818a4aa7ba43/docs/index.html" target="_blank">ff86799</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/03907cfd1c1311b16e6373729db2bebb77db9ee7/analysis/index.Rmd" target="_blank">03907cf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/69681f8e41a7234db023537f6ebcd926175225e5/docs/index.html" target="_blank">69681f8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/12a693365ab2d0c82c850d1b9db75213af34673a/analysis/index.Rmd" target="_blank">12a6933</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ce9a2f22cd4312b8eb169774ee45c983c121ee99/docs/index.html" target="_blank">ce9a2f2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/374f897246487f9f696c4b794300ae94a94ae4a6/analysis/index.Rmd" target="_blank">374f897</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ed4dd4ee81126c61728e8c12225405067f813fe9/docs/index.html" target="_blank">ed4dd4e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8d2e4dfc115be680d2678868283576bf22990a05/analysis/index.Rmd" target="_blank">8d2e4df</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/cfda78fc30ecd7f07d41e8560ad5e469d912e31e/docs/index.html" target="_blank">cfda78f</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7bddf373aed23b80f9dd28dccff48018a1fc5d6a/analysis/index.Rmd" target="_blank">7bddf37</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/87a2c4e1502a02c568625626063bb2cb08c44634/docs/index.html" target="_blank">87a2c4e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d23f56a394569a348d83c275b6a6fc2ba534e4c3/analysis/index.Rmd" target="_blank">d23f56a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e7708788d1e3be0dbaba1e63409ac42f1f5ea695/analysis/index.Rmd" target="_blank">e770878</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-11-30
+</td>
+<td>
+Prepare index for Cellbender analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fe612c77bfacdf6d1cedfcd35a955c377345ef65/docs/index.html" target="_blank">fe612c7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-11-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/378e079801050755bc2b9a41aad9e49a8538e737/analysis/index.Rmd" target="_blank">378e079</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-11-29
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3ba7a2a4abdabd1250c93a45311d27f990b32560/docs/index.html" target="_blank">3ba7a2a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-11-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c52d92cef5b163a575b2150c1e8817da8de7ff03/analysis/index.Rmd" target="_blank">c52d92c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-11-22
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d0df7933e33652ca34de22941a9701c1c710a8b8/docs/index.html" target="_blank">d0df793</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-09-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/49b06d7d99dc1165627ba30e5b3606706a2bc463/analysis/index.Rmd" target="_blank">49b06d7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-09-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a349e6153b9dc795835b6cca162c868a0af2294a/docs/index.html" target="_blank">a349e61</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-08-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ee4848538629e041ade97b981edcfb1bd9db5c6d/docs/index.html" target="_blank">ee48485</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-08-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3f86e661d55ca8dd1a3a161e07c870cd91b66b87/analysis/index.Rmd" target="_blank">3f86e66</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2023-08-31
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_additional_generate_colour_schemes.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bde9c7ec5920ad22582eccd435ff1e5ab22d63a4/docs/index.html" target="_blank">bde9c7e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-12-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/46dd12bbc8b99716cc07012278e6ae5494efd7a2/docs/index.html" target="_blank">46dd12b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-12-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/23c66b964ea43438bc0bec684611061768179fc7/analysis/index.Rmd" target="_blank">23c66b9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-12-12
+</td>
+<td>
+Switching from Azimuth to Celltypist
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fe114f43745deedba4b646e025e0cde3a06e7f18/analysis/index.Rmd" target="_blank">fe114f4</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-12-06
+</td>
+<td>
+wflow_publish(here("analysis",
+"AmnioSC_workflow_preprocess_dataset01.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/cfb78541d5d79601d625dcd69490f6832ae667ca/analysis/index.Rmd" target="_blank">cfb7854</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-12-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fef48b7ed81b885c1e847459b53cf30022f875b1/analysis/index.Rmd" target="_blank">fef48b7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-11-23
+</td>
+<td>
+Celltypist annotation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c6ec617aae2460d569634c3aca02e1d14f9e710b/docs/index.html" target="_blank">c6ec617</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-11-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d8a263a9dddd1499bbe2fd6f661461c9ecb80691/analysis/index.Rmd" target="_blank">d8a263a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-11-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1579f19340ae44455871e2ed76f9a1ca6ac3ba58/docs/index.html" target="_blank">1579f19</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/70a64904bdf951644eb7d5a61053c364672a3cfe/analysis/index.Rmd" target="_blank">70a6490</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d9a9f8863ef59e86bbd3a7807d1939fd470e9c90/docs/index.html" target="_blank">d9a9f88</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e6a7b9eb6e44fcc43f56e0499f0875f2b46edd1f/analysis/index.Rmd" target="_blank">e6a7b9e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9b6205e35234e1ddcd3d266f9beb60b46ecf1ccc/analysis/index.Rmd" target="_blank">9b6205e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+Update index file
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9b6205e35234e1ddcd3d266f9beb60b46ecf1ccc/docs/index.html" target="_blank">9b6205e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-10-18
+</td>
+<td>
+Update index file
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/aa3e16c378c8b97a1c43086f6b9017755f1dffc2/docs/index.html" target="_blank">aa3e16c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-09-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7967e47624f18b2921b2a230d0d1b98e8781365e/analysis/index.Rmd" target="_blank">7967e47</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-09-13
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4fafb59e13d02c1fedf55379128c02357f97d76a/docs/index.html" target="_blank">4fafb59</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-09-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/05f427938bd9eebc5aa0350e59109e752df5a9c4/analysis/index.Rmd" target="_blank">05f4279</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-09-06
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/cac1881f8a46ab8e186b34a38db34f1df0bf9c26/docs/index.html" target="_blank">cac1881</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/99b677717bba77fd44819f73a640dcf80b7a677c/analysis/index.Rmd" target="_blank">99b6777</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-30
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1bf3a597a164bcc2c40bef19bfb3651946d0d58c/docs/index.html" target="_blank">1bf3a59</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e6a37e02c5c5b674f0dad3264c416e22ebd65203/analysis/index.Rmd" target="_blank">e6a37e0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-30
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/fe8a827da911e34dbcf5ce2e4707c3a9a30802a2/docs/index.html" target="_blank">fe8a827</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e0077e9504beb0cf11ed23d1d1226d6e1c47f733/analysis/index.Rmd" target="_blank">e0077e9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ab068466776812edd3454ac4791a4bab3929ae8e/docs/index.html" target="_blank">ab06846</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/67991f60098aae4a0c37dbde66cda6d74246ac7e/analysis/index.Rmd" target="_blank">67991f6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e5002a6787ec0df39334edc37156deab9fc36435/docs/index.html" target="_blank">e5002a6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4b3e099c87ccd10da7b9b7f7e6f26f3e7445d16e/analysis/index.Rmd" target="_blank">4b3e099</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-23
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e5be4cabe430cce970c6d65ddf6b877617f3eb5a/docs/index.html" target="_blank">e5be4ca</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/648c516f61dfdc1df3c07fb26b3368269805caca/analysis/index.Rmd" target="_blank">648c516</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/12d7c7a25487740b924dbc22190211c4c6d919a2/docs/index.html" target="_blank">12d7c7a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/84ad1014363b475d4689a9356ede24cbad977ce3/analysis/index.Rmd" target="_blank">84ad101</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-08-09
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/523ac589b1be975150475e87c883e08c169df3d5/docs/index.html" target="_blank">523ac58</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/34c037df315cb3ac9e37919f9aa9930df6fb4b48/analysis/index.Rmd" target="_blank">34c037d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-19
+</td>
+<td>
+&lt;project&gt;/analysis/new_index.Rmd
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b49f9427a02120355fdccecd1bf83ca4848848ea/docs/index.html" target="_blank">b49f942</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4a3d39400791d9cbc44106c4a76e903e5880be83/analysis/index.Rmd" target="_blank">4a3d394</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-19
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b684a88f070abd02fe60e35aee2a49ff42552772/docs/index.html" target="_blank">b684a88</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5eedddfd16a95a67a2f773eef52b67b6a79d7e76/analysis/index.Rmd" target="_blank">5eedddf</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-12
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a216e90e239a94797da42c2f1e5a642779b17d7d/docs/index.html" target="_blank">a216e90</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8dc15f32dd1e46097b6785ac9c3852ebdcb45d70/analysis/index.Rmd" target="_blank">8dc15f3</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-07-07
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0386da16dae71efd19ec617f6d585cf96b971b21/docs/index.html" target="_blank">0386da1</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-06-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/2b63393129a08dffad7783883e3c16216452762c/analysis/index.Rmd" target="_blank">2b63393</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-06-22
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/82f33a2401ff63f553c10d074f37b34d0e273cbb/docs/index.html" target="_blank">82f33a2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-06-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e70c784adced0c864fd114346644694ce005d82a/analysis/index.Rmd" target="_blank">e70c784</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-06-21
+</td>
+<td>
+Data integration and labelling epithelial cells with TS dataset
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/52c241bebbd1c2576fe6a322cf85a98c64996d0d/docs/index.html" target="_blank">52c241b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-05-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/1c1c8d8d0443fa995282a61de7f72f6c4da8979e/analysis/index.Rmd" target="_blank">1c1c8d8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-05-03
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0a30903b8c24fe5d6e45af31fab66c72d697cca7/docs/index.html" target="_blank">0a30903</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/15f6a2e035ead79f3c08958066772523db1b7820/analysis/index.Rmd" target="_blank">15f6a2e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7609d69124a2e70f96cfe899e5b1da13a033691c/docs/index.html" target="_blank">7609d69</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c9eb86030e80556e4a6c83b5f503de867b4333c1/analysis/index.Rmd" target="_blank">c9eb860</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6b60bd749ccc41423d224c4dd28100f798fd4897/docs/index.html" target="_blank">6b60bd7</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/85da65e83a64c5f314aa75da91c21b0a4d99d9a9/analysis/index.Rmd" target="_blank">85da65e</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-26
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/7b73217d107f75edc72b633be51c3600b182682a/docs/index.html" target="_blank">7b73217</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/5ef033db9c9bd4b575975965acbbf924beaf892a/analysis/index.Rmd" target="_blank">5ef033d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-19
+</td>
+<td>
+wflow_publish(here("analysis", "*.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f57f9018f38c13a3a9e20cee1b69acc56266e09c/docs/index.html" target="_blank">f57f901</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3d16f8b2a865daf283b400c14b8d42f523d2d40c/analysis/index.Rmd" target="_blank">3d16f8b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-19
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b32fc670deed1d6e2f7050767b61de074966591e/docs/index.html" target="_blank">b32fc67</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e7f1d90edef8b602c1b816e3c8b7c5c4524c5986/analysis/index.Rmd" target="_blank">e7f1d90</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-12
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f4897f5fc5434a0e910c24521dc5d762e23b2f9c/docs/index.html" target="_blank">f4897f5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e014a75f1272cf9b41bcea12e65716394e9bd024/analysis/index.Rmd" target="_blank">e014a75</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-04-12
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c5f3062bb214cb314ca1c2fc5f86b7c4e39cffba/docs/index.html" target="_blank">c5f3062</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/35e72c84eb760cf2298dcdcf805cc92896be9a3e/analysis/index.Rmd" target="_blank">35e72c8</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-29
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/93a6843c44b6ca7188dbb80dac5db446c9bf84eb/docs/index.html" target="_blank">93a6843</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/db1e727845bcbf86786f115449e887a64dfd89e2/analysis/index.Rmd" target="_blank">db1e727</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/90264789e2b75107bdd421c8f36a067e1bd07053/docs/index.html" target="_blank">9026478</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3e2b7f6cf60f6d7f6300ba63c2457cc635559c77/analysis/index.Rmd" target="_blank">3e2b7f6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-08
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/a43aebdd780fcecc17de3d779ce234ca18620abf/docs/index.html" target="_blank">a43aebd</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/667a175cd1f43456d63ddf68f18c41dc80b17d38/analysis/index.Rmd" target="_blank">667a175</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-03-08
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/6d9923d64a49f401ae6d78875a151f65a3bd53e1/docs/index.html" target="_blank">6d9923d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/83c4b7252c032aed13b95038c099fa408d17d690/analysis/index.Rmd" target="_blank">83c4b72</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-22
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d9ec671f6a14b597f7f14c875fdaeee8c32bb54f/analysis/index.Rmd" target="_blank">d9ec671</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-16
+</td>
+<td>
+Continue creating reference atlas
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/b8dd5611be0c08615c3aca6265756497455961e0/docs/index.html" target="_blank">b8dd561</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/96d93326e008bf7712441e21e17b82e28f341902/analysis/index.Rmd" target="_blank">96d9332</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-16
+</td>
+<td>
+wflow_publish(here("analysis", "index.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/0abde3c87d113f6ffb778839283ac1d3bf1c2517/docs/index.html" target="_blank">0abde3c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8c3eb40a94d05c8c6b67ca0774dce5008bf8407b/analysis/index.Rmd" target="_blank">8c3eb40</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/02fcb7c3385bc62d8ffcf9f0ec0afc32e77cb790/docs/index.html" target="_blank">02fcb7c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/63ab8c6044859f8ce423b0b31278c87c4d054988/analysis/index.Rmd" target="_blank">63ab8c6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/48afef23b3bf27c8c737828d5c674b9e8b491579/docs/index.html" target="_blank">48afef2</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e17a118dc30ca2119f0e5e244dc122a473e9bcbb/analysis/index.Rmd" target="_blank">e17a118</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-15
+</td>
+<td>
+wflow_publish(here("analysis", "*.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/593fd7cb9227d47f0c5389039d7b3dc28b22bd06/analysis/index.Rmd" target="_blank">593fd7c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-10
+</td>
+<td>
+Annotating dataset #2
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/01f24b04f718da02cf15924e1d177ca4c55357e1/docs/index.html" target="_blank">01f24b0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f447f786b59cb72ac52a9a944f64a3ffdc99b1e4/analysis/index.Rmd" target="_blank">f447f78</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-10
+</td>
+<td>
+wflow_publish(here("analysis", "*.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/25a7148ce1bb312d597e16f31825d88911f0fd3b/docs/index.html" target="_blank">25a7148</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bc1b4e5a651c10e2eff73069fc06d1b35ec9e950/analysis/index.Rmd" target="_blank">bc1b4e5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-08
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/081bd075157dee46ba90ac0d27b9a0e9c4fc1a53/docs/index.html" target="_blank">081bd07</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/dc01639dc45e7ab2e370d2cadc113f170d00a269/analysis/index.Rmd" target="_blank">dc01639</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-08
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ce40d3dd4ee1c3bae0ad7ee8bdb5c609d1d289b8/docs/index.html" target="_blank">ce40d3d</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ee53635805bdd8ec387fda76ac64d867f2366ad8/analysis/index.Rmd" target="_blank">ee53635</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-04
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/e9d05653ccba207df1b8f3786ea3b48b02872a6f/analysis/index.Rmd" target="_blank">e9d0565</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-03
+</td>
+<td>
+Continue fetal skin, liver and kidney reference
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/f2b910584f7995d3024f3b5f35199a486ea9e16a/docs/index.html" target="_blank">f2b9105</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-02-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/72cbd2b367b0948ae40d048e1f3d9f37fd4a0e1c/docs/index.html" target="_blank">72cbd2b</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bd41fe67cf0d4b2f58d107f98b49a13138355995/analysis/index.Rmd" target="_blank">bd41fe6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-31
+</td>
+<td>
+Update index
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bd41fe67cf0d4b2f58d107f98b49a13138355995/docs/index.html" target="_blank">bd41fe6</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-31
+</td>
+<td>
+Update index
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/4f7bef505b9a7848c84cd85c180a68e7b6973496/docs/index.html" target="_blank">4f7bef5</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/8493ba39b1643c328f6c278edb77644d1bf4369e/analysis/index.Rmd" target="_blank">8493ba3</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+wflow_publish("analysis/index.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/71dd8dafaf3ed38af926a9d3beff466ee0243d46/docs/index.html" target="_blank">71dd8da</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/ae431b4b8e843f5f1335c08814d9425094cce2e8/docs/index.html" target="_blank">ae431b4</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+Add site docs
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9507819e2bf94f7ac0ee18fe83cffe49032c885d/analysis/index.Rmd" target="_blank">9507819</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+Add analysis and docs folders
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/9507819e2bf94f7ac0ee18fe83cffe49032c885d/docs/index.html" target="_blank">9507819</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2022-01-27
+</td>
+<td>
+Add analysis and docs folders
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="abstract" class="section level1">
+<h1>Abstract</h1>
+<p><strong>Background:</strong> Human fetal development is difficult to
+study due to ethical and practical constraints on the collection and use
+of human fetal tissue. Amniotic fluid (AF) is routinely collected during
+clinical amniocentesis and contains live fetal cells shed from
+developing tissues. Thus, we use single-cell RNA-sequencing (scRNA-seq)
+to build the first cell atlas of amniotic fluid from healthy second
+trimester fetuses.</p>
+<p><strong>Methods:</strong> scRNA-seq was performed on AF samples
+collected from seven euploid, structurally normal pregnancies at 15–25
+weeks’ gestation, all of which resulted in live births of healthy term
+or near-term infants. Mapping to a modified transcriptome was used to
+help reduce counts sparsity. Supervised cell type annotation,
+unsupervised clustering and marker gene analyses were used to determine
+the cell types present in AF. Gestational age-related differences
+between earlier (≤ 19 weeks) and later (≥ 23 weeks) gestation samples
+were examined using differential gene expression (DGE) and differential
+proportion analyses.</p>
+<p><strong>Results:</strong> Fetal skin cells were the most abundant
+cell type in AF, followed by myeloid and lymphoid cell types. We
+observed significant gestational age–related shifts in cell type
+composition, with an increased proportion of lung epithelium cells in
+later-age samples, coinciding with the canalicular phase of lung
+development. DGE analysis of fetal skin cells between earlier and later
+gestation revealed numerous gene expressed changes that recapitulated
+known developmental processes across the second trimester. These were
+also enriched in an independent AF dataset from pregnancies with diverse
+fetal pathologies. Our dataset provides an annotated atlas of 11,414
+healthy fetal human cells, permitting further study into normal second
+trimester development. We provide an integrated fetal cell atlas of
+45,048 cells combining previous data with our healthy samples.</p>
+<p><strong>Conclusions:</strong> This study applied novel analytical
+approaches to demonstrate the utility of scRNA-seq in characterising AF
+and its capacity to capture a diverse range of viable fetal cell types.
+Our results suggest that changes in AF cellular composition mirror organ
+development, underscoring the potential of AF scRNA-seq to deepen our
+understanding of normal and pathological fetal biology.</p>
+</div>
+<div id="authors" class="section level1">
+<h1>Authors</h1>
+<p>Calandra Grima<sup>1,2</sup>, Ishara Atukorala<sup>3,4</sup>, Sally
+Beard<sup>3</sup>, Shalini Guleria<sup>5</sup>, Liam Neil<sup>5</sup>,
+Natalie Hannan<sup>3</sup>, Bhupinder Pal<sup>5</sup>, Jovana
+Maksimovic<sup>1,2,6</sup>, Lisa Hui*<sup>3,4,7</sup>, Alicia
+Oshlack*<sup>1,2,8</sup></p>
+<ol style="list-style-type: decimal">
+<li>Peter MacCallum Cancer Centre, Computational Biology Program,
+Parkville, Australia</li>
+<li>The Sir Peter MacCallum Department of Oncology, University of
+Melbourne, Parkville, Australia</li>
+<li>Department of Obstetrics and Gynaecology, University of Melbourne,
+Parkville, Australia</li>
+<li>Department of Perinatal Medicine, Mercy Hospital for Women,
+Heidelberg, Australia</li>
+<li>Olivia Newton-John Cancer Research Institute, Single Cell Cancer
+Genomics Laboratory, Heidelberg, Australia</li>
+<li>Murdoch Children’s Research Institute, Respiratory Group, Parkville,
+Australia</li>
+<li>Murdoch Children’s Research Institute, Reproductive Epidemiology
+Group, Parkville, Australia</li>
+<li>School of Mathematics and Statistics, University of Melbourne,
+Melbourne, Victoria, Australia</li>
+</ol>
+<p>* These authors contributed equally.</p>
+</div>
+<div id="analysis-overview" class="section level1">
+<h1>Analysis Overview</h1>
+<div id="our-dataset" class="section level2">
+<h2>Our dataset</h2>
+<ol style="list-style-type: decimal">
+<li>Preprocessing and quality control of our dataset
+<ol style="list-style-type: lower-alpha">
+<li><a
+href="AmnioSC_workflow_optref_preprocess_dataset01.html">Preprocessing
+of Dataset #1</a></li>
+<li><a
+href="AmnioSC_workflow_optref_preprocess_dataset03.html">Preprocessing
+of Dataset #2</a></li>
+<li><a
+href="AmnioSC_workflow_optref_preprocess_dataset04.html">Preprocessing
+of Dataset #3</a></li>
+<li><a
+href="AmnioSC_workflow_optref_preprocess_dataset05.html">Preprocessing
+of Dataset #4</a></li>
+</ol></li>
+<li>Cell type annotation, integration, clustering and marker gene
+analysis of our dataset
+<ol style="list-style-type: lower-alpha">
+<li><a
+href="AmnioSC_workflow_optref_celltypist_annotation.html"><em>Celltypist</em>
+annotation</a></li>
+<li><a
+href="AmnioSC_workflow_optref_integration_clustering.html">Integration
+and clustering</a></li>
+<li><a
+href="AmnioSC_workflow_optref_subclustering_immune.html">Sub-clustering
+T cells</a></li>
+<li><a href="AmnioSC_workflow_optref_refined_annotations.html">Refined
+annotations</a></li>
+<li><a
+href="AmnioSC_workflow_optref_cluster_marker_gene_analysis.html">Cluster
+marker gene and GO analysis</a></li>
+</ol></li>
+<li>Examining cell type proportions and differential gene expression
+changes by gestational age
+<ol style="list-style-type: lower-alpha">
+<li><a
+href="AmnioSC_workflow_optref_cluster_proportions_sccomp.html">Examining
+differences in cluster proportions using <em>sccomp</em></a></li>
+<li><a href="AmnioSC_workflow_optref_trajectory_lung.html">Examining
+fetal lung development using trajectory analysis</a></li>
+<li><a
+href="AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html">Differential
+gene expression in fetal skin cells</a></li>
+</ol></li>
+</ol>
+</div>
+<div id="validation-using-gerli-et-al.-2024-dataset"
+class="section level2">
+<h2>Validation using Gerli et al. (2024) dataset</h2>
+<ol start="4" style="list-style-type: decimal">
+<li>Cell type annotation, clustering and marker gene analysis of Gerli
+et al. (2024) dataset
+<ol style="list-style-type: lower-alpha">
+<li><a
+href="Gerli_et_al_2024.preprocessing_Celltypist_annotation.html"><em>Celltypist</em>
+annotation</a></li>
+<li><a
+href="Gerli_et_al_2024.integration_clustering.html">Clustering</a></li>
+<li><a href="Gerli_et_al_2024.refined_annotations.html">Refined
+annotations</a></li>
+<li><a href="Gerli_et_al_2024.cluster_marker_gene_analysis.html">Cluster
+marker gene and GO analysis</a></li>
+</ol></li>
+<li>Examining cell type proportions and differential gene expression
+changes by gestational age
+<ol style="list-style-type: lower-alpha">
+<li><a href="Gerli_et_al_2024.cluster_proportions_sccomp.html">Examining
+differences in cluster proportions using <em>sccomp</em></a></li>
+<li><a href="Gerli_et_al_2024.dge_ruvseq.cluster_0.html">Differential
+gene expression in fetal skin cells</a></li>
+</ol></li>
+</ol>
+</div>
+</div>
+<div id="supplementary-analyses" class="section level1">
+<h1>Supplementary Analyses</h1>
+<ol start="6" style="list-style-type: decimal">
+<li>Comparing performance of standard Celltypist reference transcriptome
+versus an optimised reference transcriptome
+<ol style="list-style-type: lower-alpha">
+<li><a href="AmnioSC_workflow_optref_comparison.html">Comparison of
+standard and optimised reference transcriptome</a></li>
+<li><a href="AmnioSC_workflow_preprocess_dataset01.html">Preprocessing
+of Dataset #1 (standard Cell Ranger transcriptome)</a></li>
+<li><a href="AmnioSC_workflow_preprocess_dataset03.html">Preprocessing
+of Dataset #2 (standard Cell Ranger transcriptome)</a></li>
+<li><a href="AmnioSC_workflow_preprocess_dataset04.html">Preprocessing
+of Dataset #3 (standard Cell Ranger transcriptome)</a></li>
+</ol></li>
+<li>Other supplementary analyses
+<ol style="list-style-type: lower-alpha">
+<li><a
+href="AmnioSC_additional_sample_quality_comparison.html">Comparing
+sample quality of datasets</a></li>
+<li><a href="AmnioSC_additional_generate_colour_schemes.html">Generate
+colour schemes for plots</a></li>
+<li><a href="AmnioSC_Gerli_et_al_2024.merged_dataset.html">Integrating
+our dataset and the Gerli et al. (2024) datset</a></li>
+</ol></li>
+</ol>
+</div>
+<div id="manuscript-figures" class="section level1">
+<h1>Manuscript Figures</h1>
+<ol start="8" style="list-style-type: decimal">
+<li>Generating figures for the manuscript
+<ol style="list-style-type: lower-alpha">
+<li><a href="AmnioSC_additional_main_figures.html">Main figures</a></li>
+<li><a href="AmnioSC_additional_supp_figures_1.html">Supplementary
+figures 1 - 3</a></li>
+<li><a href="AmnioSC_additional_supp_figures_2.html">Supplementary
+figures 4 - 7</a></li>
+</ol></li>
+</ol>
+</div>
+<div id="licenses" class="section level1">
+<h1>Licenses</h1>
+<p>The code in this analysis is covered by the <a
+href="https://choosealicense.com/licenses/mit/" title="MIT License">MIT
+license</a> and the written content on this website is covered by a <a
+href="https://choosealicense.com/licenses/cc-by-4.0/"
+title="CC-BY License">Creative Commons CC-BY</a> license.</p>
+</div>
+<div id="version-information" class="section level1">
+<h1>Version Information</h1>
+<p><strong>R version:</strong> 4.5.0 (2025-04-11)</p>
+<p><strong>Bioconductor version:</strong> 3.22</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session Info</h1>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS 26.7.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Australia/Melbourne
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices datasets  utils     methods   base     
+
+other attached packages:
+[1] sessioninfo_1.2.3 workflowr_1.7.2  
+
+loaded via a namespace (and not attached):
+ [1] jsonlite_2.0.0      compiler_4.5.0      BiocManager_1.30.27
+ [4] renv_1.1.7          promises_1.5.0      Rcpp_1.1.1         
+ [7] stringr_1.6.0       git2r_0.36.2        callr_3.7.6        
+[10] later_1.4.5         jquerylib_0.1.4     yaml_2.3.12        
+[13] fastmap_1.2.0       R6_2.6.1            knitr_1.51         
+[16] tibble_3.3.1        rprojroot_2.1.1     bslib_0.10.0       
+[19] pillar_1.11.1       rlang_1.2.0         cachem_1.1.0       
+[22] stringi_1.8.7       httpuv_1.6.16       xfun_0.56          
+[25] getPass_0.2-4       fs_2.1.0            sass_0.4.10        
+[28] otel_0.2.0          cli_3.6.6           magrittr_2.0.4     
+[31] ps_1.9.1            digest_0.6.39       processx_3.8.6     
+[34] rstudioapi_0.18.0   lifecycle_1.0.5     vctrs_0.7.1        
+[37] evaluate_1.0.5      glue_1.8.0          whisker_0.4.1      
+[40] rmarkdown_2.30      httr_1.4.7          tools_4.5.0        
+[43] pkgconfig_2.0.3     htmltools_0.5.9    </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

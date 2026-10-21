@@ -1,0 +1,626 @@
+---
+title: "Data integration and clustering"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Perform data integration using *Seurat*
+
+## Prepare the datasets for integration
+
+```{r}
+seu <- readRDS(here("data", "Gerli_et_al_2024",
+                     "Gerli_et_al_2024.Celltypist_annotated.Seurat.rds"))
+
+# use the provided integrated assay
+seu_int <- seu
+DefaultAssay(seu_int) <- "integrated"
+
+seu_int <- RunPCA(seu_int, npcs = 30, verbose = FALSE)
+seu_int <- RunUMAP(seu_int, dims = 1:30, verbose = FALSE)
+
+combined_metadata <- read.csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+rownames(combined_metadata) <- combined_metadata$Sample
+
+cols_to_add <- setdiff(colnames(seu_int@meta.data), colnames(combined_metadata))
+
+seu_int@meta.data <- cbind(seu_int@meta.data[,cols_to_add], 
+                           combined_metadata[seu_int@meta.data$Donor,])
+
+dim(seu_int)
+
+# remove cells annotated as HIGH_MITO or DOUBLETS
+seu_int <- seu_int[, which(seu_int$pan_fetal.majority_voting != "HIGH_MITO")]
+seu_int <- seu_int[, which(seu_int$pan_fetal.majority_voting != "DOUBLET_LYMPHOID_MACROPHAGE")]
+
+dim(seu_int)
+```
+
+## Plot the integrated dataset
+
+```{r, fig.asp=1}
+DimPlot(seu_int, reduction = 'umap', group.by = "Sample") +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample])
+DimPlot(seu_int, reduction = 'umap', group.by = "foetal_sex") +
+  scale_colour_manual(values = ALL_FOETAL_SEX_COLOURS)
+DimPlot(seu_int, reduction = 'umap', group.by = "gest_age_weeks")
+DimPlot(seu_int, reduction = 'umap', group.by = "trimester")
+DimPlot(seu_int, reduction = 'umap', group.by = "abnormalities")
+DimPlot(seu_int, reduction = 'umap', group.by = "outcome")
+DimPlot(seu_int, reduction = 'umap', group.by = "early_late_gestation") + 
+  scale_color_manual(values = ALL_GEST_COLOURS)
+DimPlot(seu_int, reduction = 'umap', group.by = "procedure")
+```
+
+```{r, fig.asp=1}
+FeaturePlot(seu_int, reduction = 'umap', features = "nCount_RNA") +
+  scale_color_viridis(option = "turbo", trans = "log10")
+  
+FeaturePlot(seu_int, reduction = 'umap', features = "nFeature_RNA") +
+  scale_color_viridis(option = "turbo", trans = "log10")
+```
+
+# Perform clustering using *Seurat*
+
+```{r}
+object <- here("data", "Gerli_et_al_2024",
+               "Gerli_et_al_2024.Integrated_clustered_all_res.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  seu_int <- FindNeighbors(seu_int, reduction = "pca", dims = 1:30)
+  seu_int <- FindClusters(seu_int, algorithm = 3, 
+                         resolution = seq(0.01, 0.1, by = 0.01))
+  seu_int <- RunUMAP(seu_int, dims = 1:30)
+  saveRDS(seu_int, object)
+} else {
+  seu_int <- readRDS(object)
+}
+```
+
+```{r, fig.asp=1.5}
+clustree(seu_int, prefix = "integrated_snn_res.")
+```
+
+```{r, fig.asp=1}
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "integrated_snn_res.0.01") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.01)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "integrated_snn_res.0.04") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.04)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "integrated_snn_res.0.05") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.05)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "integrated_snn_res.0.1") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[unique(seu_int$integrated_snn_res.0.1)]) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend
+```
+
+A resolution of 0.04 looks best.
+
+```{r}
+seu_int$seurat_clusters <- as.factor(seu_int$integrated_snn_res.0.04)
+Idents(seu_int) <- seu_int$seurat_clusters
+```
+
+```{r}
+table(seu_int$seurat_clusters)
+```
+
+```{r}
+# find subclusters
+seu_int.0 <- FindSubCluster(seu_int, 0, "integrated_snn", algorithm = 3,
+                            resolution = 0.3)
+
+seu_int.1 <- FindSubCluster(seu_int, 1, "integrated_snn", algorithm = 3,
+                            resolution = 0.3)
+
+seu_int.2 <- FindSubCluster(seu_int, 2, "integrated_snn", algorithm = 3,
+                            resolution = 0.3)
+
+seu_int.3 <- FindSubCluster(seu_int, 3, "integrated_snn", algorithm = 3,
+                            resolution = 0.3)
+
+seu_int.4 <- FindSubCluster(seu_int, 4, "integrated_snn", algorithm = 3,
+                            resolution = 0.3)
+```
+
+```{r, fig.asp=1}
+DimPlot(seu_int.0, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub.cluster") +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int.1, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub.cluster") +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int.2, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub.cluster") +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int.3, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub.cluster") +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int.4, reduction = 'umap', label = TRUE, label.size = 5,
+        group.by = "sub.cluster") +
+  guides(color=guide_legend(ncol = 11, override.aes = list(size=2))) +
+  bottom_legend
+```
+
+```{r}
+table(seu_int.0$sub.cluster)
+table(seu_int.1$sub.cluster)
+table(seu_int.2$sub.cluster)
+table(seu_int.3$sub.cluster)
+table(seu_int.4$sub.cluster)
+```
+
+```{r}
+# merge all the subcluster labels into one variable
+seu_int$all_clusters <- as.character(seu_int$seurat_clusters)
+
+seu_int$all_clusters <- ifelse(seu_int$all_clusters == "0",
+                               seu_int.0$sub.cluster,
+                               seu_int$all_clusters)
+seu_int$all_clusters <- ifelse(seu_int$all_clusters == "1",
+                                  seu_int.1$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters <- ifelse(seu_int$all_clusters == "2",
+                                  seu_int.2$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters <- ifelse(seu_int$all_clusters == "3",
+                                  seu_int.3$sub.cluster,
+                                  seu_int$all_clusters)
+seu_int$all_clusters <- ifelse(seu_int$all_clusters == "4",
+                                  seu_int.4$sub.cluster,
+                                  seu_int$all_clusters)
+table(seu_int$all_clusters)
+
+length(unique(seu_int$all_clusters))
+```
+
+```{r}
+object <- here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.Integrated_clustered.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  # update the default clustering resolution to our chosen one
+  seu_int$seurat_clusters <- as.factor(seu_int$all_clusters)
+  Idents(seu_int) <- seu_int$seurat_clusters
+  
+  saveRDS(seu_int, object)
+} else {
+  seu_int <- readRDS(object)
+}
+```
+
+```{r}
+ALL_CLUSTER_COLOURS <- c(light.colors(n = 24), sky.colors(n = 13))
+names(ALL_CLUSTER_COLOURS) <- levels(seu_int$seurat_clusters)
+```
+
+## Visualise the clustered dataset
+
+### Cluster and sample
+
+```{r, fig.width=8, fig.height=8}
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "seurat_clusters") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=2))) +
+  bottom_legend + blank_axes + ggtitle("Seurat Clusters")
+```
+
+```{r, fig.width=15, fig.height=6}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() +
+  ylim(0, 11000) +
+  xlab("Seurat clusters") + rotate_x_labels +
+  ylab("Number of cells") + ggtitle("Seurat Clusters")
+```
+
+```{r, fig.width=15, fig.height=6}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = seurat_clusters)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = seurat_clusters)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS) +
+  NoLegend() -> p2
+
+
+p1 | p2
+```
+
+```{r, fig.height=6, fig.width=12}
+p3 <- seu_int@meta.data %>%
+        ggplot(aes(x = seurat_clusters, fill = Sample)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample])  +
+        no_legend + rotate_x_labels +
+        ggtitle("Number of cells per capture by cluster")
+
+p4 <- seu_int@meta.data %>%
+        ggplot(aes(x = seurat_clusters, fill = Sample)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS[seu_int$Sample]) +
+        guides(fill = guide_legend(ncol = 1)) + rotate_x_labels +
+        ggtitle("Propotion of capture by cluster")
+
+p3 + p4
+```
+
+```{r, fig.height=6, fig.width=12}
+p1 <- seu_int@meta.data %>%
+        ggplot(aes(x = Donor, fill = seurat_clusters)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)])  +
+        no_legend +
+        ggtitle("Number of cells per cluster by donor") +
+        rotate_x_labels
+
+p2 <- seu_int@meta.data %>%
+        ggplot(aes(x = Donor, fill = seurat_clusters)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+        guides(fill = guide_legend(ncol = 2)) +
+        ggtitle("Propotion of clusters by donor") +
+        rotate_x_labels
+
+p1 + p2
+```
+
+### Cell type
+
+```{r, fig.asp=1}
+DimPlot(seu_int, reduction = 'umap', group.by = "pan_fetal.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', group.by = "fetal_organ.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) +
+  bottom_legend
+```
+
+```{r, fig.width=16, fig.height=12}
+DimPlot(seu_int, reduction = 'umap', group.by = "pan_fetal.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) + ggtitle("Pan_Fetal_Human") +
+  bottom_legend + blank_axes -> p1
+
+DimPlot(seu_int, reduction = 'umap', group.by = "fetal_organ.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(color=guide_legend(ncol = 2, override.aes = list(size=2))) + ggtitle("Developing_Human_Organs") +
+  bottom_legend + blank_axes -> p2
+
+p1 | p2
+```
+
+```{r, fig.width=16, fig.height=10}
+seu_int@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Number of cells") + xlab("Cell Type Annotations") +
+        ggtitle("Pan_Fetal_Human") -> p1
+
+seu_int@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Number of cells") + xlab("Cell Type Annotations") +
+        ggtitle("Developing_Human_Organs") -> p2
+
+p1 | p2
+```
+
+```{r, fig.width=14, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab("Count") +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  no_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle("Number of cells per cell type by cluster") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  no_y_labels +
+  ylab("Proportion") +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  bottom_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle("Proportion of cells per cell type by cluster") -> p2
+
+p1 + p2
+```
+
+```{r, fig.width=14, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab("Count") +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  no_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle("Number of cells per cell type by cluster") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             fill = seurat_clusters)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  no_y_labels +
+  ylab("Proportion") +
+  scale_fill_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  bottom_legend + coord_flip() +
+  guides(fill=guide_legend(nrow = 6)) +
+  ggtitle("Proportion of cells per cell type by cluster") -> p2
+
+p1 + p2
+```
+
+```{r, fig.width=16, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab("Count") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  no_legend + rotate_x_labels +
+  ggtitle("Number of cells per cluster by cell type") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels +
+  ggtitle("Proportion of cells per cluster by cell type") -> p2
+
+p1 + p2
+```
+
+```{r, fig.width=16, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab("Count") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  no_legend + rotate_x_labels +
+  ggtitle("Number of cells per cluster by cell type") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels +
+  ggtitle("Proportion of cells per cluster by cell type") -> p2
+
+p1 + p2
+```
+
+```{r, fig.width=16, fig.height=10}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + xlab("Seurat Clusters") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 3)) + bottom_legend + theme(legend.title = element_blank()) + rotate_x_labels +
+  ggtitle("Pan_Fetal_Human") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + xlab("Seurat Clusters") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 3)) + bottom_legend + theme(legend.title = element_blank()) + rotate_x_labels +
+  ggtitle("Developing_Human_Organs") -> p2
+
+p1 | p2
+```
+
+```{r, fig.width=16, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  NoLegend() -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) -> p2
+
+p1 | p2
+```
+
+```{r, fig.width=16, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  NoLegend() -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  scale_y_log10() +
+  theme_cowplot(12) + rotate_x_labels +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) -> p2
+
+p1 | p2
+```
+
+### Gestational age
+
+```{r, fig.asp=1}
+DimPlot(seu_int, reduction = 'umap', group.by = "gest_age_weeks",) +
+  bottom_legend
+```
+
+```{r, fig.width=14, fig.height=8}
+seu_int@meta.data %>%
+  ggplot(aes(x = factor(gest_age_weeks),
+             fill = pan_fetal.majority_voting)) +
+  geom_bar() +
+  theme_cowplot(12) +
+  ylab("Count") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  no_legend +
+  ggtitle("Number of cells per gestational age by cell type") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = factor(gest_age_weeks),
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) +
+  ggtitle("Proportion of cells per gestational age by cell type") -> p2
+
+p1 + p2
+```
+
+### Other characteristics
+
+```{r, fig.width=8, fig.height=8}
+DimPlot(seu_int, reduction = 'umap', group.by = "Trimester",) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', group.by = "foetal_sex",) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', group.by = "outcome",) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', group.by = "abnormalities",) +
+  bottom_legend + guides(color=guide_legend(ncol = 3, override.aes = list(size=2)))
+
+DimPlot(seu_int, reduction = 'umap', group.by = "early_late_gestation",) +
+  bottom_legend + scale_color_manual(values = ALL_GEST_COLOURS)
+
+DimPlot(seu_int, reduction = 'umap', group.by = "procedure",) +
+  bottom_legend
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

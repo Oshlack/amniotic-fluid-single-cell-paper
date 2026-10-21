@@ -1,0 +1,19 @@
+name: "AmnioSC Project"
+output_dir: ../docs
+navbar:
+  title: "AmnioSC Project"
+  left:
+  - text: Home
+    href: index.html
+  - text: About
+    href: about.html
+  - text: License
+    href: license.html
+output:
+  workflowr::wflow_html:
+    toc: yes
+    toc_float:
+      collapsed: false
+    number_sections: true
+    theme: cosmo
+    highlight: textmate

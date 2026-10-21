@@ -1,0 +1,955 @@
+---
+title: "*Celltypist* Annotation - Optimised Reference"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Prepare the datasets for annotation
+
+```{r, message=FALSE, warning=FALSE}
+object <- here("data", "workflow", "AmnioSC_ALL_optimised_ref.Preprocessed_merged.Seurat.rds")
+
+if (!file.exists(object) | RERUN_ALL) {
+  # load in datasets
+  sce_data1 <- readRDS(here("data", "workflow", "AmnioSC_01_optimised_ref.Preprocess.SCE.rds"))
+  sce_data3 <- readRDS(here("data", "workflow", "AmnioSC_03_optimised_ref.Preprocess.SCE.rds"))
+  sce_data4 <- readRDS(here("data", "workflow", "AmnioSC_04_optimised_ref.Preprocess.SCE.rds"))
+  sce_data5 <- readRDS(here("data", "workflow", "AmnioSC_05_optimised_ref.Preprocess.SCE.rds"))
+  
+  # add in batch information
+  sce_data1$Dataset <- "dataset_01"
+  sce_data3$Dataset <- "dataset_03"
+  sce_data4$Dataset <- "dataset_04"
+  sce_data5$Dataset <- "dataset_05"
+
+  # distinguish between the cell names of each dataset (prevents duplicate names)
+  colnames(sce_data1) <- paste0("01_", colnames(sce_data1))
+  colnames(sce_data3) <- paste0("03_", colnames(sce_data3))
+  colnames(sce_data4) <- paste0("04_", colnames(sce_data4))
+  colnames(sce_data5) <- paste0("05_", colnames(sce_data5))
+  
+  # identify genes in common between the datasets
+  common_genes <- Reduce(intersect, list(rownames(sce_data1),
+                                         rownames(sce_data3),
+                                         rownames(sce_data4),
+                                         rownames(sce_data5)))
+  
+  sce_data1 <- sce_data1[common_genes,]
+  sce_data3 <- sce_data3[common_genes,]
+  sce_data4 <- sce_data4[common_genes,]
+  sce_data5 <- sce_data5[common_genes,]
+  
+  sce <- SingleCellExperiment(list(counts = cbind(counts(sce_data1),
+                                                  counts(sce_data3),
+                                                  counts(sce_data4),
+                                                  counts(sce_data5))),
+                              colData = data.frame(
+                                Sample = c(sce_data1$Sample,
+                                           sce_data3$Sample,
+                                           sce_data4$Sample,
+                                           sce_data5$Sample),
+                                Dataset = c(sce_data1$Dataset,
+                                            sce_data3$Dataset,
+                                            sce_data4$Dataset,
+                                            sce_data5$Dataset),
+                                Barcode = c(sce_data1$Barcode,
+                                            sce_data3$Barcode,
+                                            sce_data4$Barcode,
+                                            sce_data5$Barcode)))
+  
+  # create Seurat object
+  seu <- CreateSeuratObject(counts = counts(sce),
+                                     meta.data = data.frame(Sample = sce$Sample,
+                                                            Dataset = sce$Dataset,
+                                                            Barcode = sce$Barcode,
+                                                            row.names = colnames(sce)))
+  
+  seu$Donor <- ifelse(seu$Sample %in% c("1AFa", "1AFb"), "1AF", seu$Sample)
+  
+  saveRDS(seu, object)
+} else {
+  seu <- readRDS(object)
+}
+```
+
+```{r}
+seu$Donor.Paper <- unname(DONOR.PAPER[seu$Donor])
+seu$Donor.Paper <- factor(seu$Donor.Paper)
+
+seu$Sample.Paper <- unname(SAMPLE.PAPER[seu$Sample])
+seu$Sample.Paper <- factor(seu$Sample.Paper)
+```
+
+```{r}
+dim(seu)
+```
+
+Across all samples, this dataset contains `r ncol(seu)` cells after performing quality control.
+
+## Plot QC metrics for all datasets
+
+```{r, fig.width=10, fig.height=8}
+seu@meta.data %>%
+  ggplot(aes(x = Sample.Paper,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Sample.Paper)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+  NoLegend() +
+  # rotate_x_labels +
+  ggtitle("QC metrics for all datasets") -> p1
+
+seu@meta.data %>%
+  ggplot(aes(x = Sample.Paper,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Sample.Paper)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  # rotate_x_labels +
+  scale_colour_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+  NoLegend() -> p2
+
+p1 | p2
+
+seu@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             y = nCount_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor.Paper)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  NoLegend() +
+  # rotate_x_labels +
+  ggtitle("QC metrics by sample") +
+  xlab("Sample") + 
+  ylab("Library size") -> p3
+
+seu@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             y = nFeature_RNA)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = Donor.Paper)) +
+  scale_y_log10() +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  NoLegend() +
+  # rotate_x_labels +
+  xlab("Sample") + 
+  ylab("Number of detected genes") -> p4
+
+p3 | p4
+```
+
+```{r, fig.asp=0.8}
+seu@meta.data %>%
+  ggplot(aes(x = Sample.Paper,
+             fill = Sample.Paper)) +
+  geom_bar() +
+  geom_text(stat="count", aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER) +
+  NoLegend() +
+  # rotate_x_labels +
+  ggtitle("Number of cells per sample for all datasets") -> p5
+
+p5
+
+seu@meta.data %>%
+  ggplot(aes(x = Donor.Paper,
+             fill = Donor.Paper)) +
+  geom_bar() +
+  geom_text(stat="count", aes(label = ..count..), vjust = -0.25) +
+  theme_cowplot(12) +
+  scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER) +
+  NoLegend() +
+  ggtitle("Number of cells per sample") +
+  # rotate_x_labels +
+  ylim(0, 4000) +
+  xlab("Sample") +
+  ylab("Count") -> p6
+
+p6
+```
+
+```{r, fig.width=12, fig.height=4}
+p6 | p3 | p4
+```
+
+# *Celltypist* annotation
+
+*Celltypist* uses a logistic regression classifier to transfer cell type labels based on an in-built pan-foetal reference dataset that contains cells from a variety of tissues, including foetal skin.
+
+*Celltypist* was run via command line using the pan foetal reference model and majority voting options.
+
+## Prepare dataset for annotation with *Celltypist*
+
+```{r}
+# extract counts matrix from Seurat object
+object <- here("data", "workflow", "AmnioSC_ALL_optimised_ref.Preprocessed_merged.Counts.csv")
+if (!file.exists(object) | RERUN_ALL) {
+  seu_counts <- GetAssayData(seu[["RNA"]], "counts")
+  write.csv(seu_counts, object)
+}
+```
+
+## Load in results from *Celltypist*
+
+```{r}
+object <- here("data", "workflow", "AmnioSC_ALL_optimised_ref.Celltypist_annotated.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  # Add the pan_fetal reference results
+  predicted_labels <- read.csv(here("celltypist", "output_ALL_optimised_ref_pan_fetal", "predicted_labels.csv"))
+  probability_matrix <- read.csv(here("celltypist", "output_ALL_optimised_ref_pan_fetal", "probability_matrix.csv"))
+  decision_matrix <- read.csv(here("celltypist", "output_ALL_optimised_ref_pan_fetal", "decision_matrix.csv"))
+  
+  predicted_labels <- createCelltypistResultsDF(predicted_labels, probability_matrix, decision_matrix, 
+                                                ref_name = "pan_fetal")
+  
+  predicted_labels <- predicted_labels[colnames(seu),] # reorder to ensure names match Seurat object
+  
+  seu <- AddMetaData(seu, predicted_labels)
+  
+  # Add the pan_fetal reference results
+  predicted_labels <- read.csv(here("celltypist", "output_ALL_optimised_ref_fetal_organ", "predicted_labels.csv"))
+  probability_matrix <- read.csv(here("celltypist", "output_ALL_optimised_ref_fetal_organ", "probability_matrix.csv"))
+  decision_matrix <- read.csv(here("celltypist", "output_ALL_optimised_ref_fetal_organ", "decision_matrix.csv"))
+  
+  predicted_labels <- createCelltypistResultsDF(predicted_labels, probability_matrix, decision_matrix, 
+                                                ref_name = "fetal_organ")
+  
+  predicted_labels <- predicted_labels[colnames(seu),] # reorder to ensure names match Seurat object
+  
+  seu <- AddMetaData(seu, predicted_labels)
+  
+  # convert labels into sorted factors
+  seu$pan_fetal.predicted_labels <- sortedFactor(seu$pan_fetal.predicted_labels)
+  seu$pan_fetal.majority_voting <- sortedFactor(seu$pan_fetal.majority_voting)
+  seu$fetal_organ.predicted_labels <- sortedFactor(seu$fetal_organ.predicted_labels)
+  seu$fetal_organ.majority_voting <- sortedFactor(seu$fetal_organ.majority_voting)
+  
+  # add in metadata
+  meta <- read.csv(here("data", "workflow", "dataset_meta.csv"))
+  rownames(meta) <- meta$donor
+  meta$dataset <- NULL
+  meta$donor <- NULL
+  meta <- meta[seu$Donor,]
+  rownames(meta) <- colnames(seu)
+  seu@meta.data <- cbind(seu@meta.data, meta)
+  
+  seu$Donor.gest_age <- factor(seu$Donor, levels = c("4AF", "8AF", "6AF", "5AF", "1AF", "7AF", "2AF"))
+  seu$Donor.early_mid_late <- ifelse(seu$gest_age_weeks == 20, "Mid Gestation",
+                                     ifelse(seu$gest_age_weeks < 20, "Early Gestation",
+                                            "Late Gestation"))
+  
+  saveRDS(seu, object)
+} else {
+  seu <- readRDS(object)
+}
+```
+
+```{r}
+seu$Donor.Paper <- unname(DONOR.PAPER[seu$Donor])
+seu$Donor.Paper <- factor(seu$Donor.Paper)
+
+seu$Sample.Paper <- unname(SAMPLE.PAPER[seu$Sample])
+seu$Sample.Paper <- factor(seu$Sample.Paper)
+
+seu$Donor.gest_age <- factor(seu$Donor.Paper, levels = c("AF_3", "AF_7", "AF_5", "AF_4", "AF_1", "AF_6", "AF_2"))
+```
+
+## Examine results using the pan-fetal reference
+
+### Examine predicted labels
+
+These are the cell type labels prior to majority voting.
+
+```{r}
+# labels after initial prediction
+table(seu$pan_fetal.predicted_labels)
+```
+
+```{r, fig.width=30, fig.height=8, warning=FALSE, message=FALSE}
+seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Count") +
+        ggtitle("Number of cells by cell type")
+```
+
+```{r, fig.height=10, fig.width=30}
+p1 <- seu@meta.data %>%
+  ggplot(aes(x = pan_fetal.predicted_labels,
+             y = pan_fetal.prob_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle("Celltypist labels confidence scores (predicted labels)")
+
+p2 <- seu@meta.data %>%
+  ggplot(aes(x = pan_fetal.predicted_labels,
+             y = pan_fetal.decision_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2
+```
+
+```{r, fig.width=30, fig.height=10}
+p1 <- seu@meta.data %>%
+       ggplot(aes(x = pan_fetal.predicted_labels, y = nCount_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = pan_fetal.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle("QC metrics by cell type")
+
+p2 <- seu@meta.data %>%
+       ggplot(aes(x = pan_fetal.predicted_labels, y = nFeature_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = pan_fetal.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2
+```
+
+```{r, fig.width=20, fig.height=20}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab("Count") +
+        ylim(0, unname(max(table(seu$pan_fetal.predicted_labels))) + 100) + 
+        coord_flip() +
+        ggtitle("Number of cells by cell type")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = Sample.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER[levels(seu$Sample.Paper)]) +
+        ggtitle("Cell type proportions by sample")
+
+p3 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.predicted_labels, fill = Donor.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu$Donor.Paper)]) +
+        ggtitle("Cell type proportions by donor")
+
+p1 + p2
+p1 + p3
+```
+
+```{r, fig.width=20, fig.height=20}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = Donor, fill = pan_fetal.predicted_labels)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.predicted_labels)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by donor")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = Donor, fill = pan_fetal.predicted_labels)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.predicted_labels)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by donor")
+
+p1 + p2
+```
+
+### Examine labels after majority voting
+
+Majority voting involves overclustering the dataset and assigning the same cell type label within these clusters based on highest vote.
+
+```{r}
+# labels after majority voting
+table(seu$pan_fetal.majority_voting)
+```
+
+```{r, fig.width=12, fig.height=6, warning=FALSE, message=FALSE}
+seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Number of cells") + xlab("") + ggtitle("Pan_Fetal_Human Annotation")
+```
+
+```{r, fig.height=8, fig.width=14}
+p1 <- seu@meta.data %>%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             y = pan_fetal.prob_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle("Celltypist labels confidence scores (majority voting)")
+
+p2 <- seu@meta.data %>%
+  ggplot(aes(x = pan_fetal.majority_voting,
+             y = pan_fetal.decision_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = pan_fetal.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+       ggplot(aes(x = pan_fetal.majority_voting, y = nCount_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = pan_fetal.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle("QC metrics by cell type")
+
+p2 <- seu@meta.data %>%
+       ggplot(aes(x = pan_fetal.majority_voting, y = nFeature_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = pan_fetal.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2
+```
+
+```{r, fig.asp=2}
+alluvial_df <- createAlluvialLongDF(colnames(seu), seu$pan_fetal.predicted_labels, seu$pan_fetal.majority_voting)
+
+ggplot(alluvial_df,
+       aes(x = label, alluvium = names, stratum = label_type, fill = label_type, 
+           label = label_type)) +
+  geom_flow(stat = "alluvium", lode.guidance = "backward", alpha = 0.5, 
+            segments = 100) +
+  geom_stratum(alpha = 0.5) + 
+  theme_cowplot(12) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  scale_color_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  ggtitle("Flow between each stage of Celltypist labels") +
+  geom_text(stat = "stratum", size = 2, check_overlap = TRUE) +
+  scale_x_discrete(labels = c("predicted_labels", "majority_voting")) +
+  ylab("Number of cells")
+```
+
+```{r, fig.width=15, fig.height=10}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab("Count") +
+        ylim(0, unname(max(table(seu$pan_fetal.majority_voting))) + 100) + 
+        coord_flip() +
+        ggtitle("Number of cells by cell type")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = Sample.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER[levels(seu$Sample.Paper)]) +
+        ggtitle("Cell type proportions by sample")
+
+p3 <- seu@meta.data %>%
+        ggplot(aes(x = pan_fetal.majority_voting, fill = Donor.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu$Donor.Paper)]) +
+        ggtitle("Cell type proportions by donor")
+
+p1 + p2
+p1 + p3
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by donor")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = pan_fetal.majority_voting)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by donor")
+
+p1 + p2
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = factor(gest_age_weeks), fill = pan_fetal.majority_voting)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by gestational age") +
+        xlab("Gestational age (weeks)") +
+        facet_grid(.~seu$Donor.gest_age, scales = "free", space = "free")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = factor(gest_age_weeks), fill = pan_fetal.majority_voting)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$pan_fetal.majority_voting)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by gestational age") +
+        xlab("Gestational age (weeks)") +
+        facet_grid(.~seu$Donor.gest_age, scales = "free", space = "free")
+
+p1 + p2
+```
+
+## Examine results using the fetal organ reference
+
+### Examine predicted labels
+
+These are the cell type labels prior to majority voting.
+
+```{r}
+# labels after initial prediction
+table(seu$fetal_organ.predicted_labels)
+```
+
+```{r, fig.width=30, fig.height=8, warning=FALSE, message=FALSE}
+seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.predicted_labels, fill = fetal_organ.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Count") +
+        ggtitle("Number of cells by cell type")
+```
+
+```{r, fig.height=10, fig.width=30}
+p1 <- seu@meta.data %>%
+  ggplot(aes(x = fetal_organ.predicted_labels,
+             y = fetal_organ.prob_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle("Celltypist labels confidence scores (predicted labels)")
+
+p2 <- seu@meta.data %>%
+  ggplot(aes(x = fetal_organ.predicted_labels,
+             y = fetal_organ.decision_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.predicted_labels)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2
+```
+
+```{r, fig.width=30, fig.height=10}
+p1 <- seu@meta.data %>%
+       ggplot(aes(x = fetal_organ.predicted_labels, y = nCount_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = fetal_organ.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle("QC metrics by cell type")
+
+p2 <- seu@meta.data %>%
+       ggplot(aes(x = fetal_organ.predicted_labels, y = nFeature_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = fetal_organ.predicted_labels)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2
+```
+
+```{r, fig.width=20, fig.height=20}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.predicted_labels, fill = fetal_organ.predicted_labels)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab("Count") +
+        ylim(0, unname(max(table(seu$fetal_organ.predicted_labels))) + 100) + 
+        coord_flip() +
+        ggtitle("Number of cells by cell type")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.predicted_labels, fill = Sample.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER[levels(seu$Sample.Paper)]) +
+        ggtitle("Cell type proportions by sample")
+
+p3 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.predicted_labels, fill = Donor.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu$Donor.Paper)]) +
+        ggtitle("Cell type proportions by donor")
+
+p1 + p2
+p1 + p3
+```
+
+```{r, fig.width=20, fig.height=20}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = fetal_organ.predicted_labels)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.predicted_labels)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by donor")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = fetal_organ.predicted_labels)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.predicted_labels)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by donor")
+
+p1 + p2
+```
+
+### Examine labels after majority voting
+
+Majority voting involves overclustering the dataset and assigning the same cell type label within these clusters based on highest vote.
+
+```{r}
+# labels after majority voting
+table(seu$fetal_organ.majority_voting)
+```
+
+```{r, fig.width=12, fig.height=6, warning=FALSE, message=FALSE}
+seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), vjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        rotate_x_labels +
+        ylab("Number of cells") + xlab("") + ggtitle("Developing_Human_Organs Annotation")
+```
+
+```{r, fig.height=8, fig.width=14}
+p1 <- seu@meta.data %>%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             y = fetal_organ.prob_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels +
+  ggtitle("Celltypist labels confidence scores (majority voting)")
+
+p2 <- seu@meta.data %>%
+  ggplot(aes(x = fetal_organ.majority_voting,
+             y = fetal_organ.decision_vote)) +
+  geom_violin(scale = "area") +
+  geom_quasirandom(aes(color = fetal_organ.majority_voting)) +
+  theme_cowplot(12) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+  NoLegend() +
+  rotate_x_labels
+
+p1 | p2
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+       ggplot(aes(x = fetal_organ.majority_voting, y = nCount_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = fetal_organ.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend +
+       rotate_x_labels +
+       ggtitle("QC metrics by cell type")
+
+p2 <- seu@meta.data %>%
+       ggplot(aes(x = fetal_organ.majority_voting, y = nFeature_RNA)) +
+       geom_violin(scale = "area") +
+       geom_quasirandom(aes(colour = fetal_organ.majority_voting)) +
+       scale_y_log10() +
+       theme_cowplot(12) +
+       rotate_x_labels +
+       scale_colour_manual(values = ALL_CELL_TYPE_COLOURS) +
+       no_legend
+
+p1 + p2
+```
+
+```{r, fig.asp=2}
+alluvial_df <- createAlluvialLongDF(colnames(seu), seu$fetal_organ.predicted_labels, seu$fetal_organ.majority_voting)
+
+ggplot(alluvial_df,
+       aes(x = label, alluvium = names, stratum = label_type, fill = label_type, 
+           label = label_type)) +
+  geom_flow(stat = "alluvium", lode.guidance = "backward", alpha = 0.5, 
+            segments = 100) +
+  geom_stratum(alpha = 0.5) + 
+  theme_cowplot(12) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  scale_color_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  ggtitle("Flow between each stage of Celltypist labels") +
+  geom_text(stat = "stratum", size = 2, check_overlap = TRUE) +
+  scale_x_discrete(labels = c("predicted_labels", "majority_voting")) +
+  ylab("Number of cells")
+```
+
+```{r, fig.width=15, fig.height=10}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=..count..), hjust=-0.25) +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS) +
+        no_legend +
+        ylab("Count") +
+        ylim(0, unname(max(table(seu$fetal_organ.majority_voting))) + 100) + 
+        coord_flip() +
+        ggtitle("Number of cells by cell type")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = Sample.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_SAMPLES_COLOURS.PAPER[levels(seu$Sample.Paper)]) +
+        ggtitle("Cell type proportions by sample")
+
+p3 <- seu@meta.data %>%
+        ggplot(aes(x = fetal_organ.majority_voting, fill = Donor.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        no_y_labels +
+        bottom_legend +
+        ylab("Proportion") +
+        coord_flip() +
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu$Donor.Paper)]) +
+        ggtitle("Cell type proportions by donor")
+
+p1 + p2
+p1 + p3
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.majority_voting)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by donor")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = fetal_organ.majority_voting)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.majority_voting)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by donor")
+
+p1 + p2
+```
+
+```{r, fig.width=14, fig.height=8}
+p1 <- seu@meta.data %>%
+        ggplot(aes(x = factor(gest_age_weeks), fill = fetal_organ.majority_voting)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.majority_voting)])  +
+        no_legend +
+        ggtitle("Number of cells per cell type by gestational age") +
+        xlab("Gestational age (weeks)") +
+        facet_grid(.~seu$Donor.gest_age, scales = "free", space = "free")
+
+p2 <- seu@meta.data %>%
+        ggplot(aes(x = factor(gest_age_weeks), fill = fetal_organ.majority_voting)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu$fetal_organ.majority_voting)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cell types by gestational age") +
+        xlab("Gestational age (weeks)") +
+        facet_grid(.~seu$Donor.gest_age, scales = "free", space = "free")
+
+p1 + p2
+```
+
+## Compare the references
+
+```{r, fig.asp=2}
+alluvial_df <- createAlluvialLongDF(colnames(seu), seu$pan_fetal.predicted_labels, seu$fetal_organ.predicted_labels)
+
+ggplot(alluvial_df,
+       aes(x = label, alluvium = names, stratum = label_type, fill = label_type, 
+           label = label_type)) +
+  geom_flow(stat = "alluvium", lode.guidance = "backward", alpha = 0.5, 
+            segments = 100) +
+  geom_stratum(alpha = 0.5) + 
+  theme_cowplot(12) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  scale_color_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  ggtitle("Flow between Celltypist labels from different references") +
+  geom_text(stat = "stratum", size = 2, check_overlap = TRUE) +
+  scale_x_discrete(labels = c("pan_fetal.predicted_labels", "fetal_organ.predicted_labels")) +
+  ylab("Number of cells")
+```
+
+```{r, fig.asp=2}
+alluvial_df <- createAlluvialLongDF(colnames(seu), seu$pan_fetal.majority_voting, seu$fetal_organ.majority_voting)
+
+ggplot(alluvial_df,
+       aes(x = label, alluvium = names, stratum = label_type, fill = label_type, 
+           label = label_type)) +
+  geom_flow(stat = "alluvium", lode.guidance = "backward", alpha = 0.5, 
+            segments = 100) +
+  geom_stratum(alpha = 0.5) + 
+  theme_cowplot(12) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  scale_color_manual(values = c(ALL_CELL_TYPE_COLOURS)) +
+  ggtitle("Flow between Celltypist labels from different references") +
+  geom_text(stat = "stratum", size = 2, check_overlap = TRUE) +
+  scale_x_discrete(labels = c("pan_fetal.majority_voting", "fetal_organ.majority_voting")) +
+  ylab("Number of cells")
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

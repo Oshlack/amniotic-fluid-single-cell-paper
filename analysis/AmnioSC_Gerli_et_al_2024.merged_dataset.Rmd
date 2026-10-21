@@ -1,0 +1,263 @@
+---
+title: "Merging our dataset with the Gerli et al. (2024) dataset"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(Polychrome)
+library(dplyr)
+library(workflowr)
+library(here)
+library(sessioninfo)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load in the integrated dataset
+
+```{r}
+seu.Gerli <- readRDS(here("data", "Gerli_et_al_2024", 
+                              "Gerli_et_al_2024.Celltypist_annotated.Seurat.rds"))
+seu.Gerli$Dataset_Source <- "Gerli et al. (2024)"
+
+dim(seu.Gerli)
+```
+
+```{r}
+# add in our refined labels (cells with low quality/doublet labels are removed from this object)
+seu.Gerli_filtered <- readRDS(here("data", "Gerli_et_al_2024", "Gerli_et_al_2024.Refined_labels.Seurat.rds"))
+
+seu.Gerli$manuscript_cluster_labels <- "REMOVED"
+seu.Gerli@meta.data[colnames(seu.Gerli_filtered),"manuscript_cluster_labels"] <- as.character(seu.Gerli_filtered$cluster_names)
+
+rm(seu.Gerli_filtered)
+gc()
+```
+
+```{r}
+seu.AmnioSC <- readRDS(here("data", "workflow", 
+                                "AmnioSC_ALL_optimised_ref.Celltypist_annotated.Seurat.rds"))
+seu.AmnioSC$Dataset_Source <- "Our Dataset"
+
+dim(seu.AmnioSC)
+```
+
+```{r}
+# add in our refined labels (cells with low quality/doublet labels are removed from this object)
+seu.AmnioSC_filtered <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+
+seu.AmnioSC$manuscript_cluster_labels <- "REMOVED"
+seu.AmnioSC@meta.data[colnames(seu.AmnioSC_filtered),"manuscript_cluster_labels"] <- as.character(seu.AmnioSC_filtered$cluster_names)
+
+rm(seu.AmnioSC_filtered)
+gc()
+```
+
+# Try a simple merge of the raw counts
+
+```{r}
+common_genes <- intersect(rownames(seu.AmnioSC), rownames(seu.Gerli))
+length(common_genes)
+
+intersect(colnames(seu.AmnioSC@meta.data), colnames(seu.Gerli@meta.data))
+```
+
+```{r}
+cols_to_merge <- c("Dataset", "Dataset_Source", "Sample", "Donor", "Barcode", 
+                   "foetal_sex", "pan_fetal.predicted_labels", "pan_fetal.majority_voting", 
+                   "pan_fetal.prob_pred", "pan_fetal.prob_vote", "pan_fetal.decision_pred", 
+                   "pan_fetal.decision_vote", "fetal_organ.predicted_labels", 
+                   "fetal_organ.majority_voting", "fetal_organ.prob_pred", 
+                   "fetal_organ.prob_vote", "fetal_organ.decision_pred", "fetal_organ.decision_vote", 
+                   "cmv_status", "gest_age_weeks", "Donor.gest_age", "manuscript_cluster_labels")
+
+object <- here("data", "merged", "AmnioSC.Gerli_et_al_2024.Preprocessed_Merged.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  # create Seurat object
+  metadata_df <- rbind(seu.AmnioSC@meta.data[,cols_to_merge],
+                       seu.Gerli@meta.data[,cols_to_merge])
+  
+  seu <- CreateSeuratObject(counts = cbind(GetAssayData(object = seu.AmnioSC, assay = "RNA", 
+                                                        slot = "counts")[common_genes,],
+                                           GetAssayData(object = seu.Gerli, assay = "RNA", 
+                                                        slot = "counts")[common_genes,]),
+                            meta.data = metadata_df)
+  
+  seu$early_late_gestation <- ifelse(seu$gest_age_weeks <= 19, "Early",
+                                ifelse(seu$gest_age_weeks >= 23, "Late", 
+                                       "Mid"))
+  
+  # rename batch variable
+  seu$Dataset_Batch <- seu$Dataset
+  seu$Dataset <- NULL
+  
+  # match our name formatting
+  seu$Donor.Paper <- ifelse(seu$Donor %in% names(DONOR.PAPER), DONOR.PAPER[seu$Donor], seu$Donor)
+  seu$Sample.Paper <- ifelse(seu$Sample %in% names(SAMPLE.PAPER), SAMPLE.PAPER[seu$Sample], seu$Sample)
+  
+  # add extra metadata
+  combined_metadata <- readr::read_csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+  combined_metadata <- as.data.frame(combined_metadata)
+  rownames(combined_metadata) <- combined_metadata$Sample
+  
+  combined_metadata <- combined_metadata[seu$Donor,]
+  rownames(combined_metadata) <- colnames(seu)
+  
+  stopifnot(combined_metadata$gest_age == seu$gest_age_weeks)
+  stopifnot(combined_metadata$foetal_sex == seu$foetal_sex)
+  stopifnot(combined_metadata$dataset_batch == seu$Dataset_Batch)
+  
+  seu@meta.data <- cbind(seu@meta.data, combined_metadata[,c("trimester", "abnormalities", "outcome", "procedure")])
+  
+  saveRDS(seu, object)
+} else {
+  seu <- readRDS(object)
+}
+
+rm(seu.Gerli)
+rm(seu.AmnioSC)
+gc()
+```
+
+```{r}
+table(seu$Donor.Paper)
+table(seu$Sample.Paper)
+```
+
+```{r}
+table(seu$Dataset_Source)
+table(seu$Dataset_Batch, seu$Dataset_Source)
+table(seu$Donor, seu$Dataset_Source)
+table(seu$gest_age_weeks, seu$Dataset_Source)
+```
+
+```{r}
+gc()
+object <- here("data", "merged", "AmnioSC.Gerli_et_al_2024.DimRed_Merged.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  # need to change this so SCTransform stops crashing
+  options(future.globals.maxSize = 8000 * 1024^2)
+  seu <- SCTransform(seu, method = "glmGamPoi")
+  gc()
+  seu <- RunPCA(seu, verbose = FALSE)
+  gc()
+  seu <- RunUMAP(seu, dims = 1:30, verbose = FALSE)
+  saveRDS(seu, object)
+} else {
+  seu <- readRDS(object)
+}
+gc()
+```
+
+```{r}
+DimPlot(seu, group.by = "Dataset_Source")
+DimPlot(seu, group.by = "Dataset_Batch")
+```
+
+# Try integrating the two datasets
+
+```{r}
+gc()
+object <- here("data", "merged", "AmnioSC.Gerli_et_al_2024.Integrated.Seurat.rds")
+if (!file.exists(object) | RERUN_ALL) {
+  seu <- readRDS(here("data", "merged", "AmnioSC.Gerli_et_al_2024.Preprocessed_Merged.Seurat.rds"))
+  
+  seu <- seu[, which(seu$pan_fetal.majority_voting != "HIGH_MITO")]
+  seu <- seu[, which(seu$pan_fetal.majority_voting != "DOUBLET_LYMPHOID_MACROPHAGE")]
+  seu <- seu[, seu$pan_fetal.majority_voting != "LOW_QUALITY"]
+  gc()
+  seu_int <- integrateDataset(seu, "Dataset_Source")
+  saveRDS(seu_int, object)
+} else {
+  seu_int <- readRDS(object)
+}
+gc()
+```
+
+```{r}
+dim(seu_int)
+```
+
+```{r}
+DimPlot(seu_int, group.by = "Dataset_Source")
+DimPlot(seu_int, group.by = "Dataset_Batch")
+
+DimPlot(seu_int, group.by = "gest_age_weeks")
+DimPlot(seu_int, group.by = "early_late_gestation") + scale_color_manual(values = ALL_GEST_COLOURS)
+DimPlot(seu_int, group.by = "outcome")
+DimPlot(seu_int, group.by = "procedure")
+DimPlot(seu_int, group.by = "cmv_status")
+DimPlot(seu_int, group.by = "trimester")
+```
+
+```{r, fig.width=12, fig.height=12}
+DimPlot(seu_int, group.by = "pan_fetal.majority_voting") + 
+  scale_color_manual(values = ALL_CELL_TYPE_COLOURS) + bottom_legend +
+   guides(color=guide_legend(ncol = 4, override.aes = list(size=2)))
+
+DimPlot(seu_int, group.by = "fetal_organ.majority_voting") + 
+  scale_color_manual(values = ALL_CELL_TYPE_COLOURS) + bottom_legend +
+   guides(color=guide_legend(ncol = 4, override.aes = list(size=2)))
+
+DimPlot(seu_int, group.by = "manuscript_cluster_labels") + 
+  scale_color_manual(values = c(CLUSTER_NAME_COLOURS, CLUSTER_NAME_COLOURS.GERLI)) + bottom_legend +
+   guides(color=guide_legend(ncol = 4, override.aes = list(size=2)))
+```
+
+# Save the objects for upload
+
+```{r}
+# Integrated object with both datasets
+saveRDS(seu_int, here("output", "data_to_upload", "AmnioSC.Gerli_et_al_2024.Integrated.Seurat.rds"))
+
+# Combined metadata for both datasets
+combined_metadata <- readr::read_csv(here("data", "Gerli_et_al_2024", "combined_metadata.csv"))
+readr::write_csv(combined_metadata, here("output", "data_to_upload", "AmnioSC.Gerli_et_al_2024.combined_metadata.csv"))
+
+# Annotated object with just our data
+seu.AmnioSC_filtered <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+
+# Neaten up names for consistency with the integrated dataset
+seu.AmnioSC_filtered$Dataset_Batch <- seu.AmnioSC_filtered$Dataset
+seu.AmnioSC_filtered$Dataset_Source <- "Our Dataset"
+seu.AmnioSC_filtered$Dataset <- NULL
+seu.AmnioSC_filtered@meta.data[, startsWith(colnames(seu.AmnioSC_filtered@meta.data), "integrated_snn")] <- NULL
+
+# remove variables created during subclustering
+seu.AmnioSC_filtered$all_clusters <- NULL
+seu.AmnioSC_filtered$seurat_clusters <- NULL
+
+saveRDS(seu.AmnioSC_filtered, here("output", "data_to_upload", "AmnioSC_optref.Refined_labels.Seurat.rds"))
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

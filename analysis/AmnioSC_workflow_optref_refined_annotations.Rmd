@@ -1,0 +1,363 @@
+---
+title: "Refined annotations - Optimised Reference"
+author: "Calandra Grima"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: cosmo
+    number_sections: true
+---
+
+# Load libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(viridis)
+library(Polychrome)
+
+source(here("code", "helper_functions.R"))
+source(here("code", "load_colour_schemes.R"))
+
+RERUN_ALL <- FALSE
+```
+
+# Load dataset
+
+```{r}
+seu_int <- readRDS(here("data", "workflow", 
+                        "AmnioSC_ALL_optimised_ref.Integrated_clustered.Subclustered.Seurat.rds"))
+seu_int$seurat_clusters <- factor(seu_int$seurat_clusters)
+```
+
+```{r}
+ALL_CLUSTER_COLOURS <- c(light.colors(n = 24), sky.colors(n = 10))
+names(ALL_CLUSTER_COLOURS) <- levels(seu_int$seurat_clusters)
+```
+
+# Find the best labels for cell types and clusters
+
+## Examine labels from each reference and clusters
+
+```{r, fig.asp=1}
+DimPlot(seu_int, reduction = 'umap', group.by = "pan_fetal.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  guides(color=guide_legend(ncol = 3, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', group.by = "fetal_organ.majority_voting",) +
+  scale_colour_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  guides(color=guide_legend(ncol = 3, override.aes = list(size=2))) +
+  bottom_legend
+
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "seurat_clusters") +
+  scale_colour_manual(values = ALL_CLUSTER_COLOURS[levels(seu_int$seurat_clusters)]) +
+  guides(color=guide_legend(nrow = 3, override.aes = list(size=2))) +
+  bottom_legend
+```
+
+```{r, fig.width=16, fig.height=10}
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + xlab("Seurat Clusters") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$pan_fetal.majority_voting)]) +
+  bottom_legend + guides(fill=guide_legend(ncol = 4)) + theme(legend.title=element_blank()) + rotate_x_labels +
+  ggtitle("Pan_Fetal_Human") -> p1
+
+seu_int@meta.data %>%
+  ggplot(aes(x = seurat_clusters,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_cowplot(12) +
+  ylab("Proportion") + xlab("Seurat Clusters") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int$fetal_organ.majority_voting)]) +
+  bottom_legend + guides(fill=guide_legend(ncol = 4)) + theme(legend.title=element_blank()) + rotate_x_labels +
+  ggtitle("Developing_Human_Organs") -> p2
+
+p1 | p2
+```
+
+```{r, fig.width=18, fig.height=6}
+seu_int@meta.data %>%
+    ggplot(aes(x = seurat_clusters,
+               y = nCount_RNA)) +
+    geom_violin(scale = "area") +
+    geom_quasirandom(aes(color = seurat_clusters)) +
+    scale_y_log10() +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_color_manual(values = ALL_CLUSTER_COLOURS) +
+    no_legend + ggtitle("QC Metrics by seurat_clusters") -> p1
+
+seu_int@meta.data %>%
+    ggplot(aes(x = seurat_clusters,
+               y = nFeature_RNA)) +
+    geom_violin(scale = "area") +
+    geom_quasirandom(aes(color = seurat_clusters)) +
+    scale_y_log10() +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_color_manual(values = ALL_CLUSTER_COLOURS) +
+    no_legend -> p2
+
+seu_int@meta.data %>%
+    ggplot(aes(x = seurat_clusters, fill = seurat_clusters)) +
+    geom_bar() +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_fill_manual(values = ALL_CLUSTER_COLOURS) +
+    no_legend -> p3
+  
+p1 | p2 | p3
+```
+
+## Create refined cluster labels
+
+The one-vs-rest marker gene analysis approach does not work well when there are many clusters of the same cell type arising from overclustering. This is especially evident for the keratinocytes and macrophages, thus we will merge these cluster labels.
+
+```{r}
+seu_int$refined_clusters <- as.character(seu_int$seurat_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("0_0", "0_1", "0_2", "0_3", "0_4", "0_5",
+                                                                   "0_7", "0_8"), 
+                                   "Cluster_01", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("0_6"), 
+                                   "Cluster_02", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("1_1"), 
+                                   "Cluster_03", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("1_6", "Dendritic cells"), 
+                                   "Cluster_04", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("1_9"), 
+                                   "Cluster_05", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("1_0", "1_2", "1_3", "1_4", 
+                                                                   "1_5", "1_7", "1_8"), 
+                                   "Cluster_06", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("2_0", "2_1"), 
+                                   "Cluster_07", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("2_2", "2_3", "2_4"), 
+                                   "Cluster_08", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("3_0"), 
+                                   "Cluster_09", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("3_1"), 
+                                   "Cluster_10", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("3_2"), 
+                                   "Cluster_11", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("3_3"), 
+                                   "Cluster_12", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("4"), 
+                                   "Cluster_13", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("5"), 
+                                   "Cluster_14", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("6"), 
+                                   "Cluster_15", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("NK cells / cytotoxic lymphocytes"), 
+                                   "Cluster_16", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- ifelse(seu_int$refined_clusters %in% c("Proliferating cells"), 
+                                   "Cluster_17", 
+                                   seu_int$refined_clusters)
+
+seu_int$refined_clusters <- factor(seu_int$refined_clusters, 
+                                   levels = sort(unique(seu_int$refined_clusters)))
+```
+
+```{r, fig.height=10, fig.width=8}
+DimPlot(seu_int, reduction = 'umap', label = TRUE, label.size = 5, 
+        group.by = "refined_clusters") +
+  scale_color_manual(values = REFINED_CLUSTER_COLOURS) + 
+  guides(color=guide_legend(nrow = 3, override.aes = list(size=2))) + blank_axes +
+  bottom_legend
+```
+
+```{r, fig.width=6, fig.height=6}
+seu_int@meta.data %>%
+    ggplot(aes(x = refined_clusters, fill = refined_clusters)) +
+    geom_bar() +
+    geom_text(aes(label = after_stat(count)), stat = "count", vjust = -0.5) +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_fill_manual(values = REFINED_CLUSTER_COLOURS) +
+    no_legend + ggtitle("Number of cells per cluster") +
+    ylab("Number of cells") + xlab("")
+```
+
+```{r, fig.width=10, fig.height=6}
+seu_int@meta.data %>%
+    ggplot(aes(x = refined_clusters,
+               y = nCount_RNA)) +
+    geom_violin(scale = "area") +
+    geom_quasirandom(aes(color = refined_clusters)) +
+    scale_y_log10() +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_color_manual(values = REFINED_CLUSTER_COLOURS) +
+    no_legend + ggtitle("QC Metrics by refined_clusters") -> p1
+
+seu_int@meta.data %>%
+    ggplot(aes(x = refined_clusters,
+               y = nFeature_RNA)) +
+    geom_violin(scale = "area") +
+    geom_quasirandom(aes(color = refined_clusters)) +
+    scale_y_log10() +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_color_manual(values = REFINED_CLUSTER_COLOURS) +
+    no_legend -> p2
+  
+p1 | p2
+```
+
+```{r}
+seu_int$Donor.Paper <- unname(DONOR.PAPER[seu_int$Donor])
+seu_int$Donor.Paper <- factor(seu_int$Donor.Paper)
+
+seu_int$Sample.Paper <- unname(SAMPLE.PAPER[seu_int$Sample])
+seu_int$Sample.Paper <- factor(seu_int$Sample.Paper)
+```
+
+```{r, fig.width=10, fig.height=6}
+p1 <- seu_int@meta.data %>%
+        ggplot(aes(x = refined_clusters, fill = Donor.Paper)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu_int$Donor.Paper)])  +
+        no_legend + rotate_x_labels + 
+        ggtitle("Number of cells per cluster by donor")
+
+p2 <- seu_int@meta.data %>%
+        ggplot(aes(x = refined_clusters, fill = Donor.Paper)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) + rotate_x_labels + 
+        scale_fill_manual(values = ALL_DONORS_COLOURS.PAPER[levels(seu_int$Donor.Paper)]) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cluster by donor")
+
+p1 + p2
+```
+
+```{r, fig.width=10, fig.height=6}
+p1 <- seu_int@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = refined_clusters)) +
+        geom_bar() +
+        theme_cowplot(12) +
+        scale_fill_manual(values = REFINED_CLUSTER_COLOURS)  +
+        no_legend + rotate_x_labels + 
+        ggtitle("Number of cells per cluster by donor")
+
+p2 <- seu_int@meta.data %>%
+        ggplot(aes(x = Donor.Paper, fill = refined_clusters)) +
+        geom_bar(position = "fill") +
+        theme_cowplot(12) + rotate_x_labels + 
+        scale_fill_manual(values = REFINED_CLUSTER_COLOURS) +
+        guides(fill = guide_legend(ncol = 1)) +
+        ggtitle("Propotion of cluster by donor")
+
+p1 + p2
+```
+
+# Naming the clusters
+
+These names map directly onto the refined clusters but are added to the object for use in plots.
+
+```{r}
+CLUSTER_NAMES <- c(
+  Cluster_01 = "Keratinocytes",
+  Cluster_02 = "Erythroid",
+  Cluster_03 = "Kidney epithelium",
+  Cluster_04 = "Dendritic cells",
+  Cluster_05 = "Fibroblasts / mesenchyme",
+  Cluster_06 = "Macrophages",
+  Cluster_07 = "ILC3",
+  Cluster_08 = "T cells",
+  Cluster_09 = "Unknown",
+  Cluster_10 = "Lung epithelium (low confidence)",
+  Cluster_11 = "Neural crest-like",
+  Cluster_12 = "Lung epithelium",
+  Cluster_13 = "Neuronal-like",
+  Cluster_14 = "Ciliated",
+  Cluster_15 = "Mast cells",
+  Cluster_16 = "NK cells / cytotoxic lymphocytes",
+  Cluster_17 = "Proliferating T cells"
+)
+
+saveRDS(CLUSTER_NAMES, here("data", "workflow", "CLUSTER_NAMES.rds"))
+```
+
+```{r}
+seu_int$cluster_names <- unname(CLUSTER_NAMES[seu_int$refined_clusters])
+seu_int$cluster_names <- sortedFactor(seu_int$cluster_names)
+```
+
+```{r, fig.width=6, fig.height=6}
+seu_int@meta.data %>%
+    ggplot(aes(x = cluster_names, fill = cluster_names)) +
+    geom_bar() +
+    geom_text(aes(label = after_stat(count)), stat = "count", vjust = -0.5) +
+    theme_cowplot(12) + rotate_x_labels +
+    scale_fill_manual(values = CLUSTER_NAME_COLOURS) +
+    no_legend + ggtitle("Number of cells per cluster") +
+    ylab("Number of cells") + xlab("")
+```
+
+```{r, fig.width=8, fig.height=8}
+DimPlot(seu_int, group.by = "cluster_names") +
+  scale_color_manual(values = CLUSTER_NAME_COLOURS)
+```
+
+```{r}
+saveRDS(seu_int, here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+# Session info
+
+<summary>This analysis was performed using the following software (click triangle to expand)</summary>
+<details>
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

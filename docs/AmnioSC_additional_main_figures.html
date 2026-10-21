@@ -1,0 +1,2658 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Calandra Grima" />
+
+<meta name="date" content="2026-10-21" />
+
+<title>Main figures for manuscript</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">AmnioSC Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Main figures for manuscript</h1>
+<h4 class="author">Calandra Grima</h4>
+<h4 class="date">2026-10-21</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-10-21
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>amniosinglecell/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220125code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220125)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220125code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220125)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree650c8b031c66148bbf4523c0dee5ab1c3d177f04targetblank650c8b0a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/650c8b031c66148bbf4523c0dee5ab1c3d177f04" target="_blank">650c8b0</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree650c8b031c66148bbf4523c0dee5ab1c3d177f04targetblank650c8b0a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/650c8b031c66148bbf4523c0dee5ab1c3d177f04" target="_blank">650c8b0</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/generate_site.R
+    Ignored:    analysis/knit_docs.R
+    Ignored:    analysis/run_as_job.R
+    Ignored:    analysis/sccomp_draws_files/
+    Ignored:    celltypist/.DS_Store
+    Ignored:    data/
+    Ignored:    excluded_analysis/
+    Ignored:    output/
+    Ignored:    renv/.DS_Store
+    Ignored:    renv/library/
+    Ignored:    renv/staging/
+    Ignored:    sccomp_draws_files/
+
+Untracked files:
+    Untracked:  AmnioSC_Manuscript_Claude/
+    Untracked:  claude_log/
+
+Unstaged changes:
+    Modified:   copy_to_publication_repo.sh
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/AmnioSC_additional_main_figures.Rmd</code>) and HTML
+(<code>docs/AmnioSC_additional_main_figures.html</code>) files. If
+you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/AmnioSC_additional_main_figures.html" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/82e2b39cf35e4d999098bb7c90642c9eac96aa21/analysis/AmnioSC_additional_main_figures.Rmd" target="_blank">82e2b39</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+<td>
+wflow_publish(here("analysis", "AmnioSC_additional_main_figures.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/827d4a943666f8a17336a743d96d667296958f77/docs/AmnioSC_additional_main_figures.html" target="_blank">827d4a9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/d1d3c15a58a98bc9dd50a9134d3746a010049a63/analysis/AmnioSC_additional_main_figures.Rmd" target="_blank">d1d3c15</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+<td>
+wflow_publish(here("analysis", "AmnioSC_additional_main_figures.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/AmnioSC_additional_main_figures.html" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/216da05b2cb37f756ca8f34b7d984ef09fbc3fb1/analysis/AmnioSC_additional_main_figures.Rmd" target="_blank">216da05</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+wflow_publish(here("analysis", "AmnioSC_additional_main_figures.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/73a625c614ea89af956c22a460c3eccc2c8abcf9/analysis/AmnioSC_additional_main_figures.Rmd" target="_blank">73a625c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+rename main figures page
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/73a625c614ea89af956c22a460c3eccc2c8abcf9/docs/AmnioSC_additional_main_figures.html" target="_blank">73a625c</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+<td>
+rename main figures page
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(Seurat)
+library(SeuratObject)
+library(clustree)
+library(scater)
+library(stringr)
+library(ggplot2)
+library(ggbeeswarm)
+library(cowplot)
+library(patchwork)
+library(egg)
+library(workflowr)
+library(here)
+library(sessioninfo)
+library(viridis)
+library(Polychrome)
+library(magick)
+library(png)
+library(ggplot2)
+library(grid)
+library(limma)
+library(edgeR)
+library(ggtext)
+library(dplyr)
+library(tidyverse)
+library(ggplotify)
+
+source(here(&quot;code&quot;, &quot;helper_functions.R&quot;))
+source(here(&quot;code&quot;, &quot;load_colour_schemes.R&quot;))
+source(here(&quot;code&quot;, &quot;limma_barcodeplot_custom.R&quot;))
+# using customised version of the barcodeplot function to make the font size bigger and change shade of background colour
+# as cannot pass cex arguments to the original barcodeplot function
+# https://support.bioconductor.org/p/119752/
+source(here(&quot;code&quot;, &quot;seurat_dotplot_custom.R&quot;))
+# using customised version of DotPlot function to fix the ggplot2 facet_grid() defunct error
+# https://github.com/satijalab/seurat/issues/10143
+
+RERUN_ALL &lt;- FALSE</code></pre>
+<div id="figure-1" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Figure 1</h1>
+<div id="generate-the-plots" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Generate the
+plots</h2>
+<p>The <code>seu_int.AmnioSC</code> object was generated on <a
+href="AmnioSC_workflow_optref_refined_annotations.html">this
+page</a>.</p>
+<pre class="r"><code>seu_int.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds&quot;))</code></pre>
+<pre class="r"><code>fig1.n_cells_clusters &lt;- plotNCells.Paper(seu_int.AmnioSC, x_var = &quot;cluster_names&quot;, 
+                                          color_by = &quot;cluster_names&quot;, 
+                                          colour_scheme = CLUSTER_NAME_COLOURS, 
+                                          title = &quot;Number of cells per cluster&quot;, 
+                                          subtitle=&quot;&quot;,
+                                          xlab = &quot;&quot;, ylab = &quot;Number of cells&quot;, ymax = 6200)
+fig1.n_cells_clusters</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-2-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-2-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig1.n_cells_clusters, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig1.n_cells_clusters.rds&quot;))</code></pre>
+<pre class="r"><code>fig1.umap_clusters &lt;- plotUMAP.Paper(seu_int.AmnioSC, color_by = &quot;cluster_names&quot;, 
+                                     colour_scheme = CLUSTER_NAME_COLOURS, 
+                                     title = &quot;&quot;, subtitle=&quot;&quot;, label_size = 6) </code></pre>
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette(&quot;ggplot2-in-packages&quot;)` for more information.
+ℹ The deprecated feature was likely used in the Seurat package.
+  Please report the issue at &lt;https://github.com/satijalab/seurat/issues&gt;.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<pre><code>Warning in geom.use(data = labels.loc, mapping = aes_string(x = xynames[&quot;x&quot;], :
+Ignoring unknown parameters: `fill`</code></pre>
+<pre class="r"><code>fig1.umap_clusters</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-3-1.png" alt="" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-3-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig1.umap_clusters, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig1.umap_clusters.rds&quot;))</code></pre>
+<pre class="r"><code>AmnioSC.canonical_markers.reduced &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.canonical_markers.reduced.rds&quot;))
+AmnioSC.canonical_markers.reduced &lt;- AmnioSC.canonical_markers.reduced[levels(seu_int.AmnioSC$cluster_names)]
+
+canonical_markers.reduced &lt;- unique(unlist(AmnioSC.canonical_markers.reduced, use.names = FALSE))
+canonical_markers.reduced &lt;- filterPresentGenes(canonical_markers.reduced, seu_int.AmnioSC)
+
+seu_int.AmnioSC$cluster_names.rev &lt;- sortedFactor(seu_int.AmnioSC$cluster_names, decreasing = FALSE)
+
+DotPlot.custom(object = seu_int.AmnioSC, features = canonical_markers.reduced, assay = &quot;SCT&quot;,
+        group.by = &quot;cluster_names.rev&quot;, col.max = 5) +
+  geom_point(aes(size=pct.exp), shape = 21, colour=&quot;black&quot;, stroke=0.5) +
+  scale_size(&quot;% detected&quot;, range = c(0,6)) +
+  scale_color_gradient(low = &quot;gray95&quot;, high = &quot;#39157B&quot;,
+                       guide = guide_colorbar(ticks.colour = &quot;black&quot;,
+                                              frame.colour = &quot;black&quot;),
+                       name = &quot;Average\nexpression&quot;) +
+  ggtitle(&quot;Selected canonical marker genes&quot;) + 
+  theme_linedraw() + rotate_x_labels +
+  labs(subtitle = &quot;Our Dataset&quot;) +
+   ylab(&quot;&quot;) + xlab(&quot;&quot;) +
+  theme(plot.title = element_markdown(size = 24, face = &quot;bold&quot;, family = &quot;arial&quot;),
+        plot.subtitle = element_markdown(size = 22, face = &quot;italic&quot;, family = &quot;arial&quot;),
+        legend.title = element_text(size = 20, face = &quot;bold.italic&quot;, family = &quot;arial&quot;),
+        legend.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.y = element_text(size = 22, family = &quot;arial&quot;, face = &quot;bold&quot;),
+        axis.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.x = element_markdown(family = &quot;arial&quot;, size = 22, face = &quot;bold&quot;),
+        strip.text = element_text(face = &quot;bold&quot;, size = 22)) -&gt; fig1.dotplot_clusters</code></pre>
+<pre><code>Scale for size is already present.
+Adding another scale for size, which will replace the existing scale.
+Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<pre class="r"><code>fig1.dotplot_clusters</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-4-1.png" alt="" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-4-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig1.dotplot_clusters, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig1.dotplot_clusters.rds&quot;))</code></pre>
+</div>
+<div id="arrange-the-plots" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Arrange the
+plots</h2>
+<pre class="r"><code>diagram1 &lt;- image_read(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;AmnioSC_diagram.png&quot;))
+fig1.diagram1&lt;- rasterGrob(diagram1, interpolate = TRUE)
+
+diagram2 &lt;- image_read(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;CombinedMeta_Diagram.png&quot;))
+fig1.diagram2 &lt;- rasterGrob(diagram2, interpolate = TRUE)
+
+# fig1.n_cells_clusters &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, 
+#                                       &quot;fig1.n_cells_clusters.rds&quot;))
+# fig1.umap_clusters &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, 
+#                                    &quot;fig1.umap_clusters.rds&quot;))
+# fig1.dotplot_clusters &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, 
+#                                       &quot;fig1.dotplot_clusters.rds&quot;))</code></pre>
+<pre class="r"><code>layout = &quot;
+AAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAA
+BBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBBBBBBBBBBBBBBBBBBBBBB
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+CCCCCCCCCCCCCCDDDDDDDDDDD
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+EEEEEEEEEEEEEEEEEEEEEEEEE
+&quot;
+wrap_elements(full = fig1.diagram1) + wrap_elements(full = fig1.diagram2) +
+  wrap_elements(fig1.umap_clusters + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) + 
+  wrap_elements(fig1.n_cells_clusters + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) + 
+  wrap_elements(fig1.dotplot_clusters + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) + 
+  plot_layout(design = layout) + 
+  plot_annotation(tag_levels = list(c(&quot;A&quot;, &quot; &quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;, &quot;H&quot;))) &amp;
+  theme(
+    plot.tag = element_text(size = 30, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.title = element_text(size = 20, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.text = element_text(size = 16, family = &quot;arial&quot;),
+    legend.title = element_text(size = 16, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    legend.text = element_text(size = 16, family = &quot;arial&quot;)) -&gt; fig1
+fig1</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-6-1.png" alt="" width="2400" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-6-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>ggsave(plot = fig1, filename = here(&quot;output&quot;, &quot;figures_png&quot;, &quot;fig1.png&quot;), height = 30, width = 25)</code></pre>
+</div>
+</div>
+<div id="figure-2" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Figure 2</h1>
+<div id="generate-the-plots-1" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Generate the
+plots</h2>
+<p>The <code>seu_int.AmnioSC</code> object was generated on <a
+href="AmnioSC_workflow_optref_refined_annotations.html">this
+page</a>.</p>
+<pre class="r"><code>seu_int.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds&quot;))
+seu_int.AmnioSC &lt;- seu_int.AmnioSC[, seu_int.AmnioSC$Donor != &quot;5AF&quot;]
+
+CLUSTER_NAME_COLOURS.SELECTED &lt;- c(CLUSTER_NAME_COLOURS[c(7, 10, 12)], &quot;grey&quot;)
+names(CLUSTER_NAME_COLOURS.SELECTED) &lt;- c(&quot;ILC3&quot;, &quot;Lung epithelium (low confidence)&quot;, &quot;Lung epithelium&quot;, &quot;Other Clusters&quot;)
+
+seu_int.AmnioSC$cluster_names.selected &lt;- ifelse(as.character(seu_int.AmnioSC$cluster_names) %in% c(&quot;ILC3&quot;, 
+                                                                                          &quot;Lung epithelium (low confidence)&quot;, 
+                                                                                          &quot;Lung epithelium&quot;),
+                                            as.character(seu_int.AmnioSC$cluster_names), 
+                                            &quot;Other Clusters&quot;)
+
+table(seu_int.AmnioSC$cluster_names, seu_int.AmnioSC$cluster_names.selected) # sanity check </code></pre>
+<pre><code>                                  
+                                   ILC3 Lung epithelium
+  Keratinocytes                       0               0
+  Macrophages                         0               0
+  ILC3                              826               0
+  Erythroid                           0               0
+  T cells                             0               0
+  Neuronal-like                       0               0
+  Kidney epithelium                   0               0
+  Unknown                             0               0
+  Lung epithelium (low confidence)    0               0
+  Dendritic cells                     0               0
+  Neural crest-like                   0               0
+  Lung epithelium                     0             111
+  Ciliated                            0               0
+  Mast cells                          0               0
+  Proliferating T cells               0               0
+  NK cells / cytotoxic lymphocytes    0               0
+  Fibroblasts / mesenchyme            0               0
+                                  
+                                   Lung epithelium (low confidence)
+  Keratinocytes                                                   0
+  Macrophages                                                     0
+  ILC3                                                            0
+  Erythroid                                                       0
+  T cells                                                         0
+  Neuronal-like                                                   0
+  Kidney epithelium                                               0
+  Unknown                                                         0
+  Lung epithelium (low confidence)                              290
+  Dendritic cells                                                 0
+  Neural crest-like                                               0
+  Lung epithelium                                                 0
+  Ciliated                                                        0
+  Mast cells                                                      0
+  Proliferating T cells                                           0
+  NK cells / cytotoxic lymphocytes                                0
+  Fibroblasts / mesenchyme                                        0
+                                  
+                                   Other Clusters
+  Keratinocytes                              4698
+  Macrophages                                 937
+  ILC3                                          0
+  Erythroid                                   249
+  T cells                                     310
+  Neuronal-like                               133
+  Kidney epithelium                           314
+  Unknown                                     257
+  Lung epithelium (low confidence)              0
+  Dendritic cells                             101
+  Neural crest-like                            69
+  Lung epithelium                               0
+  Ciliated                                     92
+  Mast cells                                   51
+  Proliferating T cells                        27
+  NK cells / cytotoxic lymphocytes             31
+  Fibroblasts / mesenchyme                     34</code></pre>
+<pre class="r"><code>fig2.umap_early_late &lt;- DimPlot(seu_int.AmnioSC, reduction = &#39;umap&#39;, group.by = &quot;cluster_names.selected&quot;,
+        split.by = &quot;early_late_gestation&quot;, pt.size = 1) + 
+  scale_color_manual(values = CLUSTER_NAME_COLOURS.SELECTED) +
+  theme_linedraw(base_size = 16) + blank_axes + bottom_legend +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+        strip.text = element_text(face = &quot;bold&quot;, family = &quot;arial&quot;, size = 18),
+        plot.title = element_text(face = &quot;bold&quot;, family = &quot;arial&quot;, hjust = 0.5, size = 24),
+        legend.text = element_text(size = 18, family = &quot;arial&quot;)) +
+  ggtitle(&quot;Clusters by Gestational Age Group&quot;) + 
+  guides(color=guide_legend(nrow = 1, override.aes = list(size=3)))
+
+fig2.umap_early_late</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-8-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-8-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig2.umap_early_late, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.umap_early_late.rds&quot;))</code></pre>
+<p>The <code>sccomp_result</code> object was generated on <a
+href="AmnioSC_workflow_optref_cluster_proportions_sccomp.html">this
+page</a>.</p>
+<pre class="r"><code>sccomp_result &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.sccomp_result.rds&quot;))
+
+prop_df &lt;- generateGroupProportionsDF(seu_int.AmnioSC[,seu_int.AmnioSC$Donor != &quot;5AF&quot;],
+                                      group_var = &quot;cluster_names&quot;)</code></pre>
+<pre class="r"><code>fig2.prop_cluster07 &lt;- plotProportion.Paper(prop_df, curr_cluster = &quot;ILC3&quot;, 
+                                            title = &quot;ILC3&lt;br&gt;&quot;, 
+                                            sccomp_result, font_scaling = 4)
+fig2.prop_cluster10 &lt;- plotProportion.Paper(prop_df, curr_cluster = &quot;Lung epithelium (low confidence)&quot;, 
+                                            title = &quot;Lung epithelium&lt;br&gt;(low confidence)&quot;, 
+                                            sccomp_result, font_scaling = 4)
+fig2.prop_cluster12 &lt;- plotProportion.Paper(prop_df, curr_cluster = &quot;Lung epithelium&quot;, 
+                                            title = &quot;Lung epithelium&lt;br&gt;&quot;, 
+                                            sccomp_result, font_scaling = 4)
+
+fig2.prop_cluster07</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-1.png" alt="" width="384" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-1.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/827d4a943666f8a17336a743d96d667296958f77/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-1.png" target="_blank">827d4a9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>fig2.prop_cluster10</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-2.png" alt="" width="384" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-2">
+Past versions of unnamed-chunk-10-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-2.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/827d4a943666f8a17336a743d96d667296958f77/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-2.png" target="_blank">827d4a9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-2.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>fig2.prop_cluster12</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-3.png" alt="" width="384" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-3">
+Past versions of unnamed-chunk-10-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-3.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/827d4a943666f8a17336a743d96d667296958f77/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-3.png" target="_blank">827d4a9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-10-3.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig2.prop_cluster07, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster07.rds&quot;))
+saveRDS(fig2.prop_cluster10, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster10.rds&quot;))
+saveRDS(fig2.prop_cluster12, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster12.rds&quot;))</code></pre>
+<p>The <code>cds</code> object was generated on <a
+href="AmnioSC_workflow_optref_trajectory_lung.html">this page</a>.</p>
+<pre class="r"><code>cds &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.lung_pseudotime.rds&quot;))
+
+seu_int.AmnioSC$lung_pseudotime &lt;- NA
+seu_int.AmnioSC$lung_pseudotime[names(monocle3::pseudotime(cds))] &lt;- monocle3::pseudotime(cds)</code></pre>
+<pre class="r"><code>FeaturePlot(seu_int.AmnioSC, reduction = &quot;umap&quot;, features = &quot;lung_pseudotime&quot;, pt.size = 4) +
+  scale_color_viridis(option = &quot;viridis&quot;, direction = 1, na.value = &quot;grey&quot;) +
+  theme_void() + blank_axes + 
+  ggtitle(&quot;Pseudotime for Lung Epithelium Clusters&lt;br&gt;&quot;) +
+  bottom_legend +
+  labs(color = &quot;Pseudotime\n&quot;) +
+  theme(plot.title = element_markdown(face = &quot;bold&quot;, size = 24, hjust = 0.5, family = &quot;arial&quot;),
+        legend.key.width=unit(0.05,&quot;npc&quot;),
+        legend.title = element_text(face = &quot;bold.italic&quot;, size = 16),
+        legend.text = element_text(size = 14)) +
+  coord_cartesian(xlim = c(-4, 2), ylim = c(-15, -9)) -&gt; fig2.lung_pseudotime</code></pre>
+<pre><code>Scale for colour is already present.
+Adding another scale for colour, which will replace the existing scale.</code></pre>
+<pre class="r"><code>fig2.lung_pseudotime</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-12-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-12-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig2.lung_pseudotime, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.lung_pseudotime&quot;))</code></pre>
+<pre class="r"><code>lung_genes &lt;- c(&quot;SFTPB&quot;, &quot;SFTPC&quot;, &quot;SFTPD&quot;, &quot;ABCA3&quot;, &quot;NKX2-1&quot;, &quot;SCGB3A2&quot;, &quot;VEGFA&quot;)
+
+seu_int.AmnioSC.early_late &lt;- seu_int.AmnioSC[, seu_int.AmnioSC$Donor.Paper != &quot;AF_4&quot;]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat &lt;- as.matrix(seu_int.AmnioSC.early_late[[&quot;SCT&quot;]]@data[lung_genes,])
+meta &lt;- seu_int.AmnioSC.early_late@meta.data %&gt;% dplyr::select(refined_clusters, early_late_gestation, cluster_names)
+
+meta &lt;- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)</code></pre>
+<pre><code>                        refined_clusters early_late_gestation     cluster_names
+01_1_AAACCCAAGAGCACTG-1       Cluster_06                 Late       Macrophages
+01_1_AAACGCTTCACACCGG-1       Cluster_01                 Late     Keratinocytes
+01_1_AAAGAACTCATCACCC-1       Cluster_06                 Late       Macrophages
+01_1_AAAGGATTCGTAACTG-1       Cluster_01                 Late     Keratinocytes
+01_1_AAAGGGCGTGTGGACA-1       Cluster_09                 Late           Unknown
+01_1_AAAGGTATCGAGTGAG-1       Cluster_11                 Late Neural crest-like
+                        SFTPB SFTPC SFTPD ABCA3 NKX2-1 SCGB3A2 VEGFA
+01_1_AAACCCAAGAGCACTG-1     0     0     0     0      0       0     0
+01_1_AAACGCTTCACACCGG-1     0     0     0     0      0       0     0
+01_1_AAAGAACTCATCACCC-1     0     0     0     0      0       0     0
+01_1_AAAGGATTCGTAACTG-1     0     0     0     0      0       0     0
+01_1_AAAGGGCGTGTGGACA-1     0     0     0     0      0       0     0
+01_1_AAAGGTATCGAGTGAG-1     0     0     0     0      0       0     0</code></pre>
+<pre class="r"><code>meta &lt;- pivot_longer(meta, -c(refined_clusters, early_late_gestation, cluster_names), names_to=&quot;Gene&quot;, values_to=&quot;Expression&quot;)
+head(meta)</code></pre>
+<pre><code># A tibble: 6 × 5
+  refined_clusters early_late_gestation cluster_names Gene    Expression
+  &lt;fct&gt;            &lt;chr&gt;                &lt;fct&gt;         &lt;chr&gt;        &lt;dbl&gt;
+1 Cluster_06       Late                 Macrophages   SFTPB            0
+2 Cluster_06       Late                 Macrophages   SFTPC            0
+3 Cluster_06       Late                 Macrophages   SFTPD            0
+4 Cluster_06       Late                 Macrophages   ABCA3            0
+5 Cluster_06       Late                 Macrophages   NKX2-1           0
+6 Cluster_06       Late                 Macrophages   SCGB3A2          0</code></pre>
+<pre class="r"><code>meta_summary &lt;- meta %&gt;%
+  group_by(refined_clusters, early_late_gestation, cluster_names, Gene) %&gt;%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression &gt; 0) / length(Expression) * 100)</code></pre>
+<pre><code>`summarise()` has regrouped the output.
+ℹ Summaries were computed grouped by refined_clusters, early_late_gestation,
+  cluster_names, and Gene.
+ℹ Output is grouped by refined_clusters, early_late_gestation, and
+  cluster_names.
+ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+ℹ Use `summarise(.by = c(refined_clusters, early_late_gestation, cluster_names,
+  Gene))` for per-operation grouping (`?dplyr::dplyr_by`) instead.</code></pre>
+<pre class="r"><code>meta_summary$Gene &lt;- factor(meta_summary$Gene, levels=lung_genes)
+
+meta_summary$cluster_names &lt;- as.character(meta_summary$cluster_names)
+meta_summary$cluster_names &lt;- gsub(&quot;Lung epithelium (low confidence)&quot;, 
+                                   &quot;Lung epithelium\n(low confidence)&quot;, 
+                                   meta_summary$cluster_names, fixed = TRUE)
+
+fig2.AmnioSC.surfactant_expr &lt;- ggplot(meta_summary %&gt;% 
+                                         filter(refined_clusters %in% c(&quot;Cluster_10&quot;, &quot;Cluster_12&quot;)), 
+                                                aes(x=Gene, y=cluster_names)) +
+  geom_point(aes(size = Pct, fill = Avg), color=&quot;black&quot;, shape=21) +
+  scale_size(&quot;% detected&quot;, range = c(0,6)) +
+  scale_fill_gradient(low = &quot;gray95&quot;, high = &quot;#39157B&quot;,
+                       guide = guide_colorbar(ticks.colour = &quot;black&quot;,
+                                              frame.colour = &quot;black&quot;),
+                       name = &quot;Average\nexpression&quot;) +
+  ylab(&quot;Cluster&quot;) + xlab(&quot;&quot;) +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels + 
+  labs(title = &quot;Expression of surfactant and lung development&lt;br&gt;genes per cluster by gestational age group&quot;,
+       subtitle = &quot;Our Dataset&quot;) +
+  theme(plot.title = element_markdown(size = 24, face = &quot;bold&quot;, family = &quot;arial&quot;),
+        plot.subtitle = element_markdown(size = 22, face = &quot;italic&quot;, family = &quot;arial&quot;),
+        legend.title = element_text(size = 20, face = &quot;bold.italic&quot;, family = &quot;arial&quot;),
+        legend.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.y = element_text(size = 22, family = &quot;arial&quot;, face = &quot;bold&quot;),
+        axis.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.x = element_markdown(family = &quot;arial&quot;, size = 22, face = &quot;bold&quot;),
+        strip.text = element_text(face = &quot;bold&quot;, size = 22))
+
+fig2.AmnioSC.surfactant_expr</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-13-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-13-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig2.AmnioSC.surfactant_expr,
+        here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.AmnioSC.surfactant_expr.rds&quot;))</code></pre>
+<pre class="r"><code>ILC3_genes &lt;- c(&quot;IL23R&quot;, &quot;KLRB1&quot;, &quot;KIT&quot;, &quot;IL7R&quot;, &quot;ZBTB16&quot;, &quot;CD96&quot;, &quot;CD69&quot;, &quot;RORC&quot;, &quot;IL17A&quot;, &quot;NCR2&quot;, &quot;LTB&quot;, &quot;CD52&quot;)
+
+seu_int.AmnioSC.early_late &lt;- seu_int.AmnioSC[, seu_int.AmnioSC$Donor.Paper != &quot;AF_4&quot;]
+
+# following this tutorial: https://github.com/dpcook/code_snippets/blob/main/20210510_recreate_seurat_dotplot/recreate_seurat_dotplot.md
+exp_mat &lt;- as.matrix(seu_int.AmnioSC.early_late[[&quot;SCT&quot;]]@data[ILC3_genes,])
+meta &lt;- seu_int.AmnioSC.early_late@meta.data %&gt;% dplyr::select(refined_clusters, early_late_gestation, cluster_names)
+
+meta &lt;- bind_cols(meta, as.data.frame(t(exp_mat)))
+head(meta)</code></pre>
+<pre><code>                        refined_clusters early_late_gestation     cluster_names
+01_1_AAACCCAAGAGCACTG-1       Cluster_06                 Late       Macrophages
+01_1_AAACGCTTCACACCGG-1       Cluster_01                 Late     Keratinocytes
+01_1_AAAGAACTCATCACCC-1       Cluster_06                 Late       Macrophages
+01_1_AAAGGATTCGTAACTG-1       Cluster_01                 Late     Keratinocytes
+01_1_AAAGGGCGTGTGGACA-1       Cluster_09                 Late           Unknown
+01_1_AAAGGTATCGAGTGAG-1       Cluster_11                 Late Neural crest-like
+                        IL23R KLRB1 KIT IL7R ZBTB16 CD96 CD69 RORC IL17A NCR2
+01_1_AAACCCAAGAGCACTG-1     0     0   0    0      0    0    0    0     0    0
+01_1_AAACGCTTCACACCGG-1     0     0   0    0      0    0    0    0     0    0
+01_1_AAAGAACTCATCACCC-1     0     0   0    0      0    0    0    0     0    0
+01_1_AAAGGATTCGTAACTG-1     0     0   0    0      0    0    0    0     0    0
+01_1_AAAGGGCGTGTGGACA-1     0     0   0    0      0    0    0    0     0    0
+01_1_AAAGGTATCGAGTGAG-1     0     0   0    0      0    0    0    0     0    0
+                        LTB CD52
+01_1_AAACCCAAGAGCACTG-1   0    0
+01_1_AAACGCTTCACACCGG-1   0    0
+01_1_AAAGAACTCATCACCC-1   0    0
+01_1_AAAGGATTCGTAACTG-1   0    0
+01_1_AAAGGGCGTGTGGACA-1   0    0
+01_1_AAAGGTATCGAGTGAG-1   0    0</code></pre>
+<pre class="r"><code>meta &lt;- pivot_longer(meta, -c(refined_clusters, early_late_gestation, cluster_names), names_to=&quot;Gene&quot;, values_to=&quot;Expression&quot;)
+head(meta)</code></pre>
+<pre><code># A tibble: 6 × 5
+  refined_clusters early_late_gestation cluster_names Gene   Expression
+  &lt;fct&gt;            &lt;chr&gt;                &lt;fct&gt;         &lt;chr&gt;       &lt;dbl&gt;
+1 Cluster_06       Late                 Macrophages   IL23R           0
+2 Cluster_06       Late                 Macrophages   KLRB1           0
+3 Cluster_06       Late                 Macrophages   KIT             0
+4 Cluster_06       Late                 Macrophages   IL7R            0
+5 Cluster_06       Late                 Macrophages   ZBTB16          0
+6 Cluster_06       Late                 Macrophages   CD96            0</code></pre>
+<pre class="r"><code>meta_summary &lt;- meta %&gt;%
+  group_by(refined_clusters, early_late_gestation, cluster_names, Gene) %&gt;%
+  summarise(Avg = mean(Expression),
+            Pct = sum(Expression &gt; 0) / length(Expression) * 100)</code></pre>
+<pre><code>`summarise()` has regrouped the output.
+ℹ Summaries were computed grouped by refined_clusters, early_late_gestation,
+  cluster_names, and Gene.
+ℹ Output is grouped by refined_clusters, early_late_gestation, and
+  cluster_names.
+ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+ℹ Use `summarise(.by = c(refined_clusters, early_late_gestation, cluster_names,
+  Gene))` for per-operation grouping (`?dplyr::dplyr_by`) instead.</code></pre>
+<pre class="r"><code>meta_summary$Gene &lt;- factor(meta_summary$Gene, levels=ILC3_genes)
+
+meta_summary$cluster_names &lt;- as.character(meta_summary$cluster_names)
+
+fig2.AmnioSC.ILC3_expr &lt;- ggplot(meta_summary %&gt;% 
+                                         filter(refined_clusters %in% c(&quot;Cluster_07&quot;)), 
+                                                aes(x=Gene, y=cluster_names)) +
+  geom_point(aes(size = Pct, fill = Avg), color=&quot;black&quot;, shape=21) +
+  scale_size(&quot;% detected&quot;, range = c(0,6)) +
+  scale_fill_gradient(low = &quot;gray95&quot;, high = &quot;#39157B&quot;,
+                       guide = guide_colorbar(ticks.colour = &quot;black&quot;,
+                                              frame.colour = &quot;black&quot;),
+                       name = &quot;Average\nexpression&quot;) +
+  ylab(&quot;Cluster&quot;) + xlab(&quot;&quot;) +
+  theme_linedraw() + facet_grid(. ~ early_late_gestation) +
+  rotate_x_labels + 
+  labs(title = &quot;Expression of ILC3 genes by gestational age group&quot;,
+       subtitle = &quot;Our Dataset&quot;) +
+  theme(plot.title = element_markdown(size = 24, face = &quot;bold&quot;, family = &quot;arial&quot;),
+        plot.subtitle = element_markdown(size = 22, face = &quot;italic&quot;, family = &quot;arial&quot;),
+        legend.title = element_text(size = 20, face = &quot;bold.italic&quot;, family = &quot;arial&quot;),
+        legend.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.y = element_text(size = 22, family = &quot;arial&quot;, face = &quot;bold&quot;),
+        axis.text = element_text(size = 18, family = &quot;arial&quot;),
+        axis.title.x = element_markdown(family = &quot;arial&quot;, size = 22, face = &quot;bold&quot;),
+        strip.text = element_text(face = &quot;bold&quot;, size = 22))
+
+fig2.AmnioSC.ILC3_expr</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-14-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-14-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig2.AmnioSC.ILC3_expr,
+        here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.AmnioSC.ILC3_expr.rds&quot;))</code></pre>
+</div>
+<div id="arrange-the-plots-1" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Arrange the
+plots</h2>
+<pre class="r"><code># fig2.umap_early_late &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.umap_early_late.rds&quot;))
+# fig2.prop_cluster07 &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster07.rds&quot;))
+# fig2.prop_cluster10 &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster10.rds&quot;))
+# fig2.prop_cluster12 &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.prop_cluster12.rds&quot;))
+# fig2.lung_pseudotime &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.lung_pseudotime&quot;))
+# fig2.AmnioSC.surfactant_expr &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig2.AmnioSC.surfactant_expr.rds&quot;))</code></pre>
+<pre class="r"><code>layout = &quot;
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+AAAAAAAAABBBBBBBBBB
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+CCCCCCCCCCCDDDDDDDD
+&quot;
+
+wrap_elements(fig2.prop_cluster07 + fig2.prop_cluster10 + 
+                fig2.prop_cluster12 + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;)))  +
+  wrap_elements(fig2.umap_early_late + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  wrap_elements(fig2.AmnioSC.surfactant_expr + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  wrap_elements(fig2.lung_pseudotime + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = list(c(&quot;A&quot;,&quot;B&quot;, &quot;C&quot;, &quot;D&quot;))) &amp;
+  theme(
+    plot.tag = element_text(size = 24, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    plot.title = element_text(size = 10, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.title = element_text(size = 20),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 14)) -&gt; fig2
+
+fig2</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-16-1.png" alt="" width="2112" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-16-1.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/827d4a943666f8a17336a743d96d667296958f77/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-16-1.png" target="_blank">827d4a9</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-02
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-16-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>ggsave(plot = fig2, filename = here(&quot;output&quot;, &quot;figures_png&quot;, &quot;fig2.png&quot;), height = 16, width = 22)</code></pre>
+</div>
+</div>
+<div id="figure-3" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Figure 3</h1>
+<div id="generate-the-plots-2" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Generate the
+plots</h2>
+<p>The <code>fit.AmnioSC</code> and <code>contr.AmnioSC</code> objects
+were generated on <a
+href="AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html">this
+page</a>.</p>
+<pre class="r"><code>fit.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.dge_early_vs_late.fit.rds&quot;))
+contr.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.dge_early_vs_late.contr.rds&quot;))</code></pre>
+<pre class="r"><code>pal &lt;- c(paletteer::paletteer_d(&quot;RColorBrewer::Set1&quot;)[2:1], &quot;grey&quot;)
+
+# DGE results summary
+cutoff &lt;- 0.05
+
+# set index for current contrast
+i = 1
+
+dt.AmnioSC &lt;- lapply(1:ncol(contr.AmnioSC), function(i){
+  decideTests(glmLRT(fit.AmnioSC, contrast = contr.AmnioSC[,i]),
+                            p.value = cutoff)
+})
+
+lrt.AmnioSC &lt;- glmLRT(fit.AmnioSC, contrast = contr.AmnioSC[,i])
+topTags(lrt.AmnioSC, n = Inf) %&gt;% data.frame -&gt; top.AmnioSC
+
+top_genes_to_label &lt;- top.AmnioSC %&gt;% filter(FDR &lt; cutoff,
+                                     abs(logFC) &gt; 5 | PValue &lt; 0.000000001)
+
+top.AmnioSC$label_this &lt;- rownames(top.AmnioSC) %in% rownames(top_genes_to_label)
+table(top.AmnioSC$label_this)</code></pre>
+<pre><code>
+FALSE  TRUE 
+14258    75 </code></pre>
+<pre class="r"><code>top.AmnioSC %&gt;%
+  mutate(sig = ifelse(FDR &lt;= cutoff, glue::glue(&quot;&lt;= {cutoff}&quot;),
+                      glue::glue(&quot;&gt; {cutoff}&quot;))) %&gt;%
+  rownames_to_column(var = &quot;SYMBOL&quot;) %&gt;%
+  left_join(dt.AmnioSC[[i]][,1] %&gt;%
+              data.frame %&gt;%
+              rownames_to_column(var = &quot;SYMBOL&quot;) %&gt;%
+              dplyr::rename(status = 2)) %&gt;%
+  mutate(status = ifelse(status == 1, &quot;Up&quot;,
+                         ifelse(status == -1, &quot;Down&quot;,
+                                &quot;NotSig&quot;))) %&gt;%
+  mutate(status = as.factor(status)) %&gt;%
+  mutate(status = fct_relevel(status, &quot;NotSig&quot;, after = Inf)) %&gt;%
+  ggplot(aes(x = logFC, y = -log10(PValue), color = status)) +
+  geom_point(alpha = 0.75) +
+  ggrepel::geom_text_repel(data = function(x) subset(x, label_this == TRUE),
+                           aes(x = logFC, y = -log10(PValue),
+                               label = SYMBOL),
+                           size = 4, colour = &quot;black&quot;, max.overlaps = 50) +
+  scale_colour_manual(values = pal) +
+  theme_linedraw() +
+  labs(title = &quot;DEGs in Keratinocytes&quot;,
+       subtitle = &quot;Early vs Late Gestational Age Groups&quot;,
+       x = &quot;log&lt;sub&gt;2&lt;/sub&gt;(Fold Change)&quot;,
+       y = &quot;-log&lt;sub&gt;10&lt;/sub&gt;(P-value)&quot;,
+       colour = glue::glue(&quot;FDR &lt; {cutoff}&quot;)) +
+  theme(legend.position = &quot;bottom&quot;) +
+  theme(plot.title = element_text(face = &quot;bold&quot;, size = 18, hjust = 0.5, family = &quot;arial&quot;),
+        plot.subtitle = element_text(face = &quot;italic&quot;, size = 14, hjust = 0.5, family = &quot;arial&quot;),
+    axis.title.x = element_markdown(size = 16, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.title.y = element_markdown(size = 16, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.text = element_text(size = 14, family = &quot;arial&quot;),
+    legend.title = element_text(size = 14, family = &quot;arial&quot;, face = &quot;bold.italic&quot;),
+    legend.text = element_text(size = 14, family = &quot;arial&quot;)) -&gt; fig3.volcano_plot</code></pre>
+<pre><code>Joining with `by = join_by(SYMBOL)`</code></pre>
+<pre class="r"><code>fig3.volcano_plot</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-18-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-1">
+Past versions of unnamed-chunk-18-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-18-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-18-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig3.volcano_plot, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.volcano_plot.rds&quot;))</code></pre>
+<p>The <code>c5.cam.AmnioSC</code> and <code>c2.cam.AmnioSC</code>
+objects were generates on <a
+href="AmnioSC_workflow_optref_dge_ruvseq.cluster_0.html">this
+page</a>.</p>
+<pre class="r"><code>c5.cam.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.dge_early_vs_late.c5.cam.RDS&quot;))
+c2.cam.AmnioSC &lt;- readRDS(here(&quot;data&quot;, &quot;workflow&quot;, &quot;AmnioSC.dge_early_vs_late.c2.cam.RDS&quot;))</code></pre>
+<pre class="r"><code>pal &lt;- c(paletteer::paletteer_d(&quot;RColorBrewer::Set1&quot;)[2:1], &quot;grey&quot;)
+
+c5.cam.AmnioSC %&gt;%
+  dplyr::slice(1:10) %&gt;%
+  rownames_to_column(var = &quot;Set&quot;) %&gt;%
+  mutate(Type = &quot;GO&quot;,
+         Rank = 1:10) %&gt;%
+  bind_rows(c2.cam.AmnioSC %&gt;%
+              dplyr::slice(1:8) %&gt;%
+              rownames_to_column(var = &quot;Set&quot;) %&gt;%
+              mutate(Type = &quot;REACTOME&quot;,
+                     Rank = 1:8)) %&gt;%
+  mutate(Set = str_wrap(str_replace_all(Set, &quot;_&quot;, &quot; &quot;), width = 32),# was 75
+         Set = str_remove_all(Set, &quot;GO |REACTOME |HALLMARK &quot;)) %&gt;%
+  ggplot(aes(x = -log10(FDR), y = fct_reorder(Set, -Rank),
+             colour = Direction)) +
+  geom_point(aes(size = NGenes)) +
+  facet_wrap(~Type, ncol = 1, scales = &quot;free_y&quot;) +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = &quot;dashed&quot;)  +
+  scale_colour_manual(values = pal) +
+  labs(y = &quot;Gene Set&quot;, x = &quot;-log&lt;sub&gt;10&lt;/sub&gt;(FDR)&quot;) +
+  theme_linedraw(12) +
+  theme(legend.title = element_text(size = 14, face = &quot;bold.italic&quot;, family = &quot;arial&quot;),
+        legend.text = element_text(size = 14, family = &quot;arial&quot;),
+        axis.title.y = element_text(size = 16, family = &quot;arial&quot;, face = &quot;bold&quot;),
+        axis.text = element_text(size = 14, family = &quot;arial&quot;),
+        axis.title.x = element_markdown(family = &quot;arial&quot;, size = 16, face = &quot;bold&quot;),
+        strip.text = element_text(face = &quot;bold&quot;, size = 14),
+        legend.box = &quot;vertical&quot;) +
+  bottom_legend -&gt; fig3.gsea
+fig3.gsea</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-20-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-20-1">
+Past versions of unnamed-chunk-20-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-20-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-20-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig3.gsea, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.gsea.rds&quot;))</code></pre>
+<p>The <code>lrt.Gerli</code> and <code>fit.Gerli</code> objects were
+generated on <a href="Gerli_et_al_2024.dge_ruvseq.cluster_0.html">this
+page</a>.</p>
+<pre class="r"><code>lrt.Gerli &lt;- readRDS(here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;, &quot;Gerli_et_al_2024.dge_early_vs_late.lrt.rds&quot;))
+fit.Gerli &lt;- readRDS(here(&quot;data&quot;, &quot;Gerli_et_al_2024&quot;, &quot;Gerli_et_al_2024.dge_early_vs_late.fit.rds&quot;))</code></pre>
+<pre class="r"><code>dge_early_vs_late.up &lt;- top.AmnioSC %&gt;% filter(FDR &lt; 0.05, logFC &gt; 0)
+dim(dge_early_vs_late.up)</code></pre>
+<pre><code>[1] 469   6</code></pre>
+<pre class="r"><code>dge_early_vs_late.down &lt;- top.AmnioSC %&gt;% filter(FDR &lt; 0.05, logFC &lt; 0)
+dim(dge_early_vs_late.down)</code></pre>
+<pre><code>[1] 835   6</code></pre>
+<pre class="r"><code># translate gene SYMBOLS to entrez gene IDs
+dge_early_vs_late.up.gns &lt;- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(dge_early_vs_late.up),
+                             column = c(&quot;ENTREZID&quot;),
+                             keytype = &quot;SYMBOL&quot;,
+                             multiVals = &quot;first&quot;)</code></pre>
+<pre><code></code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<pre class="r"><code>dge_early_vs_late.down.gns &lt;- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(dge_early_vs_late.down),
+                             column = c(&quot;ENTREZID&quot;),
+                             keytype = &quot;SYMBOL&quot;,
+                             multiVals = &quot;first&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>fit.gns &lt;- AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db,
+                             keys = rownames(fit.Gerli),
+                             column = c(&quot;ENTREZID&quot;),
+                             keytype = &quot;SYMBOL&quot;,
+                             multiVals = &quot;first&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code># run camera competitive gene set test
+# use signed likelihood ratio test statistic as recommended by GS here: https://support.bioconductor.org/p/112937/
+
+# fix floating point representation issue
+lrt.Gerli$table$LR &lt;- pmax(lrt.Gerli$table$LR, 0) # Converts all negative values to 0
+
+statistic.Gerli &lt;- sign(lrt.Gerli$table$logFC) * sqrt(lrt.Gerli$table$LR)
+
+# get gene indices for all gene set genes
+dge_early_vs_late.up.id &lt;- ids2indices(dge_early_vs_late.up.gns,
+                                       unname(fit.gns[rownames(lrt.Gerli)]))
+dge_early_vs_late.up.cam &lt;- cameraPR(statistic.Gerli, dge_early_vs_late.up.id)
+dge_early_vs_late.up.cam</code></pre>
+<pre><code>     NGenes Direction       PValue
+Set1    355        Up 2.198066e-10</code></pre>
+<pre class="r"><code>dge_early_vs_late.down.id &lt;- ids2indices(dge_early_vs_late.down.gns,
+                                         unname(fit.gns[rownames(lrt.Gerli)]))
+dge_early_vs_late.down.cam &lt;- cameraPR(statistic.Gerli, dge_early_vs_late.down.id)
+dge_early_vs_late.down.cam</code></pre>
+<pre><code>     NGenes Direction       PValue
+Set1    567      Down 1.385663e-17</code></pre>
+<pre class="r"><code>fig3.barcode_plot &lt;- as.ggplot(~barcodeplot.custom(statistic.Gerli,
+                     index = dge_early_vs_late.up.id$Set1,
+                     index2 = dge_early_vs_late.down.id$Set1,
+                     main = &quot;Ranking of significant DEGs from our dataset\nin Gerli et al. (2024) dataset&quot;,
+                     cex.main = 1.6))
+
+fig3.barcode_plot &lt;- fig3.barcode_plot + geom_richtext(
+    data = data.frame(x = 0.53, y = 0.85, 
+                      label = &quot;***Up:** P-value = 2.1981 x 10&lt;sup&gt;-10&lt;/sup&gt;&lt;br&gt;**Down:** P-value = 1.3857 × 10&lt;sup&gt;−17&lt;/sup&gt;*&quot;),
+    aes(x, y, label = label), hjust = 0.5, fill = NA, label.color = NA, size = 5, family = &quot;arial&quot;)
+
+# fig3.barcode_plot &lt;- fig3.barcode_plot + labs(subtitle = paste0(&quot;Up: P-value = &quot;,
+#                                                                 format(dge_early_vs_late.up.cam$PValue,
+#                                                                        scientific = FALSE), 
+#                                                                 &quot;\nDown: P-value = &quot;,
+#                                                                 format(dge_early_vs_late.down.cam$PValue,
+#                                                                        scientific = FALSE))) + 
+#   theme(plot.subtitle = element_text(face = &quot;italic&quot;,hjust = 0.5, vjust = -30, size = 14, family = &quot;arial&quot;,
+#                                      margin = margin(t = 0, b = 10)))
+
+fig3.barcode_plot # Statistic label needs to look off center here to look ok in the main figure</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-24-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
+Past versions of unnamed-chunk-24-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-24-1.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-24-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>saveRDS(fig3.barcode_plot, here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.barcode_plot.rds&quot;))</code></pre>
+</div>
+<div id="arrange-the-plots-2" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Arrange the
+plots</h2>
+<pre class="r"><code># fig3.volcano_plot &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.volcano_plot.rds&quot;))
+# fig3.gsea &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.gsea.rds&quot;))
+# fig3.barcode_plot &lt;- readRDS(here(&quot;output&quot;, &quot;main_figures&quot;, &quot;fig3.barcode_plot.rds&quot;))</code></pre>
+<pre class="r"><code>layout = &quot;
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+AAAAAAAAAA#BBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+CCCCCCCCCCCBBBBBBBB
+&quot;
+
+wrap_elements(fig3.volcano_plot + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  wrap_elements(fig3.gsea + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  wrap_elements(fig3.barcode_plot + theme(plot.margin = unit(rep(0,4), &quot;cm&quot;))) +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = list(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;))) &amp;
+  theme(
+    plot.tag = element_text(size = 24, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    plot.title = element_text(size = 10, face = &quot;bold&quot;, family = &quot;arial&quot;),
+    axis.title = element_text(size = 20),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 14)) -&gt; fig3
+
+fig3</code></pre>
+<p><img src="figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-26-1.png" alt="" width="1920" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
+Past versions of unnamed-chunk-26-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-26-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/bac78be5ba4b0906b57c66e0be2302439d3dbef0/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-26-1.png" target="_blank">bac78be</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-13
+</td>
+</tr>
+<tr>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/3bc6d1a31ab11cd1f56bcd7af8c18ade8dfe739d/docs/figure/AmnioSC_additional_main_figures.Rmd/unnamed-chunk-26-1.png" target="_blank">3bc6d1a</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-09-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>ggsave(plot = fig3, filename = here(&quot;output&quot;, &quot;figures_png&quot;, &quot;fig3.png&quot;), height = 15, width = 20)</code></pre>
+</div>
+</div>
+<div id="session-info" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Session info</h1>
+<summary>
+This analysis was performed using the following software (click triangle
+to expand)
+</summary>
+<details>
+<pre class="r"><code>sessioninfo::session_info()</code></pre>
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.5.0 (2025-04-11)
+ os       macOS 26.7.1
+ system   aarch64, darwin20
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Australia/Melbourne
+ date     2026-10-21
+ pandoc   3.10 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown)
+ quarto   1.10.18 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ ! package              * version  date (UTC) lib source
+ P abind                  1.4-8    2024-09-12 [?] RSPM
+ P AnnotationDbi          1.72.0   2025-10-29 [?] Bioconduc~
+   backports              1.5.0    2024-05-23 [1] RSPM (R 4.5.0)
+ P beachmat               2.26.0   2025-10-29 [?] Bioconduc~
+ P beeswarm               0.4.0    2021-06-01 [?] RSPM
+ P Biobase              * 2.70.0   2025-10-29 [?] Bioconduc~
+ P BiocGenerics         * 0.56.0   2025-10-29 [?] Bioconduc~
+ P BiocManager            1.30.27  2025-11-14 [?] RSPM
+ P BiocNeighbors          2.4.0    2025-10-29 [?] Bioconduc~
+ P BiocParallel           1.44.0   2025-10-29 [?] Bioconduc~
+ P BiocSingular           1.26.1   2025-11-17 [?] Bioconduc~
+ P Biostrings             2.78.0   2025-10-29 [?] Bioconduc~
+ P bit                    4.6.0    2025-03-06 [?] RSPM
+ P bit64                  4.6.0-1  2025-01-16 [?] RSPM
+ P blob                   1.3.0    2026-01-14 [?] RSPM
+ P bluster                1.20.0   2025-10-29 [?] Bioconduc~
+ P boot                   1.3-31   2024-08-28 [?] CRAN (R 4.5.0)
+ P bslib                  0.10.0   2026-01-26 [?] RSPM
+ P cachem                 1.1.0    2024-05-16 [?] RSPM
+ P callr                  3.7.6    2024-03-25 [?] CRAN (R 4.5.0)
+ P checkmate              2.3.3    2025-08-18 [?] RSPM
+ P cli                    3.6.6    2026-04-09 [?] RSPM
+ P cluster                2.1.8.1  2025-03-12 [?] CRAN (R 4.5.0)
+ P clustree             * 0.5.1    2023-11-05 [?] RSPM
+ P cmdstanr               0.9.0    2025-03-30 [?] https://stan-dev.r-universe.dev (R 4.5.3)
+ P codetools              0.2-20   2024-03-31 [?] CRAN (R 4.5.0)
+   colorspace             2.1-2    2025-09-22 [1] RSPM (R 4.5.0)
+ P commonmark             2.0.0    2025-07-07 [?] RSPM
+ P cowplot              * 1.2.0    2025-07-07 [?] RSPM
+ P crayon                 1.5.3    2024-06-20 [?] RSPM
+ P data.table             1.18.2.1 2026-01-27 [?] RSPM
+ P DBI                    1.2.3    2024-06-02 [?] RSPM
+   DelayedArray           0.36.1   2026-03-31 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P deldir                 2.0-4    2024-02-28 [?] RSPM
+ P digest                 0.6.39   2025-11-19 [?] RSPM
+ P distributional         0.6.0    2026-01-14 [?] RSPM
+   dplyr                * 1.2.0    2026-02-03 [1] RSPM (R 4.5.0)
+ P dqrng                  0.4.1    2024-05-28 [?] CRAN (R 4.5.0)
+ P edgeR                * 4.8.2    2025-12-23 [?] https://bioc-release.r-universe.dev (R 4.5.2)
+ P egg                  * 0.4.5    2019-07-13 [?] RSPM
+ P evaluate               1.0.5    2025-08-27 [?] RSPM
+ P farver                 2.1.2    2024-05-13 [?] RSPM
+ P fastmap                1.2.0    2024-05-15 [?] RSPM
+ P fitdistrplus           1.2-6    2026-01-24 [?] RSPM
+ P forcats              * 1.0.1    2025-09-25 [?] RSPM
+ P fs                     2.1.0    2026-04-18 [?] RSPM
+ P future                 1.69.0   2026-01-16 [?] RSPM
+ P future.apply           1.20.1   2025-12-09 [?] RSPM
+ P generics             * 0.1.4    2025-05-09 [?] CRAN (R 4.5.0)
+ P GenomicRanges        * 1.62.1   2025-12-08 [?] Bioconduc~
+ P getPass                0.2-4    2023-12-10 [?] CRAN (R 4.5.0)
+ P ggalluvial           * 0.12.5   2023-02-22 [?] RSPM
+ P ggbeeswarm           * 0.7.3    2025-11-29 [?] RSPM
+ P ggforce                0.5.0    2025-06-18 [?] RSPM
+ P ggplot2              * 4.0.2    2026-02-03 [?] RSPM
+ P ggplotify            * 0.1.3    2025-09-20 [?] RSPM
+ P ggraph               * 2.2.2    2025-08-24 [?] RSPM
+ P ggrepel                0.9.6    2024-09-07 [?] CRAN (R 4.5.0)
+ P ggridges               0.5.7    2025-08-27 [?] RSPM
+ P ggtext               * 0.1.2    2022-09-16 [?] RSPM
+ P git2r                  0.36.2   2025-03-29 [?] CRAN (R 4.5.0)
+ P globals                0.19.0   2026-02-02 [?] RSPM
+ P glue                   1.8.0    2024-09-30 [?] RSPM
+ P goftest                1.2-3    2021-10-07 [?] CRAN (R 4.5.0)
+ P graphlayouts           1.2.2    2025-01-23 [?] RSPM
+ P gridExtra            * 2.3      2017-09-09 [?] RSPM
+   gridGraphics           0.5-1    2020-12-13 [1] RSPM (R 4.5.0)
+ P gridtext               0.1.5    2022-09-16 [?] RSPM
+ P gtable                 0.3.6    2024-10-25 [?] RSPM
+ P here                 * 1.0.2    2025-09-15 [?] RSPM
+ P hms                    1.1.4    2025-10-17 [?] RSPM
+ P htmltools              0.5.9    2025-12-04 [?] RSPM
+ P htmlwidgets            1.6.4    2023-12-06 [?] RSPM
+ P httpuv                 1.6.16   2025-04-16 [?] CRAN (R 4.5.0)
+ P httr                   1.4.7    2023-08-15 [?] RSPM
+ P ica                    1.0-3    2022-07-08 [?] CRAN (R 4.5.0)
+ P igraph                 2.2.1    2025-10-27 [?] RSPM
+   instantiate            0.2.3    2024-10-02 [1] RSPM (R 4.5.0)
+ P IRanges              * 2.44.0   2025-10-29 [?] Bioconduc~
+ P irlba                  2.3.7    2026-01-30 [?] RSPM
+ P jquerylib              0.1.4    2021-04-26 [?] RSPM
+ P jsonlite               2.0.0    2025-03-27 [?] RSPM
+ P KEGGREST               1.50.0   2025-10-29 [?] Bioconduc~
+ P KernSmooth             2.23-26  2025-01-01 [?] CRAN (R 4.5.0)
+ P knitr                  1.51     2025-12-20 [?] RSPM
+ P labeling               0.4.3    2023-08-29 [?] RSPM
+ P later                  1.4.5    2026-01-08 [?] RSPM
+ P lattice                0.22-7   2025-04-02 [?] RSPM
+ P lazyeval               0.2.2    2019-03-15 [?] RSPM
+   leiden                 0.4.3.1  2023-11-17 [1] RSPM (R 4.5.0)
+ P lifecycle              1.0.5    2026-01-08 [?] RSPM
+ P limma                * 3.66.0   2025-10-29 [?] Bioconduc~
+ P listenv                0.10.0   2025-11-02 [?] RSPM
+ P litedown               0.9      2025-12-18 [?] RSPM
+   lme4                   2.0-1    2026-03-05 [1] RSPM (R 4.5.0)
+ P lmtest                 0.9-40   2022-03-21 [?] CRAN (R 4.5.0)
+ P locfit                 1.5-9.12 2025-03-05 [?] RSPM
+ P lubridate            * 1.9.4    2024-12-08 [?] RSPM
+ P magick               * 2.9.0    2025-09-08 [?] RSPM
+ P magrittr               2.0.4    2025-09-12 [?] RSPM
+ P markdown               2.0      2025-03-23 [?] RSPM
+ P MASS                   7.3-65   2025-02-28 [?] CRAN (R 4.5.0)
+ P Matrix                 1.7-4    2025-08-28 [?] RSPM
+ P MatrixGenerics       * 1.22.0   2025-10-29 [?] Bioconduc~
+ P matrixStats          * 1.5.0    2025-01-07 [?] RSPM
+ P memoise                2.0.1    2021-11-26 [?] RSPM
+ P metapod                1.18.0   2025-10-29 [?] Bioconduc~
+ P mime                   0.13     2025-03-17 [?] RSPM
+ P miniUI                 0.1.2    2025-04-17 [?] CRAN (R 4.5.0)
+   minqa                  1.2.8    2024-08-17 [1] RSPM (R 4.5.0)
+   monocle3               1.4.27   2026-06-26 [1] Github (cole-trapnell-lab/monocle3@536f103)
+ P nlme                   3.1-168  2025-03-31 [?] CRAN (R 4.5.0)
+   nloptr                 2.2.1    2025-03-17 [1] RSPM (R 4.5.0)
+ P org.Hs.eg.db           3.22.0   2026-02-03 [?] Bioconductor
+ P otel                   0.2.0    2025-08-29 [?] RSPM
+ P paletteer              1.7.0    2026-01-08 [?] RSPM
+ P parallelly             1.46.1   2026-01-08 [?] RSPM
+ P patchwork            * 1.3.2    2025-08-25 [?] RSPM
+ P pbapply                1.7-4    2025-07-20 [?] RSPM
+ P pillar                 1.11.1   2025-09-17 [?] RSPM
+ P pkgconfig              2.0.3    2019-09-22 [?] RSPM
+ P plotly                 4.12.0   2026-01-24 [?] RSPM
+ P plyr                   1.8.9    2023-10-02 [?] RSPM
+ P png                  * 0.1-8    2022-11-29 [?] RSPM
+ P Polychrome           * 1.5.4    2025-04-06 [?] RSPM
+ P polyclip               1.10-7   2024-07-23 [?] CRAN (R 4.5.0)
+ P posterior              1.6.1    2025-02-27 [?] RSPM
+ P prismatic              1.1.2    2024-04-10 [?] RSPM
+ P processx               3.8.6    2025-02-21 [?] CRAN (R 4.5.0)
+ P progressr              0.18.0   2025-11-06 [?] RSPM
+ P promises               1.5.0    2025-11-01 [?] RSPM
+ P ps                     1.9.1    2025-04-12 [?] CRAN (R 4.5.0)
+ P purrr                * 1.2.1    2026-01-09 [?] RSPM
+ P R6                     2.6.1    2025-02-15 [?] RSPM
+ P ragg                   1.5.0    2025-09-02 [?] RSPM
+ P RANN                   2.6.2    2024-08-25 [?] CRAN (R 4.5.0)
+ P rappdirs               0.3.4    2026-01-17 [?] RSPM
+   rbibutils              2.4.1    2026-01-21 [1] RSPM (R 4.5.0)
+ P RColorBrewer           1.1-3    2022-04-03 [?] RSPM
+ P Rcpp                   1.1.1    2026-01-10 [?] RSPM
+ P RcppAnnoy              0.0.23   2026-01-12 [?] RSPM
+   Rdpack                 2.6.5    2026-01-23 [1] RSPM (R 4.5.0)
+ P readr                * 2.1.6    2025-11-14 [?] RSPM
+   reformulas             0.4.4    2026-02-02 [1] RSPM (R 4.5.0)
+ P rematch2               2.1.2    2020-05-01 [?] RSPM
+ P renv                   1.1.7    2026-01-27 [?] RSPM
+ P reshape2             * 1.4.5    2025-11-12 [?] RSPM
+ P reticulate             1.44.1   2025-11-14 [?] RSPM
+ P rlang                  1.2.0    2026-04-06 [?] RSPM
+ P rmarkdown              2.30     2025-09-28 [?] RSPM
+ P ROCR                   1.0-12   2026-01-23 [?] RSPM
+ P rprojroot              2.1.1    2025-08-26 [?] RSPM
+ P RSQLite                2.4.5    2025-11-30 [?] RSPM
+ P rstudioapi             0.18.0   2026-01-16 [?] RSPM
+ P rsvd                   1.0.5    2021-04-16 [?] RSPM
+ P Rtsne                  0.17     2023-12-07 [?] CRAN (R 4.5.0)
+ P S4Arrays               1.10.1   2025-12-08 [?] Bioconduc~
+   S4Vectors            * 0.48.1   2026-04-04 [1] https://bioc-release.r-universe.dev (R 4.5.3)
+ P S7                     0.2.1    2025-11-14 [?] RSPM
+ P sass                   0.4.10   2025-04-11 [?] RSPM
+ P ScaledMatrix           1.18.0   2025-10-29 [?] Bioconduc~
+ P scales                 1.4.0    2025-04-24 [?] RSPM
+ P scater               * 1.38.0   2025-10-29 [?] Bioconduc~
+ P scattermore            1.2      2023-06-12 [?] CRAN (R 4.5.0)
+ P scatterplot3d          0.3-44   2023-05-05 [?] RSPM
+ P sccomp                 2.2.0    2025-10-29 [?] https://bioc-release.r-universe.dev (R 4.5.2)
+ P scran                * 1.38.0   2025-10-29 [?] Bioconduc~
+ P sctransform            0.4.3    2026-01-10 [?] RSPM
+ P scuttle              * 1.20.0   2025-10-29 [?] Bioconduc~
+ P Seqinfo              * 1.0.0    2025-10-29 [?] Bioconduc~
+ P sessioninfo          * 1.2.3    2025-02-05 [?] RSPM
+   Seurat               * 4.4.0    2024-01-10 [1] https://satijalab.r-universe.dev (R 4.5.0)
+   SeuratObject         * 4.1.4    2023-09-27 [1] https://satijalab.r-universe.dev (R 4.5.0)
+ P shiny                  1.12.1   2025-12-09 [?] RSPM
+ P SingleCellExperiment * 1.32.0   2025-10-29 [?] Bioconduc~
+ P sp                     2.2-0    2025-02-01 [?] CRAN (R 4.5.0)
+ P SparseArray            1.10.8   2025-12-18 [?] Bioconduc~
+ P spatstat.data          3.1-9    2025-10-18 [?] RSPM
+ P spatstat.explore       3.7-0    2026-01-22 [?] RSPM
+ P spatstat.geom          3.7-0    2026-01-20 [?] RSPM
+ P spatstat.random        3.4-4    2026-01-21 [?] RSPM
+ P spatstat.sparse        3.1-0    2024-06-21 [?] CRAN (R 4.5.0)
+ P spatstat.univar        3.1-6    2026-01-17 [?] RSPM
+ P spatstat.utils         3.2-1    2026-01-10 [?] RSPM
+ P statmod                1.5.1    2025-10-09 [?] RSPM
+ P stringi                1.8.7    2025-03-27 [?] RSPM
+ P stringr              * 1.6.0    2025-11-04 [?] RSPM
+ P SummarizedExperiment * 1.40.0   2025-10-29 [?] Bioconduc~
+ P survival               3.8-6    2026-01-16 [?] RSPM
+ P systemfonts            1.3.1    2025-10-01 [?] RSPM
+ P tensor                 1.5.1    2025-06-17 [?] RSPM
+ P tensorA                0.36.2.1 2023-12-13 [?] RSPM
+ P textshaping            1.0.4    2025-10-10 [?] RSPM
+ P tibble               * 3.3.1    2026-01-11 [?] RSPM
+ P tidygraph              1.3.1    2024-01-30 [?] RSPM
+ P tidyr                * 1.3.2    2025-12-19 [?] RSPM
+ P tidyselect             1.2.1    2024-03-11 [?] RSPM
+ P tidyverse            * 2.0.0    2023-02-22 [?] RSPM
+ P timechange             0.4.0    2026-01-29 [?] RSPM
+ P tweenr                 2.0.3    2024-02-26 [?] RSPM
+ P tzdb                   0.5.0    2025-03-15 [?] RSPM
+ P utf8                   1.2.6    2025-06-08 [?] RSPM
+ P uwot                   0.2.4    2025-11-10 [?] RSPM
+ P vctrs                  0.7.1    2026-01-23 [?] RSPM
+ P vipor                  0.4.7    2023-12-18 [?] RSPM
+ P viridis              * 0.6.5    2024-01-29 [?] RSPM
+ P viridisLite          * 0.4.2    2023-05-02 [?] RSPM
+ P whisker                0.4.1    2022-12-05 [?] CRAN (R 4.5.0)
+ P withr                  3.0.2    2024-10-28 [?] RSPM
+ P workflowr            * 1.7.2    2025-08-18 [?] RSPM
+ P xfun                   0.56     2026-01-18 [?] RSPM
+ P xml2                   1.5.2    2026-01-17 [?] RSPM
+ P xtable                 1.8-4    2019-04-21 [?] RSPM
+ P XVector                0.50.0   2025-10-29 [?] Bioconduc~
+ P yaml                   2.3.12   2025-12-10 [?] RSPM
+ P yulab.utils            0.2.4    2026-02-02 [?] RSPM
+ P zoo                    1.8-15   2025-12-15 [?] RSPM
+
+ [1] &lt;project&gt;/renv/library/macos/R-4.5/aarch64-apple-darwin20
+ [2] &lt;renv-cache&gt;/sandbox/macos/R-4.5/aarch64-apple-darwin20/4cd76b74
+
+ * ── Packages attached to the search path.
+ P ── Loaded and on-disk path mismatch.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</details>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS 26.7.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Australia/Melbourne
+tzcode source: internal
+
+attached base packages:
+[1] grid      stats4    stats     graphics  grDevices datasets  utils    
+[8] methods   base     
+
+other attached packages:
+ [1] scran_1.38.0                reshape2_1.4.5             
+ [3] ggalluvial_0.12.5           ggplotify_0.1.3            
+ [5] lubridate_1.9.4             forcats_1.0.1              
+ [7] purrr_1.2.1                 readr_2.1.6                
+ [9] tidyr_1.3.2                 tibble_3.3.1               
+[11] tidyverse_2.0.0             dplyr_1.2.0                
+[13] ggtext_0.1.2                edgeR_4.8.2                
+[15] limma_3.66.0                png_0.1-8                  
+[17] magick_2.9.0                Polychrome_1.5.4           
+[19] viridis_0.6.5               viridisLite_0.4.2          
+[21] sessioninfo_1.2.3           here_1.0.2                 
+[23] egg_0.4.5                   gridExtra_2.3              
+[25] patchwork_1.3.2             cowplot_1.2.0              
+[27] ggbeeswarm_0.7.3            stringr_1.6.0              
+[29] scater_1.38.0               scuttle_1.20.0             
+[31] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
+[33] Biobase_2.70.0              GenomicRanges_1.62.1       
+[35] Seqinfo_1.0.0               IRanges_2.44.0             
+[37] S4Vectors_0.48.1            BiocGenerics_0.56.0        
+[39] generics_0.1.4              MatrixGenerics_1.22.0      
+[41] matrixStats_1.5.0           clustree_0.5.1             
+[43] ggraph_2.2.2                ggplot2_4.0.2              
+[45] SeuratObject_4.1.4          Seurat_4.4.0               
+[47] workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] fs_2.1.0               spatstat.sparse_3.1-0  httr_1.4.7            
+  [4] RColorBrewer_1.1-3     backports_1.5.0        tools_4.5.0           
+  [7] sctransform_0.4.3      utf8_1.2.6             R6_2.6.1              
+ [10] lazyeval_0.2.2         uwot_0.2.4             litedown_0.9          
+ [13] withr_3.0.2            sp_2.2-0               progressr_0.18.0      
+ [16] textshaping_1.0.4      cli_3.6.6              spatstat.explore_3.7-0
+ [19] prismatic_1.1.2        labeling_0.4.3         sass_0.4.10           
+ [22] S7_0.2.1               spatstat.data_3.1-9    ggridges_0.5.7        
+ [25] pbapply_1.7-4          systemfonts_1.3.1      commonmark_2.0.0      
+ [28] yulab.utils_0.2.4      parallelly_1.46.1      RSQLite_2.4.5         
+ [31] rstudioapi_0.18.0      gridGraphics_0.5-1     ica_1.0-3             
+ [34] spatstat.random_3.4-4  distributional_0.6.0   Matrix_1.7-4          
+ [37] abind_1.4-8            lifecycle_1.0.5        whisker_0.4.1         
+ [40] scatterplot3d_0.3-44   yaml_2.3.12            SparseArray_1.10.8    
+ [43] Rtsne_0.17             blob_1.3.0             paletteer_1.7.0       
+ [46] promises_1.5.0         dqrng_0.4.1            crayon_1.5.3          
+ [49] miniUI_0.1.2           lattice_0.22-7         beachmat_2.26.0       
+ [52] KEGGREST_1.50.0        pillar_1.11.1          knitr_1.51            
+ [55] metapod_1.18.0         boot_1.3-31            future.apply_1.20.1   
+ [58] codetools_0.2-20       leiden_0.4.3.1         glue_1.8.0            
+ [61] getPass_0.2-4          spatstat.univar_3.1-6  data.table_1.18.2.1   
+ [64] Rdpack_2.6.5           vctrs_0.7.1            gtable_0.3.6          
+ [67] rematch2_2.1.2         cachem_1.1.0           xfun_0.56             
+ [70] rbibutils_2.4.1        S4Arrays_1.10.1        mime_0.13             
+ [73] tidygraph_1.3.1        reformulas_0.4.4       sccomp_2.2.0          
+ [76] survival_3.8-6         statmod_1.5.1          bluster_1.20.0        
+ [79] fitdistrplus_1.2-6     ROCR_1.0-12            nlme_3.1-168          
+ [82] bit64_4.6.0-1          RcppAnnoy_0.0.23       rprojroot_2.1.1       
+ [85] tensorA_0.36.2.1       bslib_0.10.0           irlba_2.3.7           
+ [88] vipor_0.4.7            KernSmooth_2.23-26     otel_0.2.0            
+ [91] DBI_1.2.3              colorspace_2.1-2       tidyselect_1.2.1      
+ [94] processx_3.8.6         bit_4.6.0              compiler_4.5.0        
+ [97] git2r_0.36.2           BiocNeighbors_2.4.0    xml2_1.5.2            
+[100] DelayedArray_0.36.1    plotly_4.12.0          posterior_1.6.1       
+[103] checkmate_2.3.3        scales_1.4.0           lmtest_0.9-40         
+[106] callr_3.7.6            rappdirs_0.3.4         digest_0.6.39         
+[109] goftest_1.2-3          minqa_1.2.8            spatstat.utils_3.2-1  
+[112] rmarkdown_2.30         XVector_0.50.0         htmltools_0.5.9       
+[115] pkgconfig_2.0.3        lme4_2.0-1             fastmap_1.2.0         
+[118] rlang_1.2.0            htmlwidgets_1.6.4      shiny_1.12.1          
+[121] farver_2.1.2           jquerylib_0.1.4        zoo_1.8-15            
+[124] jsonlite_2.0.0         BiocParallel_1.44.0    BiocSingular_1.26.1   
+[127] magrittr_2.0.4         Rcpp_1.1.1             reticulate_1.44.1     
+[130] stringi_1.8.7          MASS_7.3-65            org.Hs.eg.db_3.22.0   
+[133] plyr_1.8.9             parallel_4.5.0         listenv_0.10.0        
+[136] ggrepel_0.9.6          deldir_2.0-4           Biostrings_2.78.0     
+[139] graphlayouts_1.2.2     splines_4.5.0          gridtext_0.1.5        
+[142] tensor_1.5.1           hms_1.1.4              locfit_1.5-9.12       
+[145] ps_1.9.1               igraph_2.2.1           spatstat.geom_3.7-0   
+[148] markdown_2.0           ScaledMatrix_1.18.0    evaluate_1.0.5        
+[151] renv_1.1.7             BiocManager_1.30.27    nloptr_2.2.1          
+[154] tzdb_0.5.0             tweenr_2.0.3           httpuv_1.6.16         
+[157] RANN_2.6.2             polyclip_1.10-7        future_1.69.0         
+[160] scattermore_1.2        ggforce_0.5.0          rsvd_1.0.5            
+[163] monocle3_1.4.27        xtable_1.8-4           later_1.4.5           
+[166] ragg_1.5.0             instantiate_0.2.3      AnnotationDbi_1.72.0  
+[169] memoise_2.0.1          beeswarm_0.4.0         cluster_2.1.8.1       
+[172] timechange_0.4.0       globals_0.19.0         cmdstanr_0.9.0        </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
