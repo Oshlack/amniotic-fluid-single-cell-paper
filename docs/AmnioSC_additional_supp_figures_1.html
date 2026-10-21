@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree8468ac33b84f649962b1590f35239a621cdf065ctargetblank8468ac3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreec8dbd891c54c01a2063a9c961870d7d93e204c0atargetblankc8dbd89a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/8468ac33b84f649962b1590f35239a621cdf065c" target="_blank">8468ac3</a>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/c8dbd891c54c01a2063a9c961870d7d93e204c0a" target="_blank">c8dbd89</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltree8468ac33b84f649962b1590f35239a621cdf065ctargetblank8468ac3a"
+id="strongRepositoryversionstrongahrefsshgitatlassianpetermacorgau7999osamniosinglecelltreec8dbd891c54c01a2063a9c961870d7d93e204c0atargetblankc8dbd89a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/8468ac33b84f649962b1590f35239a621cdf065c" target="_blank">8468ac3</a>.
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/tree/c8dbd891c54c01a2063a9c961870d7d93e204c0a" target="_blank">c8dbd89</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,9 @@ Ignored files:
 Untracked files:
     Untracked:  AmnioSC_Manuscript_Claude/
     Untracked:  claude_log/
+
+Unstaged changes:
+    Modified:   copy_to_publication_repo.sh
 
 </code></pre>
 <p>
@@ -617,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/c8dbd891c54c01a2063a9c961870d7d93e204c0a/analysis/AmnioSC_additional_supp_figures_1.Rmd" target="_blank">c8dbd89</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-21
+</td>
+<td>
+wflow_publish(here("analysis", "AmnioSC_additional_supp_figures_1.Rmd"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="ssh://git@atlassian.petermac.org.au:7999/os/amniosinglecell/blob/650c8b031c66148bbf4523c0dee5ab1c3d177f04/docs/AmnioSC_additional_supp_figures_1.html" target="_blank">650c8b0</a>
+</td>
+<td>
+Calandra Grima
+</td>
+<td>
+2026-10-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1310,8 +1347,8 @@ rm(supp_fig1.after_qc_count)
 rm(supp_fig1.annotation_confidence)
 gc()</code></pre>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells  10100482  539.5   17022617  909.2         NA  17022617  909.2
-Vcells 291369537 2223.0  597449093 4558.2      49152 495898942 3783.5</code></pre>
+Ncells  10100505  539.5   17022712  909.2         NA  17022712  909.2
+Vcells 291369823 2223.0  597449505 4558.2      49152 495899228 3783.5</code></pre>
 </div>
 </div>
 <div id="supplementary-figure-2" class="section level1" number="2">
@@ -1374,7 +1411,7 @@ Calandra Grima
 supp_fig2.n_cells_fetal_organ &lt;- plotNCells.Paper(seu_int.AmnioSC, x_var = &quot;fetal_organ.majority_voting&quot;, 
                                                 color_by = &quot;fetal_organ.majority_voting&quot;, 
                                                 colour_scheme = ALL_CELL_TYPE_COLOURS, 
-                                                title = &quot;Number of cellls per&lt;br&gt;*Developing_Human_Organs*&lt;br&gt;annotation&quot;, 
+                                                title = &quot;Number of cells per&lt;br&gt;*Developing_Human_Organs*&lt;br&gt;annotation&quot;, 
                                                 subtitle=&quot;Our Dataset&quot;,
                                                 xlab = &quot;&quot;, ylab = &quot;Number of cells&quot;, ymax = 7500)
 supp_fig2.n_cells_fetal_organ</code></pre>
@@ -1723,8 +1760,8 @@ rm(supp_fig2.cluster_composition_pan_fetal)
 rm(supp_fig2.cluster_composition_fetal_organ)
 gc()</code></pre>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells  10287259  549.4   17022617  909.2         NA  17022617  909.2
-Vcells 570792684 4354.9  860502693 6565.2      49152 597449032 4558.2</code></pre>
+Ncells  10287263  549.4   17022712  909.2         NA  17022712  909.2
+Vcells 570792949 4354.9  860503287 6565.2      49152 597449349 4558.2</code></pre>
 </div>
 </div>
 <div id="supplementary-figure-3" class="section level1" number="3">
@@ -2415,8 +2452,8 @@ rm(supp_fig3.Merged_umap_pan_fetal)
 rm(supp_fig3.Merged_umap_fetal_organ)
 gc()</code></pre>
 <pre><code>             used    (Mb) gc trigger    (Mb) limit (Mb)   max used    (Mb)
-Ncells   10524902   562.1   17022618   909.2         NA   17022618   909.2
-Vcells 2185201076 16671.8 3536524742 26981.6      49152 2267016570 17296.0</code></pre>
+Ncells   10524907   562.1   17022712   909.2         NA   17022712   909.2
+Vcells 2185201342 16671.8 3536525202 26981.6      49152 2266991901 17295.8</code></pre>
 </div>
 </div>
 <div id="session-info" class="section level1" number="4">

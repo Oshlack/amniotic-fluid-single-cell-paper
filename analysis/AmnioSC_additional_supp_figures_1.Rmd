@@ -347,7 +347,7 @@ saveRDS(supp_fig2.n_cells_pan_fetal, here("output", "supp_figures", "supp_fig2.n
 supp_fig2.n_cells_fetal_organ <- plotNCells.Paper(seu_int.AmnioSC, x_var = "fetal_organ.majority_voting", 
                                                 color_by = "fetal_organ.majority_voting", 
                                                 colour_scheme = ALL_CELL_TYPE_COLOURS, 
-                                                title = "Number of cellls per<br>*Developing_Human_Organs*<br>annotation", 
+                                                title = "Number of cells per<br>*Developing_Human_Organs*<br>annotation", 
                                                 subtitle="Our Dataset",
                                                 xlab = "", ylab = "Number of cells", ymax = 7500)
 supp_fig2.n_cells_fetal_organ
