@@ -1,4 +1,4 @@
-# Single-cell RNA-seq of amniotic fluid: gaining unique insight into fetal development
+# Single-cell RNA-seq of amniotic fluid provides unique insight into fetal development
 
 This repository contains code and output for the analysis described in our manuscript: [Single-cell RNA-seq of amniotic fluid: gaining unique insight into fetal development](add link here).
 
