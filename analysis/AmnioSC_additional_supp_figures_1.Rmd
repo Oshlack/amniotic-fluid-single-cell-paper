@@ -329,155 +329,6 @@ gc()
 ## Generate the plots
 
 The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
-
-```{r}
-seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
-```
-
-```{r, fig.width=12, fig.height=6, warning=FALSE, message=FALSE}
-supp_fig2.n_cells_pan_fetal <- plotNCells.Paper(seu_int.AmnioSC, x_var = "pan_fetal.majority_voting", 
-                                                color_by = "pan_fetal.majority_voting", 
-                                                colour_scheme = ALL_CELL_TYPE_COLOURS, 
-                                                title = "Number of cells per<br>*Pan_Fetal_Human* annotation<br>", 
-                                                subtitle="Our Dataset",
-                                                xlab = "", ylab = "Number of cells", ymax = 6500)
-supp_fig2.n_cells_pan_fetal
-saveRDS(supp_fig2.n_cells_pan_fetal, here("output", "supp_figures", "supp_fig2.n_cells_pan_fetal.rds"))
-
-supp_fig2.n_cells_fetal_organ <- plotNCells.Paper(seu_int.AmnioSC, x_var = "fetal_organ.majority_voting", 
-                                                color_by = "fetal_organ.majority_voting", 
-                                                colour_scheme = ALL_CELL_TYPE_COLOURS, 
-                                                title = "Number of cells per<br>*Developing_Human_Organs*<br>annotation", 
-                                                subtitle="Our Dataset",
-                                                xlab = "", ylab = "Number of cells", ymax = 7500)
-supp_fig2.n_cells_fetal_organ
-saveRDS(supp_fig2.n_cells_fetal_organ, here("output", "supp_figures", "supp_fig2.n_cells_fetal_organ.rds"))
-```
-
-```{r, fig.height=8, fig.width=8}
-supp_fig2.umap_pan_fetal <- plotUMAP.Paper(seu_int.AmnioSC, color_by = "pan_fetal.majority_voting",
-                                           colour_scheme = ALL_CELL_TYPE_COLOURS,
-                                           title = "*Pan_Fetal_Human* Annotation", 
-                                           subtitle = "Our Dataset",
-                                           label_size = 6)
-
-supp_fig2.umap_pan_fetal
-saveRDS(supp_fig2.umap_pan_fetal, here("output", "supp_figures", "supp_fig2.umap_pan_fetal.rds"))
-
-supp_fig2.umap_fetal_organ <- plotUMAP.Paper(seu_int.AmnioSC, color_by = "fetal_organ.majority_voting",
-                                             colour_scheme = ALL_CELL_TYPE_COLOURS,
-                                             title = "*Developing_Human_Organs* Annotation", 
-                                             subtitle = "Our Dataset", 
-                                             label_size = 6)
-
-supp_fig2.umap_fetal_organ
-saveRDS(supp_fig2.umap_fetal_organ, here("output", "supp_figures", "supp_fig2.umap_fetal_organ.rds"))
-```
-
-```{r, fig.height=8, fig.width=8}
-supp_fig2.cluster_composition_pan_fetal <- seu_int.AmnioSC@meta.data %>%
-  ggplot(aes(x = cluster_names,
-             fill = pan_fetal.majority_voting)) +
-  geom_bar(position="fill") +
-  theme_linedraw(12) +
-  ylab("Proportion") + xlab("") +
-  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.AmnioSC$pan_fetal.majority_voting)]) +
-  guides(fill=guide_legend(ncol = 1)) + labs(fill="Pan_Fetal_Human\nAnnotation") + rotate_x_labels +
-  ggtitle("Cell type composition of each cluster<br>*using Pan_Fetal_Human* annotations") +
-  labs(subtitle = "Our Dataset") +
-  theme(plot.title = element_markdown(face = "bold", size = 24),
-        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
-        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
-        legend.text = element_text(size = 18, family = "arial"),
-        axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial"))
-supp_fig2.cluster_composition_pan_fetal
-saveRDS(supp_fig2.cluster_composition_pan_fetal, here("output", "supp_figures", "supp_fig2.cluster_composition_pan_fetal.rds"))
-
-supp_fig2.cluster_composition_fetal_organ <- seu_int.AmnioSC@meta.data %>%
-  ggplot(aes(x = cluster_names,
-             fill = fetal_organ.majority_voting)) +
-  geom_bar(position="fill") +
-  theme_linedraw(12) +
-  ylab("Proportion") + xlab("") +
-  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.AmnioSC$fetal_organ.majority_voting)]) +
-  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels + labs(fill = "Developing_Human_Organs\nAnnotation") +
-  ggtitle("Cell type composition of each cluster<br>using *Developing_Human_Organs* annotations") +
-  labs(subtitle = "Our Dataset") +
-  theme(plot.title = element_markdown(face = "bold", size = 24),
-        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
-        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
-        legend.text = element_text(size = 18, family = "arial"),
-        axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial"))
-supp_fig2.cluster_composition_fetal_organ
-saveRDS(supp_fig2.cluster_composition_fetal_organ, here("output", "supp_figures", "supp_fig2.cluster_composition_fetal_organ.rds"))
-```
-
-## Arrange the plots
-
-```{r}
-# supp_fig2.umap_pan_fetal <- readRDS(here("output", "supp_figures",
-#                                                "supp_fig2.umap_pan_fetal.rds"))
-# supp_fig2.n_cells_pan_fetal <- readRDS(here("output", "supp_figures",
-#                                                   "supp_fig2.n_cells_pan_fetal.rds"))
-# supp_fig2.umap_fetal_organ <- readRDS(here("output", "supp_figures",
-#                                                  "supp_fig2.umap_fetal_organ.rds"))
-# supp_fig2.n_cells_fetal_organ <- readRDS(here("output", "supp_figures",
-#                                                     "supp_fig2.n_cells_fetal_organ.rds"))
-# supp_fig2.cluster_composition_pan_fetal <- readRDS(here("output", "supp_figures",
-#                                                        "supp_fig2.cluster_composition_pan_fetal.rds"))
-# supp_fig2.cluster_composition_fetal_organ <- readRDS(here("output", "supp_figures",
-#                                                          "supp_fig2.cluster_composition_fetal_organ.rds"))
-```
-
-```{r, fig.width=35, fig.height=30}
-layout = "
-AAAAAAAABBBBBBGGGGGGGG
-AAAAAAAABBBBBBGGGGGGGG
-AAAAAAAABBBBBBGGGGGGGG
-AAAAAAAABBBBBBGGGGGGGG
-AAAAAAAABBBBBBGGGGGGGG
-AAAAAAAABBBBBBGGGGGGGG
-EEEEEEEEFFFFFFHHHHHHHH
-EEEEEEEEFFFFFFHHHHHHHH
-EEEEEEEEFFFFFFHHHHHHHH
-EEEEEEEEFFFFFFHHHHHHHH
-EEEEEEEEFFFFFFHHHHHHHH
-EEEEEEEEFFFFFFHHHHHHHH
-"
-
-wrap_elements(supp_fig2.umap_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig2.n_cells_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig2.umap_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig2.n_cells_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig2.cluster_composition_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig2.cluster_composition_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  plot_layout(design = layout) +
-  plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F", "G", "H"))) &
-  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig2
-
-supp_fig2
-
-ggsave(plot = supp_fig2, filename = here("output", "figures_png", "supp_fig2.png"),
-       height = 30, width = 35)
-```
-
-```{r}
-rm(supp_fig2.umap_pan_fetal)
-rm(supp_fig2.n_cells_pan_fetal)
-rm(supp_fig2.umap_fetal_organ)
-rm(supp_fig2.n_cells_fetal_organ)
-rm(supp_fig2.cluster_composition_pan_fetal)
-rm(supp_fig2.cluster_composition_fetal_organ)
-gc()
-```
-
-# Supplementary Figure 3
-
-## Generate the plots
-
-The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
 The `seu_int.Gerli` object was generated on [this page](Gerli_et_al_2024.refined_annotations.html).
 
 ```{r}
@@ -522,8 +373,8 @@ plot_df %>%
           axis.text = element_text(size = 18, family = "arial"),
           legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
           legend.text = element_text(size = 18, family = "arial"),
-          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig3.comparison_n_cells
-supp_fig3.comparison_n_cells
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig2.comparison_n_cells
+supp_fig2.comparison_n_cells
 
 plot_df %>%
   ggplot(aes(x = Donor,
@@ -543,8 +394,8 @@ plot_df %>%
           axis.text = element_text(size = 18, family = "arial"),
           legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
           legend.text = element_text(size = 18, family = "arial"),
-          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig3.comparison_lib_size
-supp_fig3.comparison_lib_size
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig2.comparison_lib_size
+supp_fig2.comparison_lib_size
 
 plot_df %>%
   ggplot(aes(x = Donor,
@@ -564,13 +415,13 @@ plot_df %>%
           axis.text = element_text(size = 18, family = "arial"),
           legend.title = element_text(size = 20, family = "arial", face = "bold.italic"),
           legend.text = element_text(size = 18, family = "arial"),
-          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig3.comparison_detected
+          strip.text = element_text(size = 18, family = "arial", face = "bold")) -> supp_fig2.comparison_detected
 
-supp_fig3.comparison_detected
+supp_fig2.comparison_detected
 
-saveRDS(supp_fig3.comparison_n_cells, here("output", "supp_figures", "supp_fig3.comparison_n_cells.RDS"))
-saveRDS(supp_fig3.comparison_lib_size, here("output", "supp_figures", "supp_fig3.comparison_lib_size.RDS"))
-saveRDS(supp_fig3.comparison_detected, here("output", "supp_figures", "supp_fig3.comparison_detected.RDS"))
+saveRDS(supp_fig2.comparison_n_cells, here("output", "supp_figures", "supp_fig2.comparison_n_cells.RDS"))
+saveRDS(supp_fig2.comparison_lib_size, here("output", "supp_figures", "supp_fig2.comparison_lib_size.RDS"))
+saveRDS(supp_fig2.comparison_detected, here("output", "supp_figures", "supp_fig2.comparison_detected.RDS"))
 ```
 
 ```{r, fig.height=10, fig.width=10}
@@ -590,7 +441,7 @@ seu_int.AmnioSC@meta.data %>%
   theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
         plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
         axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial")) -> supp_fig3.AmnioSC_cluster_lib_size
+        axis.text = element_text(size = 18, family = "arial")) -> supp_fig2.AmnioSC_cluster_lib_size
 
 seu_int.AmnioSC@meta.data %>%
   ggplot(aes(x = cluster_names,
@@ -606,15 +457,15 @@ seu_int.AmnioSC@meta.data %>%
   theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
         plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
         axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial")) -> supp_fig3.AmnioSC_cluster_detected
+        axis.text = element_text(size = 18, family = "arial")) -> supp_fig2.AmnioSC_cluster_detected
 
-supp_fig3.AmnioSC_cluster_lib_size
-supp_fig3.AmnioSC_cluster_detected
+supp_fig2.AmnioSC_cluster_lib_size
+supp_fig2.AmnioSC_cluster_detected
 
-saveRDS(supp_fig3.AmnioSC_cluster_lib_size, 
-        here("output", "supp_figures", "supp_fig3.AmnioSC_cluster_lib_size.RDS"))
-saveRDS(supp_fig3.AmnioSC_cluster_detected, 
-        here("output", "supp_figures", "supp_fig3.AmnioSC_cluster_detected.RDS"))
+saveRDS(supp_fig2.AmnioSC_cluster_lib_size, 
+        here("output", "supp_figures", "supp_fig2.AmnioSC_cluster_lib_size.RDS"))
+saveRDS(supp_fig2.AmnioSC_cluster_detected, 
+        here("output", "supp_figures", "supp_fig2.AmnioSC_cluster_detected.RDS"))
 
 seu_int.Gerli@meta.data %>%
   ggplot(aes(x = cluster_names,
@@ -632,7 +483,7 @@ seu_int.Gerli@meta.data %>%
   theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
         plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
         axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial")) -> supp_fig3.Gerli_cluster_lib_size
+        axis.text = element_text(size = 18, family = "arial")) -> supp_fig2.Gerli_cluster_lib_size
 
 seu_int.Gerli@meta.data %>%
   ggplot(aes(x = cluster_names,
@@ -648,15 +499,15 @@ seu_int.Gerli@meta.data %>%
   theme(plot.title = element_markdown(face = "bold", size = 24, family = "arial"),
         plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
         axis.title = element_text(size = 22, family = "arial", face = "bold"),
-        axis.text = element_text(size = 18, family = "arial")) ->  supp_fig3.Gerli_cluster_detected
+        axis.text = element_text(size = 18, family = "arial")) ->  supp_fig2.Gerli_cluster_detected
 
-supp_fig3.Gerli_cluster_lib_size
-supp_fig3.Gerli_cluster_detected
+supp_fig2.Gerli_cluster_lib_size
+supp_fig2.Gerli_cluster_detected
 
-saveRDS(supp_fig3.Gerli_cluster_lib_size, 
-        here("output", "supp_figures", "supp_fig3.Gerli_cluster_lib_size.RDS"))
-saveRDS(supp_fig3.Gerli_cluster_detected, 
-        here("output", "supp_figures", "supp_fig3.Gerli_cluster_detected.RDS"))
+saveRDS(supp_fig2.Gerli_cluster_lib_size, 
+        here("output", "supp_figures", "supp_fig2.Gerli_cluster_lib_size.RDS"))
+saveRDS(supp_fig2.Gerli_cluster_detected, 
+        here("output", "supp_figures", "supp_fig2.Gerli_cluster_detected.RDS"))
 ```
 
 The `seu_int.Merged` object was generated on [this page](AmnioSC_Gerli_et_al_2024.merged_dataset.html)
@@ -669,60 +520,60 @@ seu_int.Merged <- readRDS(here("data", "merged", "AmnioSC.Gerli_et_al_2024.Integ
 DATASET_SOURCE_COLOURS <- dark.colors(n = 2)
 names(DATASET_SOURCE_COLOURS) <- c("Our Dataset", "Gerli et al. (2024)")
 
-supp_fig3.Merged_umap_dataset <- plotUMAP.Paper(seu_int.Merged, color_by = "Dataset_Source",
+supp_fig2.Merged_umap_dataset <- plotUMAP.Paper(seu_int.Merged, color_by = "Dataset_Source",
                                                 colour_scheme = DATASET_SOURCE_COLOURS,
                                                 title = "Dataset", 
                                                 subtitle = "Integrated Datasets",
                                                 label_clusters = FALSE)
-supp_fig3.Merged_umap_dataset <- supp_fig3.Merged_umap_dataset + bottom_legend +
+supp_fig2.Merged_umap_dataset <- supp_fig2.Merged_umap_dataset + bottom_legend +
                                   guides(colour=guide_legend(title="Dataset")) +
                                   theme(legend.title = element_text(size = 20, 
                                                                     family = "arial", face = "bold.italic"),
                                         legend.text = element_text(size = 18, family = "arial"))
-supp_fig3.Merged_umap_dataset
-saveRDS(supp_fig3.Merged_umap_dataset, here("output", "supp_figures", "supp_fig3.Merged_umap_dataset.RDS"))
+supp_fig2.Merged_umap_dataset
+saveRDS(supp_fig2.Merged_umap_dataset, here("output", "supp_figures", "supp_fig2.Merged_umap_dataset.RDS"))
 
-supp_fig3.Merged_umap_pan_fetal <- plotUMAP.Paper(seu_int.Merged, color_by = "pan_fetal.majority_voting",
+supp_fig2.Merged_umap_pan_fetal <- plotUMAP.Paper(seu_int.Merged, color_by = "pan_fetal.majority_voting",
                                                   colour_scheme = ALL_CELL_TYPE_COLOURS,
                                                   title = "*Pan_Fetal_Human* Annotation", 
                                                   subtitle = "Integrated Datasets",
                                                   label_size = 6)
 
-supp_fig3.Merged_umap_pan_fetal
-saveRDS(supp_fig3.Merged_umap_pan_fetal, here("output", "supp_figures", "supp_fig3.Merged_umap_pan_fetal.RDS"))
+supp_fig2.Merged_umap_pan_fetal
+saveRDS(supp_fig2.Merged_umap_pan_fetal, here("output", "supp_figures", "supp_fig2.Merged_umap_pan_fetal.RDS"))
 
-supp_fig3.Merged_umap_fetal_organ <- plotUMAP.Paper(seu_int.Merged, color_by = "fetal_organ.majority_voting",
+supp_fig2.Merged_umap_fetal_organ <- plotUMAP.Paper(seu_int.Merged, color_by = "fetal_organ.majority_voting",
                                                     colour_scheme = ALL_CELL_TYPE_COLOURS,
                                                     title = "*Developing_Human_Organs* Annotation", 
                                                     subtitle = "Integrated Datasets",
                                                     label_size = 6)
 
-supp_fig3.Merged_umap_fetal_organ
-saveRDS(supp_fig3.Merged_umap_fetal_organ, here("output", "supp_figures", "supp_fig3.Merged_umap_fetal_organ.RDS"))
+supp_fig2.Merged_umap_fetal_organ
+saveRDS(supp_fig2.Merged_umap_fetal_organ, here("output", "supp_figures", "supp_fig2.Merged_umap_fetal_organ.RDS"))
 ```
 
 ## Arrange the plots
 
 ```{r}
-# supp_fig3.comparison_n_cells <- readRDS(here("output", "supp_figures",
-#                                              "supp_fig3.comparison_n_cells.rds"))
-# supp_fig3.comparison_lib_size <- readRDS(here("output", "supp_figures",
-#                                               "supp_fig3.comparison_lib_size.rds"))
-# supp_fig3.comparison_detected <- readRDS(here("output", "supp_figures",
-#                                               "supp_fig3.comparison_detected.rds"))
+# supp_fig2.comparison_n_cells <- readRDS(here("output", "supp_figures",
+#                                              "supp_fig2.comparison_n_cells.RDS"))
+# supp_fig2.comparison_lib_size <- readRDS(here("output", "supp_figures",
+#                                               "supp_fig2.comparison_lib_size.RDS"))
+# supp_fig2.comparison_detected <- readRDS(here("output", "supp_figures",
+#                                               "supp_fig2.comparison_detected.RDS"))
 # 
-# supp_fig3.AmnioSC_cluster_lib_size <- readRDS(here("output", "supp_figures",
-#                                                    "supp_fig3.AmnioSC_cluster_lib_size.RDS"))
-# supp_fig3.AmnioSC_cluster_detected <- readRDS(here("output", "supp_figures",
-#                                                    "supp_fig3.AmnioSC_cluster_detected.RDS"))
+# supp_fig2.AmnioSC_cluster_lib_size <- readRDS(here("output", "supp_figures",
+#                                                    "supp_fig2.AmnioSC_cluster_lib_size.RDS"))
+# supp_fig2.AmnioSC_cluster_detected <- readRDS(here("output", "supp_figures",
+#                                                    "supp_fig2.AmnioSC_cluster_detected.RDS"))
 # 
-# supp_fig3.Gerli_cluster_lib_size <- readRDS(here("output", "supp_figures",
-#                                                  "supp_fig3.Gerli_cluster_lib_size.RDS"))
-# supp_fig3.Gerli_cluster_detected <- readRDS(here("output", "supp_figures",
-#                                                  "supp_fig3.Gerli_cluster_detected.RDS"))
-# supp_fig3.Merged_umap_dataset <- readRDS(here("output", "supp_figures", "supp_fig3.Merged_umap_dataset.RDS"))
-# supp_fig3.Merged_umap_pan_fetal <- readRDS(here("output", "supp_figures", "supp_fig3.Merged_umap_pan_fetal.RDS"))
-# supp_fig3.Merged_umap_fetal_organ <- readRDS(here("output", "supp_figures", "supp_fig3.Merged_umap_fetal_organ.RDS"))
+# supp_fig2.Gerli_cluster_lib_size <- readRDS(here("output", "supp_figures",
+#                                                  "supp_fig2.Gerli_cluster_lib_size.RDS"))
+# supp_fig2.Gerli_cluster_detected <- readRDS(here("output", "supp_figures",
+#                                                  "supp_fig2.Gerli_cluster_detected.RDS"))
+# supp_fig2.Merged_umap_dataset <- readRDS(here("output", "supp_figures", "supp_fig2.Merged_umap_dataset.RDS"))
+# supp_fig2.Merged_umap_pan_fetal <- readRDS(here("output", "supp_figures", "supp_fig2.Merged_umap_pan_fetal.RDS"))
+# supp_fig2.Merged_umap_fetal_organ <- readRDS(here("output", "supp_figures", "supp_fig2.Merged_umap_fetal_organ.RDS"))
 ```
 
 ```{r, fig.width=35, fig.height=35}
@@ -738,35 +589,184 @@ HHHHHIIIIIIJJJJJJJ
 HHHHHIIIIIIJJJJJJJ
 "
 
-wrap_elements(supp_fig3.comparison_n_cells + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig3.comparison_lib_size + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  wrap_elements(supp_fig3.comparison_detected + theme(plot.margin = unit(rep(0,4), "cm"))) +
-  supp_fig3.AmnioSC_cluster_lib_size + supp_fig3.AmnioSC_cluster_detected +
-  supp_fig3.Gerli_cluster_lib_size + supp_fig3.Gerli_cluster_detected +
-  wrap_elements(supp_fig3.Merged_umap_dataset) +
-  wrap_elements(supp_fig3.Merged_umap_pan_fetal) +
-  wrap_elements(supp_fig3.Merged_umap_fetal_organ) +
+wrap_elements(supp_fig2.comparison_n_cells + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig2.comparison_lib_size + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig2.comparison_detected + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  supp_fig2.AmnioSC_cluster_lib_size + supp_fig2.AmnioSC_cluster_detected +
+  supp_fig2.Gerli_cluster_lib_size + supp_fig2.Gerli_cluster_detected +
+  wrap_elements(supp_fig2.Merged_umap_dataset) +
+  wrap_elements(supp_fig2.Merged_umap_pan_fetal) +
+  wrap_elements(supp_fig2.Merged_umap_fetal_organ) +
   plot_layout(design = layout) + 
   plot_annotation(tag_levels = list(c("A", " ", "  ", "B", "   ", "    ", "     ", "C", "D", "E", "F", "G", "H", "I", "J"))) &
+  theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig2
+
+supp_fig2
+
+ggsave(plot = supp_fig2, filename = here("output", "figures_png", "supp_fig2.png"),
+       height = 35, width = 35)
+```
+
+```{r}
+rm(supp_fig2.comparison_n_cells)
+rm(supp_fig2.comparison_lib_size)
+rm(supp_fig2.comparison_detected)
+rm(supp_fig2.AmnioSC_cluster_lib_size)
+rm(supp_fig2.AmnioSC_cluster_detected)
+rm(supp_fig2.Gerli_cluster_lib_size)
+rm(supp_fig2.Gerli_cluster_detected)
+rm(supp_fig2.Merged_umap_dataset)
+rm(supp_fig2.Merged_umap_pan_fetal)
+rm(supp_fig2.Merged_umap_fetal_organ)
+gc()
+```
+
+# Supplementary Figure 3
+
+## Generate the plots
+
+The `seu_int.AmnioSC` object was generated on [this page](AmnioSC_workflow_optref_refined_annotations.html).
+
+```{r}
+seu_int.AmnioSC <- readRDS(here("data", "workflow", "AmnioSC_ALL_optimised_ref.Refined_labels.Seurat.rds"))
+```
+
+```{r, fig.width=12, fig.height=6, warning=FALSE, message=FALSE}
+supp_fig3.n_cells_pan_fetal <- plotNCells.Paper(seu_int.AmnioSC, x_var = "pan_fetal.majority_voting", 
+                                                color_by = "pan_fetal.majority_voting", 
+                                                colour_scheme = ALL_CELL_TYPE_COLOURS, 
+                                                title = "Number of cells per<br>*Pan_Fetal_Human* annotation<br>", 
+                                                subtitle="Our Dataset",
+                                                xlab = "", ylab = "Number of cells", ymax = 6500)
+supp_fig3.n_cells_pan_fetal
+saveRDS(supp_fig3.n_cells_pan_fetal, here("output", "supp_figures", "supp_fig3.n_cells_pan_fetal.rds"))
+
+supp_fig3.n_cells_fetal_organ <- plotNCells.Paper(seu_int.AmnioSC, x_var = "fetal_organ.majority_voting", 
+                                                color_by = "fetal_organ.majority_voting", 
+                                                colour_scheme = ALL_CELL_TYPE_COLOURS, 
+                                                title = "Number of cells per<br>*Developing_Human_Organs*<br>annotation", 
+                                                subtitle="Our Dataset",
+                                                xlab = "", ylab = "Number of cells", ymax = 7500)
+supp_fig3.n_cells_fetal_organ
+saveRDS(supp_fig3.n_cells_fetal_organ, here("output", "supp_figures", "supp_fig3.n_cells_fetal_organ.rds"))
+```
+
+```{r, fig.height=8, fig.width=8}
+supp_fig3.umap_pan_fetal <- plotUMAP.Paper(seu_int.AmnioSC, color_by = "pan_fetal.majority_voting",
+                                           colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                           title = "*Pan_Fetal_Human* Annotation", 
+                                           subtitle = "Our Dataset",
+                                           label_size = 6)
+
+supp_fig3.umap_pan_fetal
+saveRDS(supp_fig3.umap_pan_fetal, here("output", "supp_figures", "supp_fig3.umap_pan_fetal.rds"))
+
+supp_fig3.umap_fetal_organ <- plotUMAP.Paper(seu_int.AmnioSC, color_by = "fetal_organ.majority_voting",
+                                             colour_scheme = ALL_CELL_TYPE_COLOURS,
+                                             title = "*Developing_Human_Organs* Annotation", 
+                                             subtitle = "Our Dataset", 
+                                             label_size = 6)
+
+supp_fig3.umap_fetal_organ
+saveRDS(supp_fig3.umap_fetal_organ, here("output", "supp_figures", "supp_fig3.umap_fetal_organ.rds"))
+```
+
+```{r, fig.height=8, fig.width=8}
+supp_fig3.cluster_composition_pan_fetal <- seu_int.AmnioSC@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = pan_fetal.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_linedraw(12) +
+  ylab("Proportion") + xlab("") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.AmnioSC$pan_fetal.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + labs(fill="Pan_Fetal_Human\nAnnotation") + rotate_x_labels +
+  ggtitle("Cell type composition of each cluster<br>*using Pan_Fetal_Human* annotations") +
+  labs(subtitle = "Our Dataset") +
+  theme(plot.title = element_markdown(face = "bold", size = 24),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"))
+supp_fig3.cluster_composition_pan_fetal
+saveRDS(supp_fig3.cluster_composition_pan_fetal, here("output", "supp_figures", "supp_fig3.cluster_composition_pan_fetal.rds"))
+
+supp_fig3.cluster_composition_fetal_organ <- seu_int.AmnioSC@meta.data %>%
+  ggplot(aes(x = cluster_names,
+             fill = fetal_organ.majority_voting)) +
+  geom_bar(position="fill") +
+  theme_linedraw(12) +
+  ylab("Proportion") + xlab("") +
+  scale_fill_manual(values = ALL_CELL_TYPE_COLOURS[levels(seu_int.AmnioSC$fetal_organ.majority_voting)]) +
+  guides(fill=guide_legend(ncol = 1)) + rotate_x_labels + labs(fill = "Developing_Human_Organs\nAnnotation") +
+  ggtitle("Cell type composition of each cluster<br>using *Developing_Human_Organs* annotations") +
+  labs(subtitle = "Our Dataset") +
+  theme(plot.title = element_markdown(face = "bold", size = 24),
+        plot.subtitle = element_markdown(face = "italic", size = 22, family = "arial"),
+        legend.title = element_text(size = 20, face = "bold.italic", family = "arial"),
+        legend.text = element_text(size = 18, family = "arial"),
+        axis.title = element_text(size = 22, family = "arial", face = "bold"),
+        axis.text = element_text(size = 18, family = "arial"))
+supp_fig3.cluster_composition_fetal_organ
+saveRDS(supp_fig3.cluster_composition_fetal_organ, here("output", "supp_figures", "supp_fig3.cluster_composition_fetal_organ.rds"))
+```
+
+## Arrange the plots
+
+```{r}
+# supp_fig3.umap_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                "supp_fig3.umap_pan_fetal.rds"))
+# supp_fig3.n_cells_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                   "supp_fig3.n_cells_pan_fetal.rds"))
+# supp_fig3.umap_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                  "supp_fig3.umap_fetal_organ.rds"))
+# supp_fig3.n_cells_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                     "supp_fig3.n_cells_fetal_organ.rds"))
+# supp_fig3.cluster_composition_pan_fetal <- readRDS(here("output", "supp_figures",
+#                                                        "supp_fig3.cluster_composition_pan_fetal.rds"))
+# supp_fig3.cluster_composition_fetal_organ <- readRDS(here("output", "supp_figures",
+#                                                          "supp_fig3.cluster_composition_fetal_organ.rds"))
+```
+
+```{r, fig.width=35, fig.height=30}
+layout = "
+AAAAAAAABBBBBBGGGGGGGG
+AAAAAAAABBBBBBGGGGGGGG
+AAAAAAAABBBBBBGGGGGGGG
+AAAAAAAABBBBBBGGGGGGGG
+AAAAAAAABBBBBBGGGGGGGG
+AAAAAAAABBBBBBGGGGGGGG
+EEEEEEEEFFFFFFHHHHHHHH
+EEEEEEEEFFFFFFHHHHHHHH
+EEEEEEEEFFFFFFHHHHHHHH
+EEEEEEEEFFFFFFHHHHHHHH
+EEEEEEEEFFFFFFHHHHHHHH
+EEEEEEEEFFFFFFHHHHHHHH
+"
+
+wrap_elements(supp_fig3.umap_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig3.n_cells_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig3.umap_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig3.n_cells_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig3.cluster_composition_pan_fetal + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  wrap_elements(supp_fig3.cluster_composition_fetal_organ + theme(plot.margin = unit(rep(0,4), "cm"))) +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F", "G", "H"))) &
   theme(plot.tag = element_text(size = 28, face = "bold", family = "arial")) -> supp_fig3
 
 supp_fig3
 
 ggsave(plot = supp_fig3, filename = here("output", "figures_png", "supp_fig3.png"),
-       height = 35, width = 35)
+       height = 30, width = 35)
 ```
 
 ```{r}
-rm(supp_fig3.comparison_n_cells)
-rm(supp_fig3.comparison_lib_size)
-rm(supp_fig3.comparison_detected)
-rm(supp_fig3.AmnioSC_cluster_lib_size)
-rm(supp_fig3.AmnioSC_cluster_detected)
-rm(supp_fig3.Gerli_cluster_lib_size)
-rm(supp_fig3.Gerli_cluster_detected)
-rm(supp_fig3.Merged_umap_dataset)
-rm(supp_fig3.Merged_umap_pan_fetal)
-rm(supp_fig3.Merged_umap_fetal_organ)
+rm(supp_fig3.umap_pan_fetal)
+rm(supp_fig3.n_cells_pan_fetal)
+rm(supp_fig3.umap_fetal_organ)
+rm(supp_fig3.n_cells_fetal_organ)
+rm(supp_fig3.cluster_composition_pan_fetal)
+rm(supp_fig3.cluster_composition_fetal_organ)
 gc()
 ```
 
