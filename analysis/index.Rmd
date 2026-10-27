@@ -24,6 +24,10 @@ library(sessioninfo)
 **Conclusions:** This study applied novel analytical approaches to demonstrate the utility of scRNA-seq in characterising AF and its capacity to capture a diverse range of viable fetal cell types. Our results suggest that changes in AF cellular composition mirror organ development, underscoring the potential of AF scRNA-seq to deepen our understanding of normal and pathological fetal biology.
 
 
+# Data Availability
+
+Raw and processed single-cell count data for our dataset are available from [Zenodo](https://doi.org/10.5281/zenodo.23655939) in Cell Ranger output and Seurat formats. The integrated dataset combining our dataset and the Gerli et al. (2024) dataset is also provided in Seurat format. Raw sequencing data (FASTQ) are not publicly available as per ethics approval.
+
 # Authors
 
 Calandra Grima^1,2^, Ishara Atukorala^3,4^, Sally Beard^3^, Shalini Guleria^5^, Liam Neil^5^, Natalie Hannan^3^, Bhupinder Pal^5^, Jovana Maksimovic\*^1,2,6^, Lisa Hui\*^3,4,7^, Alicia Oshlack\*^1,2,8^
